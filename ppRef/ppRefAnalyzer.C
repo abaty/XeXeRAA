@@ -47,6 +47,9 @@ void ppRefAnalyzer(){
   TH1D * ppSpec_syst = (TH1D*) f->Get("Table 7/Hist1D_y1_e2plus");
   TH1D * ppSpec_lumi = (TH1D*) f->Get("Table 7/Hist1D_y1_e3");
 
+  TFile * fpythia = TFile::Open("MCFiles/Pythia8Spectra.root","read");
+  TH1D * pythia8_fromFile = (TH1D*)fpythia->Get("pythia8");
+
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
   TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins,s.xtrkbins);
@@ -65,8 +68,8 @@ void ppRefAnalyzer(){
     pp5relSyst_plus1->SetBinContent(i,1.+TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
     pp5relSyst_minus1->SetBinContent(i,1.-TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
   
-    pythia8_5->SetBinContent(i,70*1.3*pp5->GetBinContent(i));//FIXME
-    pythia8_5->SetBinError(i,70*0.05*pp5->GetBinContent(i));//FIXME
+    pythia8_5->SetBinContent(i,pythia8_fromFile->GetBinContent(i));
+    pythia8_5->SetBinError(i,pythia8_fromFile->GetBinError(i));
     EPOS5->SetBinContent(i,70*0.8*pp5->GetBinContent(i));//FIXME
     EPOS5->SetBinError(i,70*0.05*pp5->GetBinContent(i));//FIXME
   }
@@ -161,8 +164,10 @@ void ppRefAnalyzer(){
   pp5relSyst_minus1->Draw("same hist ][");
   pythia8_5rat->SetLineColor(kRed);
   pythia8_5rat->SetMarkerSize(0);
+  pythia8_5rat->SetLineWidth(2);
   EPOS5rat->SetLineColor(kBlue);
   EPOS5rat->SetLineStyle(2);
+  EPOS5rat->SetLineWidth(2);
   EPOS5rat->SetMarkerSize(0);
 
 
