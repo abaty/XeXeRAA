@@ -177,7 +177,7 @@ void ppRefAnalyzer(){
   systLeg->Draw("same");
   ppSpecD2->Draw("sameaxis");
   ppSpecD2->GetXaxis()->Draw("same");
-  pythia8_5rat->Draw("hist same c");
+  pythia8_5rat->Draw("h same ][");
   EPOS5rat->Draw("hist same c");
 
   TLine * line3 = new TLine(0.4,1,130,1);
