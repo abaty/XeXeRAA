@@ -49,6 +49,7 @@ void ppRefAnalyzer(){
 
   TFile * fpythia = TFile::Open("MCFiles/Pythia8Spectra.root","read");
   TH1D * pythia8_fromFile = (TH1D*)fpythia->Get("pythia8");
+  TH1D * pythia8_544 = (TH1D*)fpythia->Get("pythia8_544");
 
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
@@ -57,9 +58,12 @@ void ppRefAnalyzer(){
   TH1D * pp5relSyst_minus1 = new TH1D("pp5relSyst_minus1","pp5relSyst_minus1",s.ntrkBins,s.xtrkbins);
 
   TH1D * pythia8_5 = new TH1D("pythia8_5","pythia8_5",s.ntrkBins,s.xtrkbins);
+  //TH1D * pythia8_544 = new TH1D("pythia8_544","pythia8_544",s.ntrkBins,s.xtrkbins);
   TH1D * EPOS5 = new TH1D("EPOS_5","EPOS_5",s.ntrkBins,s.xtrkbins);
   TH1D * pythia8_5rat;
   TH1D * EPOS5rat;
+
+  TH1D * extrapFactorPythia;
 
   for(int i = 1; i<pp5->GetSize()-1; i++){
     pp5->SetBinContent(i,ppSpec->GetBinContent(i));
@@ -69,7 +73,9 @@ void ppRefAnalyzer(){
     pp5relSyst_minus1->SetBinContent(i,1.-TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
   
     pythia8_5->SetBinContent(i,pythia8_fromFile->GetBinContent(i));
-    pythia8_5->SetBinError(i,pythia8_fromFile->GetBinError(i));
+    pythia8_5->SetBinContent(i,pythia8_fromFile->GetBinContent(i));
+    //pythia8_544->SetBinError(i,pythia8_544->GetBinError(i));
+    //pythia8_544->SetBinError(i,pythia8_544->GetBinError(i));
     EPOS5->SetBinContent(i,70*0.8*pp5->GetBinContent(i));//FIXME
     EPOS5->SetBinError(i,70*0.05*pp5->GetBinContent(i));//FIXME
   }
@@ -80,6 +86,7 @@ void ppRefAnalyzer(){
   pythia8_5rat->Divide(pp5);
   EPOS5rat = (TH1D*)EPOS5->Clone("EPOS5rat");
   EPOS5rat->Divide(pp5);
+
 
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
   canv2->SetBorderSize(0);
@@ -123,13 +130,13 @@ void ppRefAnalyzer(){
   EPOS5->SetMarkerStyle(25);
   EPOS5->SetMarkerColor(kBlue);
   EPOS5->SetLineColor(kBlue);
-  EPOS5->Draw("same p"); 
+  //EPOS5->Draw("same p"); 
  
   TLegend * specLeg = new TLegend(0.25,0.1,0.45,0.5);
   specLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
   specLeg->AddEntry(pp5,"pp 5 TeV Data","p"); 
   specLeg->AddEntry(pythia8_5,"Pythia 8 (x3)","p"); 
-  specLeg->AddEntry(EPOS5,"EPOS LHC (x10)","p"); 
+  //specLeg->AddEntry(EPOS5,"EPOS LHC (x10)","p"); 
   specLeg->Draw("same"); 
 
   pad2->cd();
@@ -178,7 +185,7 @@ void ppRefAnalyzer(){
   ppSpecD2->Draw("sameaxis");
   ppSpecD2->GetXaxis()->Draw("same");
   pythia8_5rat->Draw("h same ][");
-  EPOS5rat->Draw("hist same c");
+  //EPOS5rat->Draw("hist same c");
 
   TLine * line3 = new TLine(0.4,1,130,1);
   line3->SetLineWidth(1);
@@ -197,5 +204,21 @@ void ppRefAnalyzer(){
   canv2->SaveAs("img/Spectra_perEventYield.png");
   canv2->SaveAs("img/Spectra_perEventYield.pdf");
   canv2->SaveAs("img/Spectra_perEventYield.C");
+
+  
+  TCanvas * c3 = new TCanvas("c3","c3",800,600);
+  extrapFactorPythia = (TH1D*)pythia8_544->Clone("extrapFactorPythia");
+  extrapFactorPythia->Divide(pythia8_fromFile);
+  extrapFactorPythia->SetLineColor(kBlue);
+  extrapFactorPythia->SetMarkerColor(kBlue);
+  extrapFactorPythia->SetMarkerStyle(8);
+  extrapFactorPythia->GetYaxis()->SetTitle("5.44 TeV/5.02 TeV");
+  extrapFactorPythia->GetYaxis()->SetRangeUser(0.9,1.4);
+  extrapFactorPythia->GetXaxis()->SetTitle("p_{T}");
+  extrapFactorPythia->SetTitle("");
+  extrapFactorPythia->Draw();
+  canv2->SaveAs("img/extrapolationFactorPythia8.png");
+  canv2->SaveAs("img/extrapolationFactorPythia8.pdf");
+  canv2->SaveAs("img/extrapolationFacotrPythia8.C");
 
 }
