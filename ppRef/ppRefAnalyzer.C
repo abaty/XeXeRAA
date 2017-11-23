@@ -55,6 +55,10 @@ void ppRefAnalyzer(){
   TFile * fEPOS = TFile::Open("EPOSMCFiles/EPOSSpectra.root","read");
   TH1D * EPOS5 = (TH1D*)fEPOS->Get("EPOS_5");
   TH1D * EPOS544 = (TH1D*)fEPOS->Get("EPOS_544");
+  
+  TFile * fHerw = TFile::Open("HerwigMCFiles/HerwigppSpectra.root","read");
+  TH1D * Herw5 = (TH1D*)fHerw->Get("Herwigpp_5");
+  TH1D * Herw544 = (TH1D*)fHerw->Get("Herwigpp_544");
 
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
@@ -68,9 +72,12 @@ void ppRefAnalyzer(){
   TH1D * pythia8_5rat;
   TH1D * EPOS5rat;
   TH1D * EPOS5scaled;
+  TH1D * Herw5rat;
+  TH1D * Herw5scaled;
 
   TH1D * extrapFactorPythia;
   TH1D * extrapFactorEPOS;
+  TH1D * extrapFactorHerw;
 
   for(int i = 1; i<pp5->GetSize()-1; i++){
     pp5->SetBinContent(i,ppSpec->GetBinContent(i));
@@ -94,6 +101,9 @@ void ppRefAnalyzer(){
   EPOS5scaled = (TH1D*)EPOS5->Clone("EPOS5scaled");
   EPOS5rat = (TH1D*)EPOS5->Clone("EPOS5rat");
   EPOS5rat->Divide(pp5);
+  Herw5scaled = (TH1D*)Herw5->Clone("Herw5scaled");
+  Herw5rat = (TH1D*)Herw5->Clone("Herw5rat");
+  Herw5rat->Divide(pp5);
 
 
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
@@ -139,12 +149,18 @@ void ppRefAnalyzer(){
   EPOS5scaled->SetMarkerColor(kBlue);
   EPOS5scaled->SetLineColor(kBlue);
   EPOS5scaled->Draw("same p"); 
+  Herw5scaled->Scale(30);
+  Herw5scaled->SetMarkerStyle(28);
+  Herw5scaled->SetMarkerColor(kMagenta);
+  Herw5scaled->SetLineColor(kMagenta);
+  Herw5scaled->Draw("same p"); 
  
   TLegend * specLeg = new TLegend(0.25,0.1,0.45,0.5);
   specLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
   specLeg->AddEntry(pp5,"pp 5 TeV Data","p"); 
   specLeg->AddEntry(pythia8_5,"Pythia 8 (x3)","p"); 
-  specLeg->AddEntry(EPOS5,"EPOS LHC (x10)","p"); 
+  specLeg->AddEntry(EPOS5scaled,"EPOS LHC (x10)","p"); 
+  specLeg->AddEntry(Herw5scaled,"Herwig++ (x30)","p"); 
   specLeg->Draw("same"); 
 
   pad2->cd();
@@ -184,7 +200,10 @@ void ppRefAnalyzer(){
   EPOS5rat->SetLineStyle(1);
   EPOS5rat->SetLineWidth(2);
   EPOS5rat->SetMarkerSize(0);
-
+  Herw5rat->SetLineColor(kMagenta);
+  Herw5rat->SetLineStyle(1);
+  Herw5rat->SetLineWidth(2);
+  Herw5rat->SetMarkerSize(0);
 
   TLegend * systLeg = new TLegend(0.3,0.75,0.6,0.98);
   //systLeg->SetFillStyle(0);
@@ -193,6 +212,7 @@ void ppRefAnalyzer(){
   ppSpecD2->Draw("sameaxis");
   ppSpecD2->GetXaxis()->Draw("same");
   EPOS5rat->Draw("h same ][");
+  Herw5rat->Draw("h same ][");
   pythia8_5rat->Draw("h same ][");
 
   TLine * line3 = new TLine(0.4,1,130,1);
@@ -235,11 +255,24 @@ void ppRefAnalyzer(){
   extrapFactorEPOS->GetXaxis()->SetTitle("p_{T}");
   extrapFactorEPOS->SetTitle("");
   extrapFactorEPOS->Draw("same");
+  
+  extrapFactorHerw = (TH1D*)Herw544->Clone("extrapFactorHerw");
+  extrapFactorHerw->Divide(Herw5);
+  extrapFactorHerw->SetLineColor(kMagenta);
+  extrapFactorHerw->SetMarkerColor(kMagenta);
+  extrapFactorHerw->SetMarkerStyle(28);
+  extrapFactorHerw->GetYaxis()->SetTitle("5.44 TeV/5.02 TeV");
+  extrapFactorHerw->GetYaxis()->SetRangeUser(0.9,1.4);
+  extrapFactorHerw->GetXaxis()->SetTitle("p_{T}");
+  extrapFactorHerw->SetTitle("");
+  extrapFactorHerw->Draw("same");
+
   extrapFactorPythia->Draw("same");
 
   TLegend * specLeg2 = new TLegend(0.2,0.7,0.4,0.85);
   specLeg2->AddEntry(extrapFactorPythia,"Pythia 8","p");
   specLeg2->AddEntry(extrapFactorEPOS,"EPOS LHC","p");
+  specLeg2->AddEntry(extrapFactorHerw,"Herwig++","p");
   specLeg2->Draw("same");
   
   c3->SaveAs("img/extrapolationFactorPythia8.png");

@@ -14,10 +14,10 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 10000000){
   double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
 
   //5.02 TeV numbers
-  //float MB5TeVPythia_xsection = 69.2468-0.4202;//given in mb
+  //float MB5TeVPythia_xsection = 69.2468;//given in mb
   //float pthat155TeVPythia_xsection = 0.4202;
   //5.44TeV numbers
-  float MB5TeVPythia_xsection = 69.9985-0.4760;//given in mb
+  float MB5TeVPythia_xsection = 69.9985;//given in mb
   float pthat155TeVPythia_xsection = 0.4760;
   
 
@@ -42,9 +42,9 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 10000000){
     weightSumMB->Fill(1,(int)e->GetEntries());   
 
     //MB contribution
-    e->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8MB",Form("%f*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()<15 && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",MB5TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e->GetEntries()));
+    e->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8MB",Form("%f*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()<24.0 && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",MB5TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e->GetEntries()));
 
-   e_hard->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8Hard",Form("%f*GenEventInfoProduct_generator__VALIDATION.obj.weight()*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",pthat155TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e_hard->GetEntries()));
+   e_hard->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8Hard",Form("%f*GenEventInfoProduct_generator__VALIDATION.obj.weight()*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()>24.0  && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",pthat155TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e_hard->GetEntries()));
    
     
     input_pythiaMB->Close(); 

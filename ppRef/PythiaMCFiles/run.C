@@ -19,6 +19,9 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 1000000000){
   //5.44TeV numbers
   float MB5TeVPythia_xsection = 68.72;//given in mb
   float pthat155TeVPythia_xsection = 5.952e-01;
+  //7TeV numbers
+  //float MB5TeVPythia_xsection = 71.39;//given in mb
+  //float pthat155TeVPythia_xsection = 8.430e-01;
   
 
   TFile * output = TFile::Open(Form("output_%d.root",job),"recreate");
