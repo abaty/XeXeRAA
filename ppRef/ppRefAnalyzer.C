@@ -60,6 +60,8 @@ void ppRefAnalyzer(){
   TH1D * Herw5 = (TH1D*)fHerw->Get("Herwigpp_5");
   TH1D * Herw544 = (TH1D*)fHerw->Get("Herwigpp_544");
 
+  TFile * output = TFile::Open("ppRef_Extrapolated.root","recreate");
+
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
   TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins,s.xtrkbins);
@@ -104,7 +106,6 @@ void ppRefAnalyzer(){
   Herw5scaled = (TH1D*)Herw5->Clone("Herw5scaled");
   Herw5rat = (TH1D*)Herw5->Clone("Herw5rat");
   Herw5rat->Divide(pp5);
-
 
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
   canv2->SetBorderSize(0);
@@ -282,5 +283,15 @@ void ppRefAnalyzer(){
   c3->SaveAs("img/extrapolationFactorPythia8Logx.png");
   c3->SaveAs("img/extrapolationFactorPythia8Logx.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8Logx.C");
+
+
+  pp5->SetDirectory(output);
+  pp5->Write();
+  extrapFactorPythia->SetDirectory(output);
+  extrapFactorPythia->Write();
+  TH1D * ppScaled = (TH1D*)pp5->Clone("ppScaled");
+  ppScaled->Multiply(extrapFactorPythia);
+  ppScaled->SetDirectory(output);
+  ppScaled->Write();
 
 }

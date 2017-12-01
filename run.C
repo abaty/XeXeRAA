@@ -10,26 +10,26 @@
 #include <string>
 
 //FIXME preliminary
-double findNcollAverage(int L, int H) {
-  if(L==0 && H==10) return 948.1;
-  if(L==10 && H==20) return 740.3;
-  if(L==20 && H==30) return 579.1;
-  if(L==30 && H==40) return 451.3;
-  if(L==40 && H==50) return 348.7;
-  if(L==50 && H==60) return 266.1;
-  if(L==60 && H==80) return 175.1;
-  if(L==80 && H==100) return 93.63;
-  if(L==100 && H==120) return 47.22;
-  if(L==120 && H==140) return 22.41;
-  if(L==140 && H==160) return 10.32;
-  if(L==160 && H==200) return 3.642;
-  if(L==0 && H==20) return 844.2;
-  if(L==20 && H==60) return 411.3;
-  if(L==60 && H==100) return 134.4;
-  if(L==100 && H==200) return 17.44;
-  if(L==0 && H==200) return 202.3;
-  if(L==100 && H==140) return 35.105;
-  if(L==140 && H==180) return 7.611;
+double findTaaAverage(int L, int H) {
+  if(L==0 && H==10) return 13.9;
+  if(L==10 && H==20) return 10.8;
+  if(L==20 && H==30) return 8.47;
+  if(L==30 && H==40) return 6.60;
+  if(L==40 && H==50) return 5.1;
+  if(L==50 && H==60) return 3.89;
+  if(L==60 && H==80) return 2.56;
+  if(L==80 && H==100) return 1.37;
+  if(L==100 && H==120) return 0.69;
+  if(L==120 && H==140) return 0.328;
+  if(L==140 && H==160) return 0.151;
+  if(L==160 && H==200) return 0.053;
+  if(L==0 && H==20) return 12.3;
+  if(L==20 && H==60) return 6.01;
+  if(L==60 && H==100) return 1.96;
+  if(L==100 && H==200) return 0.255;
+  if(L==0 && H==200) return 2.96;
+  if(L==100 && H==140) return 0.521;
+  if(L==140 && H==180) return 0.679;
   return 1.0;
 }
 
@@ -39,13 +39,13 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   for(int c = 0; c<s.nCentBins; c++){
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
-    s.HI_NCollWeighted[c] = new TH1D(Form("HI_NCollWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_NCollWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
+    s.HI_TaaWeighted[c] = new TH1D(Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
   }
   s.nVtx = new TH1D("nVtx","nVtx",20,0,20);
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
   TH1D * scaledPP;
-  TFile * ppFile = TFile::Open("ppRef_Oct31_Pythia.root","read");
-  scaledPP = (TH1D*)ppFile->Get("scaledPP");
+  TFile * ppFile = TFile::Open("ppRef_Dec1_Pythia.root","read");
+  scaledPP = (TH1D*)ppFile->Get("ppScaled");
   scaledPP->SetDirectory(output);
   ppFile->Close();
   output->cd();
@@ -152,16 +152,16 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * RAA[s.nCentBins];
   for(int c = 0; c<s.nCentBins; c++)
   {
-    double NColl = findNcollAverage(s.lowCentBin[c]*10,s.highCentBin[c]*10);
+    double Taa = findTaaAverage(s.lowCentBin[c]*10,s.highCentBin[c]*10);
     for(int i = 1; i<s.HI[c]->GetSize()+1; i++)
     { 
-      s.HI_NCollWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*NColl)); 
-      s.HI_NCollWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*NColl));
+      s.HI_TaaWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa)); 
+      s.HI_TaaWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa));
       s.HI[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
     }
     //RAA
-    RAA[c] = (TH1D*) s.HI_NCollWeighted[c]->Clone(Form("RAA_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     RAA[c]->Divide(scaledPP);
   }
   

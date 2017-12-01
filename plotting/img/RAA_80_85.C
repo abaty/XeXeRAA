@@ -1,0 +1,426 @@
+void RAA_80_85()
+{
+//=========Macro generated from canvas: RAA/RAA
+//=========  (Fri Dec  1 16:27:04 2017) by ROOT version6.08/07
+   TCanvas *RAA = new TCanvas("RAA", "RAA",1,1,800,676);
+   gStyle->SetOptFit(1);
+   gStyle->SetOptStat(0);
+   gStyle->SetOptTitle(0);
+   RAA->Range(-0.7299911,-0.24,2.129749,1.76);
+   RAA->SetFillColor(0);
+   RAA->SetBorderMode(0);
+   RAA->SetBorderSize(2);
+   RAA->SetLogx();
+   RAA->SetTickx(1);
+   RAA->SetTicky(1);
+   RAA->SetLeftMargin(0.15);
+   RAA->SetRightMargin(0.04);
+   RAA->SetTopMargin(0.08);
+   RAA->SetBottomMargin(0.12);
+   RAA->SetFrameFillStyle(0);
+   RAA->SetFrameBorderMode(0);
+   RAA->SetFrameFillStyle(0);
+   RAA->SetFrameBorderMode(0);
+   Double_t xAxis49[33] = {0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 3.2, 4, 4.8, 5.6, 6.4, 7.2, 9.6, 12, 14.4, 19.2, 24, 28.8, 35.2, 41.6, 48, 60.8, 73.6, 86.4, 103.6}; 
+   
+   TH1D *RAA_80_85__49 = new TH1D("RAA_80_85__49","HI_TaaWeighted_80_85",32, xAxis49);
+   RAA_80_85__49->SetBinContent(1,0.01070514);
+   RAA_80_85__49->SetBinContent(2,0.0166757);
+   RAA_80_85__49->SetBinContent(3,0.0231907);
+   RAA_80_85__49->SetBinContent(4,0.02479946);
+   RAA_80_85__49->SetBinContent(5,0.02465396);
+   RAA_80_85__49->SetBinContent(6,0.02719414);
+   RAA_80_85__49->SetBinContent(7,0.02947789);
+   RAA_80_85__49->SetBinContent(8,0.02844875);
+   RAA_80_85__49->SetBinContent(9,0.03027937);
+   RAA_80_85__49->SetBinContent(10,0.02592613);
+   RAA_80_85__49->SetBinContent(11,0.02506044);
+   RAA_80_85__49->SetBinContent(12,0.02899645);
+   RAA_80_85__49->SetBinContent(13,0.02231888);
+   RAA_80_85__49->SetBinContent(14,0.02472588);
+   RAA_80_85__49->SetBinContent(15,0.02836113);
+   RAA_80_85__49->SetBinContent(16,0.02332003);
+   RAA_80_85__49->SetBinContent(17,0.02009884);
+   RAA_80_85__49->SetBinContent(20,0.05592012);
+   RAA_80_85__49->SetBinContent(21,0.07293882);
+   RAA_80_85__49->SetBinError(1,0.000526793);
+   RAA_80_85__49->SetBinError(2,0.0007465697);
+   RAA_80_85__49->SetBinError(3,0.001011283);
+   RAA_80_85__49->SetBinError(4,0.001165341);
+   RAA_80_85__49->SetBinError(5,0.001325591);
+   RAA_80_85__49->SetBinError(6,0.001554837);
+   RAA_80_85__49->SetBinError(7,0.001814562);
+   RAA_80_85__49->SetBinError(8,0.001463506);
+   RAA_80_85__49->SetBinError(9,0.001871016);
+   RAA_80_85__49->SetBinError(10,0.002082777);
+   RAA_80_85__49->SetBinError(11,0.00248174);
+   RAA_80_85__49->SetBinError(12,0.003164349);
+   RAA_80_85__49->SetBinError(13,0.003291199);
+   RAA_80_85__49->SetBinError(14,0.002498076);
+   RAA_80_85__49->SetBinError(15,0.004727672);
+   RAA_80_85__49->SetBinError(16,0.007032187);
+   RAA_80_85__49->SetBinError(17,0.01005046);
+   RAA_80_85__49->SetBinError(20,0.03229141);
+   RAA_80_85__49->SetBinError(21,0.07295);
+   RAA_80_85__49->SetMinimum(0);
+   RAA_80_85__49->SetMaximum(1.6);
+   RAA_80_85__49->SetEntries(44.74914);
+   RAA_80_85__49->SetDirectory(0);
+   RAA_80_85__49->SetMarkerStyle(8);
+   RAA_80_85__49->SetMarkerSize(1.3);
+   RAA_80_85__49->GetXaxis()->SetTitle("p_{T} (GeV)");
+   RAA_80_85__49->GetXaxis()->SetRange(1,32);
+   RAA_80_85__49->GetXaxis()->CenterTitle(true);
+   RAA_80_85__49->GetXaxis()->SetLabelFont(42);
+   RAA_80_85__49->GetXaxis()->SetLabelOffset(-0.005);
+   RAA_80_85__49->GetXaxis()->SetLabelSize(0.035);
+   RAA_80_85__49->GetXaxis()->SetTitleSize(0.1);
+   RAA_80_85__49->GetXaxis()->SetTitleOffset(1.2);
+   RAA_80_85__49->GetXaxis()->SetTitleFont(42);
+   RAA_80_85__49->GetYaxis()->SetTitle("R*_{AA}");
+   RAA_80_85__49->GetYaxis()->CenterTitle(true);
+   RAA_80_85__49->GetYaxis()->SetLabelFont(42);
+   RAA_80_85__49->GetYaxis()->SetLabelSize(0.035);
+   RAA_80_85__49->GetYaxis()->SetTitleSize(0.1);
+   RAA_80_85__49->GetYaxis()->SetTitleOffset(1.2);
+   RAA_80_85__49->GetYaxis()->SetTitleFont(42);
+   RAA_80_85__49->GetZaxis()->SetLabelFont(42);
+   RAA_80_85__49->GetZaxis()->SetLabelSize(0.035);
+   RAA_80_85__49->GetZaxis()->SetTitleSize(0.035);
+   RAA_80_85__49->GetZaxis()->SetTitleFont(42);
+   RAA_80_85__49->Draw("");
+   TLine *line = new TLine(0.5,1,103.6,1);
+   line->SetLineStyle(2);
+   line->SetLineWidth(2);
+   line->Draw();
+   TLatex *   tex = new TLatex(0.9,0.1,"80-85%");
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.8,1.03,"T_{AA} and lumi. uncertainty");
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.8,0.93,"|#eta|<1");
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
+   tex->SetLineWidth(2);
+   tex->Draw();
+   TBox *box = new TBox(0.5,0.009634622,0.6,0.01177565);
+
+   Int_t ci;      // for color index setting
+   TColor *color; // for color definition with alpha
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(0.6,0.01500813,0.7,0.01834327);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(0.7,0.02087163,0.8,0.02550977);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(0.8,0.02231952,0.9,0.02727941);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(0.9,0.02218857,1,0.02711936);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1,0.02447473,1.1,0.02991355);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1.1,0.0265301,1.2,0.03242568);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1.2,0.02560387,1.4,0.03129362);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1.4,0.02725143,1.6,0.0333073);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1.6,0.02333352,1.8,0.02851874);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(1.8,0.0225544,2,0.02756649);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(2,0.02609681,2.2,0.0318961);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(2.2,0.02008699,2.4,0.02455077);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(2.4,0.0222533,3.2,0.02719847);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(3.2,0.02552502,4,0.03119725);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(4,0.02098803,4.8,0.02565204);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(4.8,0.01808895,5.6,0.02210872);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(5.6,0,6.4,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(6.4,0,7.2,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(7.2,0.05032811,9.6,0.06151214);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(9.6,0.06564493,12,0.0802327);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(12,0,14.4,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(14.4,0,19.2,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(19.2,0,24,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(24,0,28.8,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(28.8,0,35.2,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(35.2,0,41.6,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(41.6,0,48,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(48,0,60.8,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(60.8,0,73.6,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   box = new TBox(73.6,0,86.4,0);
+
+   ci = TColor::GetColor("#ff6666");
+   box->SetFillColor(ci);
+   box->Draw();
+   Double_t xAxis50[33] = {0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 3.2, 4, 4.8, 5.6, 6.4, 7.2, 9.6, 12, 14.4, 19.2, 24, 28.8, 35.2, 41.6, 48, 60.8, 73.6, 86.4, 103.6}; 
+   
+   TH1D *RAA_80_85__50 = new TH1D("RAA_80_85__50","HI_TaaWeighted_80_85",32, xAxis50);
+   RAA_80_85__50->SetBinContent(1,0.01070514);
+   RAA_80_85__50->SetBinContent(2,0.0166757);
+   RAA_80_85__50->SetBinContent(3,0.0231907);
+   RAA_80_85__50->SetBinContent(4,0.02479946);
+   RAA_80_85__50->SetBinContent(5,0.02465396);
+   RAA_80_85__50->SetBinContent(6,0.02719414);
+   RAA_80_85__50->SetBinContent(7,0.02947789);
+   RAA_80_85__50->SetBinContent(8,0.02844875);
+   RAA_80_85__50->SetBinContent(9,0.03027937);
+   RAA_80_85__50->SetBinContent(10,0.02592613);
+   RAA_80_85__50->SetBinContent(11,0.02506044);
+   RAA_80_85__50->SetBinContent(12,0.02899645);
+   RAA_80_85__50->SetBinContent(13,0.02231888);
+   RAA_80_85__50->SetBinContent(14,0.02472588);
+   RAA_80_85__50->SetBinContent(15,0.02836113);
+   RAA_80_85__50->SetBinContent(16,0.02332003);
+   RAA_80_85__50->SetBinContent(17,0.02009884);
+   RAA_80_85__50->SetBinContent(20,0.05592012);
+   RAA_80_85__50->SetBinContent(21,0.07293882);
+   RAA_80_85__50->SetBinError(1,0.000526793);
+   RAA_80_85__50->SetBinError(2,0.0007465697);
+   RAA_80_85__50->SetBinError(3,0.001011283);
+   RAA_80_85__50->SetBinError(4,0.001165341);
+   RAA_80_85__50->SetBinError(5,0.001325591);
+   RAA_80_85__50->SetBinError(6,0.001554837);
+   RAA_80_85__50->SetBinError(7,0.001814562);
+   RAA_80_85__50->SetBinError(8,0.001463506);
+   RAA_80_85__50->SetBinError(9,0.001871016);
+   RAA_80_85__50->SetBinError(10,0.002082777);
+   RAA_80_85__50->SetBinError(11,0.00248174);
+   RAA_80_85__50->SetBinError(12,0.003164349);
+   RAA_80_85__50->SetBinError(13,0.003291199);
+   RAA_80_85__50->SetBinError(14,0.002498076);
+   RAA_80_85__50->SetBinError(15,0.004727672);
+   RAA_80_85__50->SetBinError(16,0.007032187);
+   RAA_80_85__50->SetBinError(17,0.01005046);
+   RAA_80_85__50->SetBinError(20,0.03229141);
+   RAA_80_85__50->SetBinError(21,0.07295);
+   RAA_80_85__50->SetMinimum(0);
+   RAA_80_85__50->SetMaximum(1.6);
+   RAA_80_85__50->SetEntries(44.74914);
+   RAA_80_85__50->SetDirectory(0);
+   RAA_80_85__50->SetMarkerStyle(8);
+   RAA_80_85__50->SetMarkerSize(1.3);
+   RAA_80_85__50->GetXaxis()->SetTitle("p_{T} (GeV)");
+   RAA_80_85__50->GetXaxis()->SetRange(1,32);
+   RAA_80_85__50->GetXaxis()->CenterTitle(true);
+   RAA_80_85__50->GetXaxis()->SetLabelFont(42);
+   RAA_80_85__50->GetXaxis()->SetLabelOffset(-0.005);
+   RAA_80_85__50->GetXaxis()->SetLabelSize(0.035);
+   RAA_80_85__50->GetXaxis()->SetTitleSize(0.1);
+   RAA_80_85__50->GetXaxis()->SetTitleOffset(1.2);
+   RAA_80_85__50->GetXaxis()->SetTitleFont(42);
+   RAA_80_85__50->GetYaxis()->SetTitle("R*_{AA}");
+   RAA_80_85__50->GetYaxis()->CenterTitle(true);
+   RAA_80_85__50->GetYaxis()->SetLabelFont(42);
+   RAA_80_85__50->GetYaxis()->SetLabelSize(0.035);
+   RAA_80_85__50->GetYaxis()->SetTitleSize(0.1);
+   RAA_80_85__50->GetYaxis()->SetTitleOffset(1.2);
+   RAA_80_85__50->GetYaxis()->SetTitleFont(42);
+   RAA_80_85__50->GetZaxis()->SetLabelFont(42);
+   RAA_80_85__50->GetZaxis()->SetLabelSize(0.035);
+   RAA_80_85__50->GetZaxis()->SetTitleSize(0.035);
+   RAA_80_85__50->GetZaxis()->SetTitleFont(42);
+   RAA_80_85__50->Draw("same");
+      tex = new TLatex(0.96,0.936,"??? #mub^{-1} (5.44 TeV XeXe)");
+tex->SetNDC();
+   tex->SetTextAlign(31);
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.18645,0.892,"CMS");
+tex->SetNDC();
+   tex->SetTextAlign(13);
+   tex->SetTextFont(61);
+   tex->SetTextSize(0.06);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.18645,0.82,"Preliminary");
+tex->SetNDC();
+   tex->SetTextAlign(13);
+   tex->SetTextFont(52);
+   tex->SetTextSize(0.0456);
+   tex->SetLineWidth(2);
+   tex->Draw();
+   Double_t xAxis51[33] = {0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 3.2, 4, 4.8, 5.6, 6.4, 7.2, 9.6, 12, 14.4, 19.2, 24, 28.8, 35.2, 41.6, 48, 60.8, 73.6, 86.4, 103.6}; 
+   
+   TH1D *RAA_80_85_copy__51 = new TH1D("RAA_80_85_copy__51","HI_TaaWeighted_80_85",32, xAxis51);
+   RAA_80_85_copy__51->SetBinContent(1,0.01070514);
+   RAA_80_85_copy__51->SetBinContent(2,0.0166757);
+   RAA_80_85_copy__51->SetBinContent(3,0.0231907);
+   RAA_80_85_copy__51->SetBinContent(4,0.02479946);
+   RAA_80_85_copy__51->SetBinContent(5,0.02465396);
+   RAA_80_85_copy__51->SetBinContent(6,0.02719414);
+   RAA_80_85_copy__51->SetBinContent(7,0.02947789);
+   RAA_80_85_copy__51->SetBinContent(8,0.02844875);
+   RAA_80_85_copy__51->SetBinContent(9,0.03027937);
+   RAA_80_85_copy__51->SetBinContent(10,0.02592613);
+   RAA_80_85_copy__51->SetBinContent(11,0.02506044);
+   RAA_80_85_copy__51->SetBinContent(12,0.02899645);
+   RAA_80_85_copy__51->SetBinContent(13,0.02231888);
+   RAA_80_85_copy__51->SetBinContent(14,0.02472588);
+   RAA_80_85_copy__51->SetBinContent(15,0.02836113);
+   RAA_80_85_copy__51->SetBinContent(16,0.02332003);
+   RAA_80_85_copy__51->SetBinContent(17,0.02009884);
+   RAA_80_85_copy__51->SetBinContent(20,0.05592012);
+   RAA_80_85_copy__51->SetBinContent(21,0.07293882);
+   RAA_80_85_copy__51->SetBinError(1,0.000526793);
+   RAA_80_85_copy__51->SetBinError(2,0.0007465697);
+   RAA_80_85_copy__51->SetBinError(3,0.001011283);
+   RAA_80_85_copy__51->SetBinError(4,0.001165341);
+   RAA_80_85_copy__51->SetBinError(5,0.001325591);
+   RAA_80_85_copy__51->SetBinError(6,0.001554837);
+   RAA_80_85_copy__51->SetBinError(7,0.001814562);
+   RAA_80_85_copy__51->SetBinError(8,0.001463506);
+   RAA_80_85_copy__51->SetBinError(9,0.001871016);
+   RAA_80_85_copy__51->SetBinError(10,0.002082777);
+   RAA_80_85_copy__51->SetBinError(11,0.00248174);
+   RAA_80_85_copy__51->SetBinError(12,0.003164349);
+   RAA_80_85_copy__51->SetBinError(13,0.003291199);
+   RAA_80_85_copy__51->SetBinError(14,0.002498076);
+   RAA_80_85_copy__51->SetBinError(15,0.004727672);
+   RAA_80_85_copy__51->SetBinError(16,0.007032187);
+   RAA_80_85_copy__51->SetBinError(17,0.01005046);
+   RAA_80_85_copy__51->SetBinError(20,0.03229141);
+   RAA_80_85_copy__51->SetBinError(21,0.07295);
+   RAA_80_85_copy__51->SetMinimum(0);
+   RAA_80_85_copy__51->SetMaximum(1.6);
+   RAA_80_85_copy__51->SetEntries(44.74914);
+   RAA_80_85_copy__51->SetDirectory(0);
+   RAA_80_85_copy__51->SetMarkerStyle(8);
+   RAA_80_85_copy__51->SetMarkerSize(1.3);
+   RAA_80_85_copy__51->GetXaxis()->SetTitle("p_{T} (GeV)");
+   RAA_80_85_copy__51->GetXaxis()->SetRange(1,32);
+   RAA_80_85_copy__51->GetXaxis()->CenterTitle(true);
+   RAA_80_85_copy__51->GetXaxis()->SetLabelFont(42);
+   RAA_80_85_copy__51->GetXaxis()->SetLabelOffset(-0.005);
+   RAA_80_85_copy__51->GetXaxis()->SetLabelSize(0.035);
+   RAA_80_85_copy__51->GetXaxis()->SetTitleSize(0.1);
+   RAA_80_85_copy__51->GetXaxis()->SetTitleOffset(1.2);
+   RAA_80_85_copy__51->GetXaxis()->SetTitleFont(42);
+   RAA_80_85_copy__51->GetYaxis()->SetTitle("R*_{AA}");
+   RAA_80_85_copy__51->GetYaxis()->CenterTitle(true);
+   RAA_80_85_copy__51->GetYaxis()->SetLabelFont(42);
+   RAA_80_85_copy__51->GetYaxis()->SetLabelSize(0.035);
+   RAA_80_85_copy__51->GetYaxis()->SetTitleSize(0.1);
+   RAA_80_85_copy__51->GetYaxis()->SetTitleOffset(1.2);
+   RAA_80_85_copy__51->GetYaxis()->SetTitleFont(42);
+   RAA_80_85_copy__51->GetZaxis()->SetLabelFont(42);
+   RAA_80_85_copy__51->GetZaxis()->SetLabelSize(0.035);
+   RAA_80_85_copy__51->GetZaxis()->SetTitleSize(0.035);
+   RAA_80_85_copy__51->GetZaxis()->SetTitleFont(42);
+   RAA_80_85_copy__51->Draw("sameaxis");
+   RAA->Modified();
+   RAA->cd();
+   RAA->SetSelected(RAA);
+}
