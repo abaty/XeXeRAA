@@ -12,14 +12,14 @@ g++ $MainCFile $(root-config --cflags --libs) -Wall -O2 -o "run.exe"
 
 #grid certificate
 #gets unique user ID for this system, change to your own
-userID=$(quota -u $USER | grep uid | sed 's/.*uid //' | cut -d')' -f1) 
-echo $userID
+#userID=$(quota -u $USER | grep uid | sed 's/.*uid //' | cut -d')' -f1) 
+#echo $userID
 voms-proxy-init -voms cms
-cp /tmp/x509up_u$userID .
+cp /tmp/x509up_u2150 .
 
 #make a tar of all needed input files
-tar -zcvf inputs.tar.gz x509up_u$userID run.exe $inputFiles 
-rm  x509up_u$userID 
+tar -zcvf inputs.tar.gz x509up_u2150 run.exe $inputFiles 
+rm  x509up_u2150 
 
 #make subdir
 subdir="CondorJob__$(date +"%Y_%m_%d__%H_%M_%S")"
