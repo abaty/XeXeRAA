@@ -119,7 +119,7 @@ void RAA_plots(){
     tex->DrawLatex(0.8,1.03,"T_{AA} and lumi. uncertainty");
     tex->DrawLatex(0.8,0.93,"|#eta|<1");
   
-    for(int i = 1; i< (h[0]->GetSize()-2); i++){
+    for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);
       b[i-1]->SetX1(h[c]->GetXaxis()->GetBinLowEdge(i));
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));

@@ -28,8 +28,9 @@ double findTaaAverage(int L, int H) {
   if(L==60 && H==100) return 1.96;
   if(L==100 && H==200) return 0.255;
   if(L==0 && H==200) return 2.96;
-  if(L==100 && H==140) return 0.521;
-  if(L==140 && H==180) return 0.679;
+  if(L==100 && H==140) return 0.509;
+  if(L==140 && H==180) return 0.111;
+  if(L==100 && H==180) return 0.310;
   return 1.0;
 }
 
