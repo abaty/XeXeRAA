@@ -17,11 +17,11 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 1000000000){
   //float MB5TeVPythia_xsection = 67.89;//given in mb
   //float pthat155TeVPythia_xsection = 5.232e-01;
   //5.44TeV numbers
-  float MB5TeVPythia_xsection = 68.72;//given in mb
-  float pthat155TeVPythia_xsection = 5.952e-01;
+  //float MB5TeVPythia_xsection = 68.72;//given in mb
+  //float pthat155TeVPythia_xsection = 5.952e-01;
   //7TeV numbers
-  //float MB5TeVPythia_xsection = 71.39;//given in mb
-  //float pthat155TeVPythia_xsection = 8.430e-01;
+  float MB5TeVPythia_xsection = 71.39;//given in mb
+  float pthat155TeVPythia_xsection = 8.430e-01;
   
 
   TFile * output = TFile::Open(Form("output_%d.root",job),"recreate");
@@ -33,11 +33,13 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 1000000000){
   for(int f = job+1; f<job+2; f++){
     std::cout << f << std::endl;
     //TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia85TeV/MB/Pythia8MB_5TeV/Pythia8MB_5TeV/171109_193621/0000/output_%d.root",f),"read");
-    TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia8544TeV/MB/Pythia8MB_544TeV/Pythia8MB_544TeV/171109_200101/0000/output_%d.root",f),"read");
+    //TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia8544TeV/MB/Pythia8MB_544TeV/Pythia8MB_544TeV/171109_200101/0000/output_%d.root",f),"read");
+    TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia87TeV/MB/Pythia8MB_5TeV/Pythia8MB_5TeV/171123_162808/0000/output_%d.root",f),"read");
     TTree * e = (TTree*)input_pythiaMB->Get("Events");
 
     //TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia85TeV/pthat15/Pythia8pthat15_5TeV/Pythia8pthat15_5TeV/171109_204504/0000/output_%d.root",f),"read");
-    TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia8544TeV/pthat15/Pythia8pthat15_544TeV/Pythia8pthat15_544TeV/171109_204613/0000/output_%d.root",f),"read");
+    //TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia8544TeV/pthat15/Pythia8pthat15_544TeV/Pythia8pthat15_544TeV/171109_204613/0000/output_%d.root",f),"read");
+    TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Pythia87TeV/pthat15/Pythia8pthat15_5TeV/Pythia8pthat15_5TeV/171123_163123/0000/output_%d.root",f),"read");
     TTree * e_hard = (TTree*)input_pythiaHard->Get("Events");
    
     output->cd(); 
