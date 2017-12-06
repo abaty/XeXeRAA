@@ -10,6 +10,7 @@
 
 Double_t spline_3nodes(Double_t *x, Double_t *par)
 {
+
    /*Fit parameters:
     par[0-3]=X of nodes (to be fixed in the fit!)
     par[4-7]=Y of nodes
@@ -27,6 +28,11 @@ Double_t spline_3nodes(Double_t *x, Double_t *par)
 void graphToHist7TeV(){
   TFile * f = TFile::Open("7000TeV_CMS_TGraph_xt.root","read");
   TGraphAsymmErrors * g = (TGraphAsymmErrors*)f->Get("Table 3/Graph1D_y1");
+  
+  const int ntrkBins = 32;
+  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
+  TH1D * pp7 = new TH1D("pp7","",ntrkBins,xtrkbins);
+
 
   for(int i = 0; i<g->GetN(); i++){
     double x, y;
@@ -74,4 +80,21 @@ void graphToHist7TeV(){
   double parameters[9] = {r2->GetParams()[0],r2->GetParams()[1],r2->GetParams()[2],r2->GetParams()[3],r2->GetParams()[4],r2->GetParams()[5],r2->GetParams()[6],r2->GetParams()[7],r2->GetParams()[8]};
   double x1 = 5.0;
   std::cout << spline_3nodes(&x1,parameters) << std::endl;;
+
+
+  //numeric integration with the spline
+  for(int i = 0; i<ntrkBins; i++){
+    double step = (xtrkbins[i+1]-xtrkbins[i])/50.0;
+    double total = 0;
+    for(int j = 0; j<50; j++){
+      double x = xtrkbins[i]+(0.5+j)*step;
+      //first term corrects for divding by bin center of pt or just the pt of a track
+      //second is spline fit
+      //third is lo power law fit
+      //last one averages over the bin width
+      total += (x/((xtrkbins[i]+xtrkbins[i+1])/2))*spline_3nodes(&x,parameters)*cms_7000_fit->Eval(x)*(step/(xtrkbins[i+1]-xtrkbins[i]));
+    }
+    pp7->SetBinContent(i+1,total);
+  }
+  pp7->Print("All");
 }
