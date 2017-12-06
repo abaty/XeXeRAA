@@ -54,6 +54,9 @@ void graphToHist7TeV(){
   TFitResultPtr r = g->Fit(cms_7000_fit,"REMEX0S");
   std::cout << "Chi2/ndof: " << r->Chi2()/r->Ndf() << std::endl;
   
+  c1->SaveAs("img/7TeV_PowerLawFit.C");
+  c1->SaveAs("img/7TeV_PowerLawFit.png");
+  c1->SaveAs("img/7TeV_PowerLawFit.pdf");
   //residuals
    
   TGraphErrors * residuals = new TGraphErrors(g->GetN());
@@ -75,6 +78,9 @@ void graphToHist7TeV(){
   res_fit->SetParameters(1,5,10,30,1,1,1,1,0);
   TFitResultPtr r2 = residuals->Fit(res_fit,"REMEX0S");
   std::cout << "Chi2/ndof: " << r2->Chi2()/r2->Ndf() << std::endl;  
+  c2->SaveAs("img/7TeV_Residuals.C");
+  c2->SaveAs("img/7TeV_Residuals.png");
+  c2->SaveAs("img/7TeV_Residuals.pdf");
 
 
   double parameters[9] = {r2->GetParams()[0],r2->GetParams()[1],r2->GetParams()[2],r2->GetParams()[3],r2->GetParams()[4],r2->GetParams()[5],r2->GetParams()[6],r2->GetParams()[7],r2->GetParams()[8]};
@@ -97,4 +103,9 @@ void graphToHist7TeV(){
     pp7->SetBinContent(i+1,total);
   }
   pp7->Print("All");
+
+  TFile * out = TFile::Open("binned7TeV.root","recreate");
+  pp7->SetDirectory(out);
+  pp7->SetTitle("binned7TeVpp");
+  pp7->Write(); 
 }
