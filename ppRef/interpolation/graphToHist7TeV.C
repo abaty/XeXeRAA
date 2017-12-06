@@ -101,6 +101,19 @@ void graphToHist7TeV(){
       total += (x/((xtrkbins[i]+xtrkbins[i+1])/2))*spline_3nodes(&x,parameters)*cms_7000_fit->Eval(x)*(step/(xtrkbins[i+1]-xtrkbins[i]));
     }
     pp7->SetBinContent(i+1,total);
+
+    double dist = 999;
+    double relError = 100;
+    for(int j = 0; j<g->GetN(); j++){
+      double x, y;
+      g->GetPoint(j,x,y);
+      if(TMath::Abs(x-pp7->GetXaxis()->GetBinCenter(i+1))<dist){
+        dist = TMath::Abs(x-pp7->GetXaxis()->GetBinCenter(i+1));
+        relError = g->GetErrorYhigh(j)/y;
+      }
+    }
+    std::cout << relError << std::endl;
+    pp7->SetBinError(i+1,relError*pp7->GetBinContent(i+1));
   }
   pp7->Print("All");
 

@@ -50,11 +50,12 @@ void ppRefAnalyzer(){
   TFile * fpythia = TFile::Open("PythiaMCFiles/Pythia8Spectra.root","read");
   TH1D * pythia8_fromFile = (TH1D*)fpythia->Get("pythia8");
   TH1D * pythia8_544 = (TH1D*)fpythia->Get("pythia8_544");
-
+  TH1D * pythia8_7 = (TH1D*)fpythia->Get("pythia8_7");
 
   TFile * fEPOS = TFile::Open("EPOSMCFiles/EPOSSpectra.root","read");
   TH1D * EPOS5 = (TH1D*)fEPOS->Get("EPOS_5");
   TH1D * EPOS544 = (TH1D*)fEPOS->Get("EPOS_544");
+  TH1D * EPOS7 = (TH1D*)fEPOS->Get("EPOS_7");
   
   TFile * fHerw = TFile::Open("HerwigMCFiles/HerwigppSpectra.root","read");
   TH1D * Herw5 = (TH1D*)fHerw->Get("Herwigpp_5");
@@ -63,6 +64,7 @@ void ppRefAnalyzer(){
   TFile * output = TFile::Open("ppRef_Extrapolated.root","recreate");
 
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
+  TH1D * pp5NoError = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
   TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins,s.xtrkbins);
   TH1D * pp5relSyst_plus1 = new TH1D("pp5relSyst_plus1","pp5relSyst_plus1",s.ntrkBins,s.xtrkbins);
@@ -83,13 +85,15 @@ void ppRefAnalyzer(){
 
   for(int i = 1; i<pp5->GetSize()-1; i++){
     pp5->SetBinContent(i,ppSpec->GetBinContent(i));
+    pp5->SetBinError(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5));
+    pp5NoError->SetBinContent(i,ppSpec->GetBinContent(i));
     pp5Syst->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5));
     pp5relSyst->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
     pp5relSyst_plus1->SetBinContent(i,1.+TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
     pp5relSyst_minus1->SetBinContent(i,1.-TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
   
     pythia8_5->SetBinContent(i,pythia8_fromFile->GetBinContent(i));
-    pythia8_5->SetBinContent(i,pythia8_fromFile->GetBinContent(i));
+    pythia8_5->SetBinError(i,pythia8_fromFile->GetBinError(i));
     //pythia8_544->SetBinError(i,pythia8_544->GetBinError(i));
     //pythia8_544->SetBinError(i,pythia8_544->GetBinError(i));
     //EPOS5->SetBinContent(i,70*0.8*pp5->GetBinContent(i));//FIXME
@@ -98,14 +102,15 @@ void ppRefAnalyzer(){
 
   pp5->Scale(70);
   pp5Syst->Scale(70);
+  pp5NoError->Scale(70);
   pythia8_5rat = (TH1D*)pythia8_5->Clone("pythia8_5rat");
-  pythia8_5rat->Divide(pp5);
+  pythia8_5rat->Divide(pp5NoError);
   EPOS5scaled = (TH1D*)EPOS5->Clone("EPOS5scaled");
   EPOS5rat = (TH1D*)EPOS5->Clone("EPOS5rat");
-  EPOS5rat->Divide(pp5);
+  EPOS5rat->Divide(pp5NoError);
   Herw5scaled = (TH1D*)Herw5->Clone("Herw5scaled");
   Herw5rat = (TH1D*)Herw5->Clone("Herw5rat");
-  Herw5rat->Divide(pp5);
+  Herw5rat->Divide(pp5NoError);
 
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
   canv2->SetBorderSize(0);
@@ -284,14 +289,162 @@ void ppRefAnalyzer(){
   c3->SaveAs("img/extrapolationFactorPythia8Logx.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8Logx.C");
 
+  //******************************************************************************************
+  //******************************************************************************************
+  //plots for 7 TeV comparisons
+  TFile * pp7TeVFile = TFile::Open("interpolation/binned7TeV.root","read");
+  TH1D * pp7 = (TH1D*)pp7TeVFile->Get("pp7");
+  TH1D * pp7NoError = (TH1D*)pp7->Clone("pp7NoError");
+  for(int i = 0; i<pp7NoError->GetSize(); i++) pp7NoError->SetBinError(i,0);
+  TH1D * pp7relSyst_plus1 = new TH1D("pp7relSyst_plus1","pp7relSyst_plus1",s.ntrkBins,s.xtrkbins);
+  TH1D * pp7relSyst_minus1 = new TH1D("pp7relSyst_minus1","pp7relSyst_minus1",s.ntrkBins,s.xtrkbins);
+  for(int i = 0; i<pp7->GetSize()-2;i++){
+    pp7relSyst_plus1->SetBinContent(i+1,1+pp7->GetBinError(i+1)/pp7->GetBinContent(i+1));
+    pp7relSyst_minus1->SetBinContent(i+1,1-pp7->GetBinError(i+1)/pp7->GetBinContent(i+1));
+  }
 
+
+  pythia8_7scaled = (TH1D*)pythia8_7->Clone("pythia8_7scaled");
+  pythia8_7rat = (TH1D*)pythia8_7->Clone("pythia8_7rat");
+  pythia8_7rat->Divide(pp7NoError);
+  EPOS7scaled = (TH1D*)EPOS7->Clone("EPOS7scaled");
+  EPOS7rat = (TH1D*)EPOS7->Clone("EPOS7rat");
+  EPOS7rat->Divide(pp7NoError);
+  /*Herw7scaled = (TH1D*)Herw7->Clone("Herw7scaled");
+  Herw7rat = (TH1D*)Herw7->Clone("Herw7rat");
+  Herw7rat->Divide(pp7);*/
+  
+  pad1->cd(); 
+  ppSpecD->Draw();
+  pp7->SetMarkerStyle(5);
+  pp7->Draw("same p");
+  pythia8_7scaled->Scale(3);
+  pythia8_7scaled->SetMarkerStyle(4);
+  pythia8_7scaled->SetMarkerColor(kRed);
+  pythia8_7scaled->SetLineColor(kRed);
+  pythia8_7scaled->Draw("same p");
+  EPOS7scaled->Scale(10); 
+  EPOS7scaled->SetMarkerStyle(25);
+  EPOS7scaled->SetMarkerColor(kBlue);
+  EPOS7scaled->SetLineColor(kBlue);
+  EPOS7scaled->Draw("same p");
+  TLegend * specLeg3 = new TLegend(0.25,0.1,0.45,0.5);
+  specLeg3->AddEntry((TObject*)0,"|#eta|<1",""); 
+  specLeg3->AddEntry(pp7,"binned pp 7 TeV Data","p"); 
+  specLeg3->AddEntry(pythia8_7scaled,"Pythia 8 (x3)","p"); 
+  specLeg3->AddEntry(EPOS7scaled,"EPOS LHC (x10)","p"); 
+  //specLeg3->AddEntry(Herw5scaled,"Herwig++ (x30)","p"); 
+  specLeg3->Draw("same"); 
+
+  pad2->cd();
+  ppSpecD2->Draw(); 
+  pp7relSyst_plus1->SetFillColor(kGray);
+  pp7relSyst_plus1->SetLineWidth(0);
+  pp7relSyst_plus1->GetXaxis()->SetRangeUser(0.4,130);
+  pp7relSyst_minus1->SetFillColor(10);
+  pp7relSyst_minus1->SetFillStyle(1001);
+  pp7relSyst_minus1->SetLineWidth(0);
+  pp7relSyst_minus1->GetXaxis()->SetRangeUser(0.4,130);
+  pp7relSyst_plus1->Draw("same hist ][");
+  pp7relSyst_minus1->Draw("same hist ][");
+  pythia8_7rat->SetLineColor(kRed);
+  pythia8_7rat->SetMarkerSize(0);
+  pythia8_7rat->SetLineWidth(2);
+  pythia8_7rat->Draw("h same ][");
+  EPOS7rat->SetLineColor(kBlue);
+  EPOS7rat->SetLineStyle(1);
+  EPOS7rat->SetLineWidth(2);
+  EPOS7rat->SetMarkerSize(0);
+  EPOS7rat->Draw("h same ][");
+  line3->Draw("same");
+  TLegend * systLeg2 = new TLegend(0.3,0.75,0.6,0.98);
+  systLeg2->AddEntry(pp5relSyst_plus1,"Data Uncertainty","f");
+  systLeg2->Draw("same");
+  ppSpecD2->Draw("sameaxis");
+
+  canv2->SaveAs("img/Spectra7TeV_perEventYield.png");
+  canv2->SaveAs("img/Spectra7TeV_perEventYield.pdf");
+  canv2->SaveAs("img/Spectra7TeV_perEventYield.C");
+
+  TCanvas * c4 = new TCanvas("c4","c4",800,600);
+  
+  TH1D * extrapFactorPythia7 = (TH1D*)pythia8_544->Clone("extrapFactorPythia_from7TeV");
+  extrapFactorPythia7->Divide(pythia8_7);
+  extrapFactorPythia7->SetLineColor(kRed);
+  extrapFactorPythia7->SetMarkerColor(kRed);
+  extrapFactorPythia7->SetMarkerStyle(8);
+  extrapFactorPythia7->GetYaxis()->SetTitle("5.44 TeV/7 TeV");
+  extrapFactorPythia7->GetYaxis()->SetRangeUser(0.5,1.1);
+  extrapFactorPythia7->GetXaxis()->SetTitle("p_{T}");
+  extrapFactorPythia7->SetTitle("");
+  //extrapFactorPythia->Draw();
+  extrapFactorEPOS7 = (TH1D*)EPOS544->Clone("extrapFactorEPOS_from7TeV");
+  extrapFactorEPOS7->Divide(EPOS7);
+  extrapFactorEPOS7->SetLineColor(kBlue);
+  extrapFactorEPOS7->SetMarkerColor(kBlue);
+  extrapFactorEPOS7->SetMarkerStyle(8);
+  extrapFactorEPOS7->GetYaxis()->SetTitle("5.44 TeV/7 TeV");
+  extrapFactorEPOS7->GetYaxis()->SetRangeUser(0.5,1.1);
+  extrapFactorEPOS7->GetXaxis()->SetTitle("p_{T}");
+  extrapFactorEPOS7->SetTitle("");
+  extrapFactorEPOS7->Draw("same");
+  
+  /*extrapFactorHerw = (TH1D*)Herw544->Clone("extrapFactorHerw");
+  extrapFactorHerw->Divide(Herw5);
+  extrapFactorHerw->SetLineColor(kMagenta);
+  extrapFactorHerw->SetMarkerColor(kMagenta);
+  extrapFactorHerw->SetMarkerStyle(28);
+  extrapFactorHerw->GetYaxis()->SetTitle("5.44 TeV/5.02 TeV");
+  extrapFactorHerw->GetYaxis()->SetRangeUser(0.9,1.4);
+  extrapFactorHerw->GetXaxis()->SetTitle("p_{T}");
+  extrapFactorHerw->SetTitle("");
+  extrapFactorHerw->Draw("same");*/
+  extrapFactorPythia7->Draw("same");
+
+  TLegend * specLeg5 = new TLegend(0.2,0.7,0.4,0.85);
+  specLeg5->AddEntry(extrapFactorPythia,"Pythia 8","p");
+  specLeg5->AddEntry(extrapFactorEPOS,"EPOS LHC","p");
+  //specLeg2->AddEntry(extrapFactorHerw,"Herwig++","p");
+  specLeg5->Draw("same");
+  
+  c4->SaveAs("img/extrapolationFactorPythia8_from7TeV.png");
+  c4->SaveAs("img/extrapolationFactorPythia8_from7TeV.pdf");
+  c4->SaveAs("img/extrapolationFacotrPythia8_from7TeV.C");
+  c4->SetLogx();
+  c4->SaveAs("img/extrapolationFactorPythia8Logx_from7TeV.png");
+  c4->SaveAs("img/extrapolationFactorPythia8Logx_from7TeV.pdf");
+  c4->SaveAs("img/extrapolationFacotrPythia8Logx_from7TeV.C");
+
+  output->cd();
   pp5->SetDirectory(output);
   pp5->Write();
+  pp7->SetDirectory(output);
+  pp7->Write();
   extrapFactorPythia->SetDirectory(output);
   extrapFactorPythia->Write();
+  extrapFactorPythia7->SetDirectory(output);
+  extrapFactorPythia7->Write();
   TH1D * ppScaled = (TH1D*)pp5->Clone("ppScaled");
   ppScaled->Multiply(extrapFactorPythia);
   ppScaled->SetDirectory(output);
   ppScaled->Write();
+  TH1D * ppScaled_from7 = (TH1D*)pp7->Clone("ppScaled_from7");
+  ppScaled_from7->Multiply(extrapFactorPythia7);
+  ppScaled_from7->SetDirectory(output);
+  ppScaled_from7->Write();
+  
+  TH1D * ppScaledRatio = (TH1D*)ppScaled->Clone("ppScaledRatio");
+  ppScaledRatio->Divide(ppScaled_from7);
+  TCanvas * c5 = new TCanvas("c5","c5",800,600);
+  c5->SetLogx();
+  ppScaledRatio->GetXaxis()->SetTitle("p_{T}");
+  ppScaledRatio->GetYaxis()->SetTitle("(Extrap from 5 TeV)/(Extrap. from 7 TeV)");
+  ppScaledRatio->GetYaxis()->SetRangeUser(0.5,1.5);
+  ppScaledRatio->SetMarkerStyle(8);
+  ppScaledRatio->SetLineColor(kBlack);
+  ppScaledRatio->Draw("");
+  c5->SaveAs("img/5vs7TeVExtrap.C");
+  c5->SaveAs("img/5vs7TeVExtrap.png");
+  c5->SaveAs("img/5vs7TeVExtrap.pdf");
 
 }
