@@ -435,6 +435,13 @@ void ppRefAnalyzer(){
   
   TH1D * ppScaledRatio = (TH1D*)ppScaled->Clone("ppScaledRatio");
   ppScaledRatio->Divide(ppScaled_from7);
+
+  //set error bars to only have data uncertainties (for splitting data vs MC uncerts)
+  TH1D * ppScaledRatio_MCUncert = (TH1D*)ppScaledRatio->Clone("ppScaledRatio_DataUncert");
+  for(int i = 1; i<ppScaledRatio_MCUncert->GetSize()-1; i++){
+    ppScaledRatio_MCUncert->SetBinError(i,TMath::Power(TMath::Power(ppScaledRatio->GetBinError(i)/ppScaledRatio->GetBinContent(i),2)-TMath::Power(pp5->GetBinError(i)/pp5->GetBinContent(i),2)-TMath::Power(pp7->GetBinError(i)/pp7->GetBinContent(i),2),0.5)*ppScaledRatio_MCUncert->GetBinContent(i)); 
+  }
+
   TCanvas * c5 = new TCanvas("c5","c5",800,600);
   c5->SetLogx();
   ppScaledRatio->SetTitle("");
@@ -444,6 +451,18 @@ void ppRefAnalyzer(){
   ppScaledRatio->SetMarkerStyle(8);
   ppScaledRatio->SetLineColor(kBlack);
   ppScaledRatio->Draw("");
+
+  ppScaledRatio_MCUncert->SetMarkerStyle(8);
+  ppScaledRatio_MCUncert->SetLineColor(kBlack);
+  ppScaledRatio_MCUncert->SetLineWidth(3);
+
+  ppScaledRatio_MCUncert->Draw("same");
+
+  TLegend * systLeg6 = new TLegend(0.3,0.7,0.6,0.85);
+  systLeg6->AddEntry(ppScaledRatio,"Data+MC Uncertainty","l");
+  systLeg6->AddEntry(ppScaledRatio_MCUncert,"MC Uncertainty","l");
+  systLeg6->Draw("same");
+
   c5->SaveAs("img/5vs7TeVExtrap.C");
   c5->SaveAs("img/5vs7TeVExtrap.png");
   c5->SaveAs("img/5vs7TeVExtrap.pdf");
