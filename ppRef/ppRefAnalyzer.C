@@ -437,6 +437,7 @@ void ppRefAnalyzer(){
   ppScaledRatio->Divide(ppScaled_from7);
   TCanvas * c5 = new TCanvas("c5","c5",800,600);
   c5->SetLogx();
+  ppScaledRatio->SetTitle("");
   ppScaledRatio->GetXaxis()->SetTitle("p_{T}");
   ppScaledRatio->GetYaxis()->SetTitle("(Extrap from 5 TeV)/(Extrap. from 7 TeV)");
   ppScaledRatio->GetYaxis()->SetRangeUser(0.5,1.5);
