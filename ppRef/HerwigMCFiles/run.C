@@ -14,11 +14,11 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 10000000){
   double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
 
   //5.02 TeV numbers
-  //float MB5TeVPythia_xsection = 69.2468;//given in mb
-  //float pthat155TeVPythia_xsection = 0.4202;
+  float MB5TeVPythia_xsection = 69.2468;//given in mb
+  float pthat155TeVPythia_xsection = 0.4202;
   //5.44TeV numbers
-  float MB5TeVPythia_xsection = 69.9985;//given in mb
-  float pthat155TeVPythia_xsection = 0.4760;
+  //float MB5TeVPythia_xsection = 69.9985;//given in mb
+  //float pthat155TeVPythia_xsection = 0.4760;
   
 
   TFile * output = TFile::Open(Form("output_%d.root",job),"recreate");
@@ -29,12 +29,13 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 10000000){
  
   for(int f = job+1; f<job+2; f++){
     std::cout << f << std::endl;
-    //TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_5TeV/MB/HerwigppMB_5TeV/HerwigppMB_5TeV/171117_211102/0000/output_%d.root",f),"read");
-    TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_544TeV/MB/HerwigppMB_544TeV/HerwigppMB_544TeV/171117_211301/0000/output_%d.root",f),"read");
+    TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_5TeV/MB/HerwigppMB_5TeV/HerwigppMB_5TeV/171117_211102/0000/output_%d.root",f),"read");
+    //TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_5TeV/MB_v4/HerwigppMB_5TeV/HerwigppMB_5TeV/171123_172140/0000/output_%d.root",f),"read");
+    //TFile * input_pythiaMB = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_544TeV/MB/HerwigppMB_544TeV/HerwigppMB_544TeV/171117_211301/0000/output_%d.root",f),"read");
     TTree * e = (TTree*)input_pythiaMB->Get("Events");
 
-    //TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_5TeV/pthat15/HerwigppPthat15_5TeV/HerwigppPthat15_5TeV/171117_211638/0000/output_%d.root",f),"read");
-    TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_544TeV/pthat15/HerwigppPthat15_544TeV/HerwigppPthat15_544TeV/171117_212558/0000/output_%d.root",f),"read");
+    TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_5TeV/pthat15/HerwigppPthat15_5TeV/HerwigppPthat15_5TeV/171117_211638/0000/output_%d.root",f),"read");
+    //TFile * input_pythiaHard = TFile::Open(Form("/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Herwigpp_544TeV/pthat15/HerwigppPthat15_544TeV/HerwigppPthat15_544TeV/171117_212558/0000/output_%d.root",f),"read");
     TTree * e_hard = (TTree*)input_pythiaHard->Get("Events");
    
     output->cd(); 
@@ -44,7 +45,7 @@ void pythia8MCAnalyzer(int job, int nEvtPerFile = 10000000){
     //MB contribution
     e->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8MB",Form("%f*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()<24.0 && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",MB5TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e->GetEntries()));
 
-   e_hard->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8Hard",Form("%f*GenEventInfoProduct_generator__VALIDATION.obj.weight()*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()>24.0  && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",pthat155TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e_hard->GetEntries()));
+    e_hard->Draw("recoGenParticles_genParticles__VALIDATION.obj->pt()>>+pythia8Hard",Form("%f*GenEventInfoProduct_generator__VALIDATION.obj.weight()*(recoGenParticles_genParticles__VALIDATION.obj->pt()>0.5 && recoGenParticles_genParticles__VALIDATION.obj->pt()>24.0  && TMath::Abs(recoGenParticles_genParticles__VALIDATION.obj->eta())<1.0 && recoGenParticles_genParticles__VALIDATION.obj->charge()!=0 && recoGenParticles_genParticles__VALIDATION.obj->status()==1)",pthat155TeVPythia_xsection),"",TMath::Min(nEvtPerFile,(int)e_hard->GetEntries()));
    
     
     input_pythiaMB->Close(); 

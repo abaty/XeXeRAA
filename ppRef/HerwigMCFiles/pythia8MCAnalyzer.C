@@ -7,15 +7,15 @@
 void pythia8MCAnalyzer(){
   TH1::SetDefaultSumw2();
 
-
   TFile * input = TFile::Open("Herwig_5TeV_Nov20.root","read");
   TH1D * weightSumHard = (TH1D*)input->Get("weightSumHard");
   TH1D * weightSumMB = (TH1D*)input->Get("weightSumMB");
   TH1D * pythia8MB = (TH1D*)input->Get("pythia8MB");
   TH1D * pythia8Hard = (TH1D*)input->Get("pythia8Hard");
+
   pythia8MB->Scale(1.0/(float)weightSumMB->GetBinContent(1));
   pythia8Hard->Scale(1.0/(float)weightSumHard->GetBinContent(1));
-  
+
   TFile * input544 = TFile::Open("Herwig_544TeV_Nov20.root","read");
   TH1D * weightSumHard544 = (TH1D*)input544->Get("weightSumHard");
   TH1D * weightSumMB544 = (TH1D*)input544->Get("weightSumMB");
