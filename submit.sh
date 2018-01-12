@@ -31,6 +31,7 @@ echo $PWD/$subdir
 
 mv inputs.tar.gz $subdir/
 cp run.exe run.sh $inputFiles $subdir/
+cp fileListTest.txt $subdir/
 
 #change submit file to pick up subdir
 cat submit_template.condor | sed "s@SED_PWDHERE@$PWD/$subdir@g" | sed "s@SED_njobs@$njobs@g" | sed "s@SED_otherParams@$otherParameters@g" > $subdir/run.condor 
