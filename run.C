@@ -64,10 +64,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
 
   TH1D * scaledPP;
-  TFile * ppFile = TFile::Open("ppRef_Dec1_Pythia.root","read");
-  scaledPP = (TH1D*)ppFile->Get("ppScaled");
-  scaledPP->SetDirectory(output);
-  ppFile->Close();
+  if(jobNumber==0){
+    TFile * ppFile = TFile::Open("ppRef_Dec1_Pythia.root","read");
+    scaledPP = (TH1D*)ppFile->Get("ppScaled");
+    scaledPP->SetDirectory(output);
+    ppFile->Close();
+  }
   output->cd();
 
   int nTrk;
@@ -216,7 +218,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
     }
     //RAA
-    RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_SingleThreadDEBUGONLY_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     RAA[c]->Divide(scaledPP);
   }
   

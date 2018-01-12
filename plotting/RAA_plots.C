@@ -133,7 +133,7 @@ void RAA_plots(){
     h[c]->Draw("same");
   
     int iPeriod = 0;
-    lumi_sqrtS = "??? #mub^{-1} (5.44 TeV XeXe)";
+    lumi_sqrtS = "3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
     extraText  = "Preliminary";
     //extraText  = "Unpublished";
