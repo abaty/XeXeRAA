@@ -218,8 +218,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
     }
     //RAA
-    RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_SingleThreadDEBUGONLY_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    RAA[c]->Divide(scaledPP);
+    if(jobNumber==0){
+      RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_SingleThreadDEBUGONLY_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      RAA[c]->Divide(scaledPP);
+    }
   }
   
   output->Write();
