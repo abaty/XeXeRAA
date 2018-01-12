@@ -126,7 +126,15 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       }
       hiBin_h->Fill(hiBin);
  
-      trk->GetEntry(i);
+      trk->GetEntry(i); 
+      //for tracking
+      if(s.fillTrackDistribuutions){
+        for(int j = 0; j<nTrk; j++){
+           
+
+          }
+      }//end of tracking stuff
+
       for(int j = 0; j<nTrk; j++){
         if(TMath::Abs(trkEta[j])>s.etaCut) continue;
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
