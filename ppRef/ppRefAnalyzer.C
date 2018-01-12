@@ -468,4 +468,34 @@ void ppRefAnalyzer(){
   c5->SaveAs("img/5vs7TeVExtrap.png");
   c5->SaveAs("img/5vs7TeVExtrap.pdf");
 
+  TH1D * data5To7Ratio = (TH1D*)pp5->Clone("data5To7Ratio");
+  data5To7Ratio->Divide(pp7);
+  data5To7Ratio->GetYaxis()->SetRangeUser(0.5,1.0);
+  data5To7Ratio->SetMarkerStyle(8);
+  data5To7Ratio->SetLineColor(kBlack);
+  data5To7Ratio->GetXaxis()->SetTitle("p_{T}");
+  data5To7Ratio->GetYaxis()->SetTitle("5 TeV / 7 TeV");
+  data5To7Ratio->Draw();
+  TH1D * pythia5To7Ratio = (TH1D*)pythia8_fromFile->Clone("pythia5To7Ratio");
+  pythia5To7Ratio->Divide(pythia8_7);
+  pythia5To7Ratio->SetMarkerStyle(24);
+  pythia5To7Ratio->SetMarkerColor(kRed);
+  pythia5To7Ratio->SetLineColor(kRed);
+  pythia5To7Ratio->Draw("same");
+  TH1D * EPOS5To7Ratio = (TH1D*)EPOS5->Clone("EPOS5To7Ratio");
+  EPOS5To7Ratio->Divide(EPOS7);
+  EPOS5To7Ratio->SetMarkerStyle(21);
+  EPOS5To7Ratio->SetMarkerColor(kBlue);
+  EPOS5To7Ratio->SetLineColor(kBlue);
+  EPOS5To7Ratio->Draw("same");
+  TLegend * systLeg7 = new TLegend(0.6,0.65,0.85,0.85);
+  systLeg7->AddEntry(data5To7Ratio,"Data","l");
+  systLeg7->AddEntry(pythia5To7Ratio,"Pythia 8","l");
+  systLeg7->AddEntry(EPOS5To7Ratio,"EPOS LHC","l");
+  systLeg7->Draw("same");
+ 
+  c5->SaveAs("img/5To7Ratio.C");
+  c5->SaveAs("img/5To7Ratio.png");
+  c5->SaveAs("img/5To7Ratio.pdf");
+
 }
