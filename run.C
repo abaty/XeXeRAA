@@ -43,7 +43,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
-  if(s.fillTrackDistributions){
+  if(s.doTrackDists){
     for(int c = 0; c<17; c++){
       nHit[c] = new TH1D(Form("nHit%d",c),Form("nHit%d",c),30,0,30);
       chi2[c] = new TH1D(Form("chi2%d",c),Form("chi2%d",c),50,0,0.3);
@@ -80,6 +80,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   float trkPt[50000];
   float trkPtError[50000];
   float trkEta[50000];
+  float trkPhi[50000];
   float pfEcal[50000];
   float pfHcal[50000];
   float trkDxy1[50000];//with respect to highest Pt Vertex
@@ -113,6 +114,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     skim->SetBranchAddress("phfCoincFilter2",&hfCoinc);
     trk->SetBranchAddress("nTrk",&nTrk);
     trk->SetBranchAddress("trkPt",trkPt);
+    trk->SetBranchAddress("trkPhi",trkPhi);
+    trk->SetBranchAddress("trkEta",trkEta);
+    trk->SetBranchAddress("highPurity",&highPurity);
     trk->SetBranchAddress("trkPtError",trkPtError);
     trk->SetBranchAddress("trkDxy1",trkDxy1);
     trk->SetBranchAddress("trkDxyError1",trkDxyError1);
@@ -125,8 +129,6 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
     trk->SetBranchAddress("pfEcal",pfEcal);
     trk->SetBranchAddress("pfHcal",pfHcal);
-    trk->SetBranchAddress("trkEta",trkEta);
-    trk->SetBranchAddress("highPurity",&highPurity);
 
 
     for(int i = 0; i<trk->GetEntries(); i++){
@@ -151,16 +153,16 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(hiBin<0 || hiBin>199) continue;//protection
       hiBin_h->Fill(hiBin);
 
-      trk->GetEntry(i); 
+      trk->GetEntry(i);
       //for tracking
-      if(s.fillTrackDistributions){
+      if(s.doTrackDists){
         for(int j = 0; j<nTrk; j++){
           if(!highPurity[j]) continue;     
           if(trkPt[j]<0.5) continue;
           eta[0]->Fill(trkEta[j]);
           eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
-
+          
           phi[0]->Fill(trkPhi[j]);
           phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
           DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
