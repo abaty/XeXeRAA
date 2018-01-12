@@ -4,6 +4,7 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "Settings.h"
+#include "include/trackingBinMap.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -38,12 +39,30 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
+  TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
+  TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
+  TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
+  TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
+  if(s.fillTrackDistributions){
+    for(int c = 0; c<17; c++){
+      nHit[c] = new TH1D(Form("nHit%d",c),Form("nHit%d",c),30,0,30);
+      chi2[c] = new TH1D(Form("chi2%d",c),Form("chi2%d",c),50,0,0.3);
+      ptErr[c] = new TH1D(Form("ptErr%d",c),Form("ptErr%d",c),50,0,0.2);
+      DCAz[c] = new TH1D(Form("DCAz%d",c),Form("DCAz%d",c),50,-5,5);
+      DCAxy[c] = new TH1D(Form("DCAxy%d",c),Form("DCAxy%d",c),50,-5,5);
+      eta[c] = new TH1D(Form("eta%d",c),Form("eta%d",c),50,-3,3);
+      phi[c] = new TH1D(Form("phi%d",c),Form("phi%d",c),50,-TMath::Pi(),TMath::Pi());
+      caloMatch[c] = new TH1D(Form("caloMatch%d",c),Form("caloMatch%d",c),50,0,2);
+    }
+  }
+
+  s.nVtx = new TH1D("nVtx","nVtx",20,0,20);
   for(int c = 0; c<s.nCentBins; c++){
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_TaaWeighted[c] = new TH1D(Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
   }
-  s.nVtx = new TH1D("nVtx","nVtx",20,0,20);
-  TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
+
+
   TH1D * scaledPP;
   TFile * ppFile = TFile::Open("ppRef_Dec1_Pythia.root","read");
   scaledPP = (TH1D*)ppFile->Get("ppScaled");
@@ -53,10 +72,11 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   int nTrk;
   int hiBin;
+  float hiHF;
   float vz;
   int vtx;
   int beam;
-  int hfCoinc;//FIXME
+  int hfCoinc;
   float trkPt[50000];
   float trkPtError[50000];
   float trkEta[50000];
@@ -85,6 +105,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     hlt->SetBranchAddress("HLT_HIL1MinimumBiasHF_OR_SinglePixelTrack_v1",&(MB[0]));
     for(int i = 1; i<21; i++) hlt->SetBranchAddress(Form("HLT_HIL1MinimumBiasHF_OR_SinglePixelTrack_part%d_v1",i),&(MB[i]));
     evt->SetBranchAddress("hiBin",&hiBin);
+    evt->SetBranchAddress("hiHF",&hiHF);
     evt->SetBranchAddress("vz",&vz);  
 
     skim->SetBranchAddress("pPAprimaryVertexFilter",&vtx);
@@ -115,24 +136,47 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(!MinBias) continue;
 
       skim->GetEntry(i);
+      evt->GetEntry(i);
+      if(!vtx) noVtxCent_h->Fill(hiBin);
       if(!beam || !vtx || !hfCoinc) continue;
 
-      evt->GetEntry(i);
+
+      vz_h->Fill(vz);
       if(TMath::Abs(vz)>15) continue;
       for(int c = 0; c<s.nCentBins; c++){
         if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
         if(c<20) s.nVtx->Fill(c);
         s.nVtx_int[c]++;
       }
+      if(hiBin<0 || hiBin>199) continue;//protection
       hiBin_h->Fill(hiBin);
- 
+
       trk->GetEntry(i); 
       //for tracking
-      if(s.fillTrackDistribuutions){
+      if(s.fillTrackDistributions){
         for(int j = 0; j<nTrk; j++){
-           
+          if(!highPurity[j]) continue;     
+          if(trkPt[j]<0.5) continue;
+          eta[0]->Fill(trkEta[j]);
+          eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
+          if(TMath::Abs(trkEta[j])>s.etaCut) continue;
 
-          }
+          phi[0]->Fill(trkPhi[j]);
+          phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
+          DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
+          DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j]);
+          DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j]);
+          DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j]);
+          nHit[0]->Fill(trkNHit[j]);
+          nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j]);
+          chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
+          chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
+          ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
+          ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
+          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+          caloMatch[0]->Fill(Et/trkPt[j]);
+          caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
+        }
       }//end of tracking stuff
 
       for(int j = 0; j<nTrk; j++){
