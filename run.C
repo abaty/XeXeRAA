@@ -212,14 +212,15 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     double Taa = findTaaAverage(s.lowCentBin[c]*10,s.highCentBin[c]*10);
     for(int i = 1; i<s.HI[c]->GetSize()+1; i++)
     { 
-      s.HI_TaaWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa)); 
-      s.HI_TaaWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa));
-      s.HI[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
-      s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/((float)s.nVtx_int[c]*2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
+      s.HI_TaaWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa)); 
+      s.HI_TaaWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa));
+      s.HI[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
+      s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
     }
     //RAA
     if(jobNumber==0){
       RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_SingleThreadDEBUGONLY_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      RAA[c]->Scale(1.0/(float)s.nVtx_int[c]);
       RAA[c]->Divide(scaledPP);
     }
   }
