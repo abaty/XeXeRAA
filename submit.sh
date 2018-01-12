@@ -3,7 +3,7 @@
 #each job will be run as ./run.exe <job#> <njobs> <otherParamtersString>
 MainCFile="run.C"
 inputFiles="fileList.txt ppRef_Dec1_Pythia.root"
-njobs=3
+njobs=50
 otherParameters="fileList.txt 56"
 
 
