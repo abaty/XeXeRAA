@@ -39,9 +39,12 @@ void RAA_plots(){
   Settings s = Settings();
 
   TH1D * h[s.nCentBins];
+  TH1D * ppSpec;
   TFile * f = TFile::Open("../output_0.root","read");
+  ppSpec->Get("ppScaled");
   for(int c = 0; c<s.nCentBins; c++){
-    h[c] = (TH1D*)f->Get(Form("RAA_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
+    h[c] = (TH1D*)f->Get(Form("HI_TaaWeighted_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
+    h[c]->Divide(ppSpec);
     h[c]->SetDirectory(0);
   }
   f->Close();
