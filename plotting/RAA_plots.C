@@ -40,12 +40,16 @@ void RAA_plots(){
 
   TH1D * h[s.nCentBins];
   TH1D * ppSpec;
+  TH1D * nVtx;
   TFile * f = TFile::Open("../output_0.root","read");
-  ppSpec->Get("ppScaled");
+  ppSpec = (TH1D*)f->Get("ppScaled");
+  nVtx = (TH1D*)f->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
     h[c] = (TH1D*)f->Get(Form("HI_TaaWeighted_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
     h[c]->Divide(ppSpec);
+    h[c]->Scale(1.0/nVtx->GetBinContent(nVtx->GetXaxis()->FindBin(c)));
     h[c]->SetDirectory(0);
+    h[c]->Print("All");
   }
   f->Close();
 
