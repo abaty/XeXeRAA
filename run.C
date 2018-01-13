@@ -42,7 +42,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
-  TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",100,0,100);
+  TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
