@@ -6,27 +6,168 @@
 #include "TAttMarker.h"
 #include "TColor.h"
 #include "TPad.h"
+#include <string>
+
+void makeVzCent(TH1D * vz, TH1D * hiBin, TCanvas * c1){
+  vz->GetXaxis()->SetTitle("v_{z}");
+  vz->GetYaxis()->SetTitle("N_{evts}");
+  vz->SetMarkerColor(kBlack);
+  vz->SetLineColor(kBlack);
+  vz->SetMarkerStyle(8);
+  vz->Draw("");
+
+  TLegend * l = new TLegend(0.15,0.65,0.45,0.85);
+  l->AddEntry((TObject*)0,"Event Selections Applied","");
+  l->Draw("same");
+  c1->SaveAs("trkPlots/vz.png");
+  c1->SaveAs("trkPlots/vz.pdf");
+  c1->SaveAs("trkPlots/vz.C");
+
+  hiBin->GetXaxis()->SetTitle("hiBin");
+  hiBin->GetYaxis()->SetTitle("N_{evts}");
+  hiBin->SetMarkerColor(kBlack);
+  hiBin->SetLineColor(kBlack);
+  hiBin->SetMarkerStyle(8);
+  hiBin->Draw("");
+  l->Draw("same");
+  hiBin->Draw("same");
+
+  c1->SaveAs("trkPlots/hiBin.png");
+  c1->SaveAs("trkPlots/hiBin.pdf");
+  c1->SaveAs("trkPlots/hiBin.C");
+  
+  delete l;
+}
+
+void makeTrkDistInclusive(TH1D * h, TCanvas * c1, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1){
+  c1->SetLeftMargin(0.2);
+  if(doLogy==1) c1->SetLogy();
+  h->SetTitle("");
+  h->Scale(1.0/h->GetEntries());
+  h->GetXaxis()->SetTitle(Xlabel.c_str());
+  h->GetYaxis()->SetRangeUser(yMin,yMax);
+  h->GetYaxis()->SetTitle("Normalized to unity");
+  h->SetMarkerColor(kBlack);
+  h->SetLineColor(kBlack);
+  h->SetMarkerStyle(8);
+  h->GetYaxis()->SetTitleOffset(2);
+  h->Draw("h");
+
+  TLegend * l = new TLegend(0.65,0.65,0.83,0.775);
+  l->AddEntry((TObject*)0,"highPurity Tracks","");
+  l->AddEntry((TObject*)0,"|#eta|<1","");
+  l->Draw("same");
+  c1->SaveAs(Form("trkPlots/%s_Inclusive.png",fileLabel.c_str()));
+  c1->SaveAs(Form("trkPlots/%s_Inclusive.pdf",fileLabel.c_str()));
+  c1->SaveAs(Form("trkPlots/%s_Inclusive.C",fileLabel.c_str()));
+  
+  delete l;
+  
+}
+
+float getLowPt(int i){
+  if((i-1)%4==0) return 0.5;
+  if((i-1)%4==1) return 1;
+  if((i-1)%4==2) return 8;
+  if((i-1)%4==3) return 20;
+  return -1;
+}
+float getHighPt(int i){
+  if((i-1)%4==0) return 1;
+  if((i-1)%4==1) return 8;
+  if((i-1)%4==2) return 20;
+  if((i-1)%4==3) return 999;
+  return -1;
+}
+int getLowCent(int i){
+  if((i-1)/4==0) return 0;
+  if((i-1)/4==1) return 10;
+  if((i-1)/4==2) return 30;
+  if((i-1)/4==3) return 50;
+  return -1;
+}
+int getHighCent(int i){
+  if((i-1)/4==0) return 10;
+  if((i-1)/4==1) return 30;
+  if((i-1)/4==2) return 50;
+  if((i-1)/4==3) return 100;
+  return -1;
+}
+
+void makeTrkDistArray(TH1D ** h, TCanvas * c2, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1){
+  TLegend * l[16]; 
+  for(int i = 1; i<17; i++){
+    c2->cd(i);
+    l[i-1] = new TLegend(0.35,0.65,0.85,0.85);
+    l[i-1]->AddEntry((TObject*)0,"highPurity Tracks","");
+    l[i-1]->AddEntry((TObject*)0,Form("%1.1f<p_{T}<%1.1f, |#eta|<1",getLowPt(i),getHighPt(i)),"");
+    l[i-1]->AddEntry((TObject*)0,Form("%d%%-%d%%",getLowCent(i),getHighCent(i)),"");
+    if(doLogy==1) c2->SetLogy();
+    h[i]->SetTitle("");
+    h[i]->Scale(1.0/h[i]->GetEntries());
+    h[i]->GetXaxis()->SetTitle(Xlabel.c_str());
+    h[i]->GetYaxis()->SetRangeUser(yMin,yMax);
+    h[i]->GetYaxis()->SetTitle("Normalized to unity");
+    h[i]->SetMarkerColor(kBlack);
+    h[i]->SetLineColor(kBlack);
+    //h[i]->SetMarkerStyle(8);
+    h[i]->GetYaxis()->SetTitleOffset(2);
+    h[i]->Draw("h"); 
+
+    l[i-1]->Draw("same");
+  }
+  c2->SaveAs(Form("trkPlots/%s_array.png",fileLabel.c_str()));
+  c2->SaveAs(Form("trkPlots/%s_array.pdf",fileLabel.c_str()));
+  c2->SaveAs(Form("trkPlots/%s_array.C",fileLabel.c_str()));
+  for(int i = 1; i<17; i++) delete l[i-1];
+}
 
 void makeTrackingPlots(){
   TH1::SetDefaultSumw2();
+  gStyle->SetLegendBorderSize(0);
+  gStyle->SetErrorX(0);
+  gStyle->SetOptStat(0);
   
   TFile * f = TFile::Open("../output_0.root","read");
   
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
-  if(s.doTrackDists){
-    for(int c = 0; c<17; c++){
-      nHit[c] = (TH1D*)f->Get(Form("nHit%d",c));
-      chi2[c] = (TH1D*)f->Get(Form("chi2%d",c));
-      ptErr[c] = (TH1D*)f->Get(Form("ptErr%d",c));
-      DCAz[c] = (TH1D*)f->Get(Form("DCAz%d",c));
-      DCAxy[c] = (TH1D*)f->Get(Form("DCAxy%d",c));
-      eta[c] = (TH1D*)f->Get(Form("eta%d",c));
-      phi[c] = (TH1D*)f->Get(Form("phi%d",c));
-      caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d",c));
-    }
+  for(int c = 0; c<17; c++){
+    nHit[c] = (TH1D*)f->Get(Form("nHit%d",c));
+    chi2[c] = (TH1D*)f->Get(Form("chi2%d",c));
+    ptErr[c] = (TH1D*)f->Get(Form("ptErr%d",c));
+    DCAz[c] = (TH1D*)f->Get(Form("DCAz%d",c));
+    DCAxy[c] = (TH1D*)f->Get(Form("DCAxy%d",c));
+    eta[c] = (TH1D*)f->Get(Form("eta%d",c));
+    phi[c] = (TH1D*)f->Get(Form("phi%d",c));
+    caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d",c));
   }
   TH1D * vz = (TH1D*)f->Get("vz");
-  TH1D * hiBin = (TH1D*)f->Get("hibin");
+  TH1D * hiBin = (TH1D*)f->Get("hiBin");
 
+  TCanvas * c1 = new TCanvas("c1","c1",800,600);
+  makeVzCent(vz,hiBin,c1);
 
+  makeTrkDistInclusive(nHit[0],c1,"nHits","nHits",0,0,0.12);
+  makeTrkDistInclusive(chi2[0],c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075);
+  makeTrkDistInclusive(DCAz[0],c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1);
+  makeTrkDistInclusive(DCAxy[0],c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1);
+  makeTrkDistInclusive(ptErr[0],c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13);
+  makeTrkDistInclusive(eta[0],c1,"#eta","eta",0,0,0.04);
+  makeTrkDistInclusive(phi[0],c1,"#phi","phi",0,0,0.04);
+  makeTrkDistInclusive(caloMatch[0],c1,"E_{T}/p_{T}","caloMatch",0,0,0.08);
+  delete c1;
+
+  //split by cent and pt
+  TCanvas * c2 = new TCanvas("c2","c2",1000,1000);
+  c2->Divide(4,4); 
+  makeTrkDistArray(nHit,c2,"nHits","nHits",0,0,0.25);
+  makeTrkDistArray(chi2,c2,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075);
+  makeTrkDistArray(DCAz,c2,"d_{z}/#sigma_{z}","DCAz",0,0,0.1);     
+  makeTrkDistArray(DCAxy,c2,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1);  
+  makeTrkDistArray(ptErr,c2,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13);
+  makeTrkDistArray(phi,c2,"#phi","phi",0,0,0.04);                
+  makeTrkDistArray(eta,c2,"#eta","eta",0,0,0.04);             
+  makeTrkDistArray(caloMatch,c2,"E_{T}/p_{T}","caloMatch",0,0,0.08);
+
+  delete c2; 
 }

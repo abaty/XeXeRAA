@@ -163,6 +163,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         for(int j = 0; j<nTrk; j++){
           if(!highPurity[j]) continue;     
           if(trkPt[j]<0.5) continue;
+          if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
           eta[0]->Fill(trkEta[j]);
           eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;

@@ -28,8 +28,8 @@
 
 void RAA_plots(){
   TH1::SetDefaultSumw2();
-  gStyle->SetOptStat(0);
   gStyle->SetErrorX(0);
+  gStyle->SetOptStat(0);
   gStyle->SetLegendBorderSize(0);
   gStyle->SetStatBorderSize(0);
   gStyle->SetTitleBorderSize(0);
