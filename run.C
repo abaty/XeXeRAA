@@ -164,6 +164,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           if(!highPurity[j]) continue;     
           if(trkPt[j]<0.5) continue;
           if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
+          if(trkPtError[j]/trkPt[j]>0.1) continue;
+          if(trkNHit[j]<11) continue;
+          if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
+          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+          if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+          
           eta[0]->Fill(trkEta[j]);
           eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
@@ -180,7 +186,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
           ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
           ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
-          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+          //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
           caloMatch[0]->Fill(Et/trkPt[j]);
           caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
         }
