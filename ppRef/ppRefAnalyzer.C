@@ -498,4 +498,44 @@ void ppRefAnalyzer(){
   c5->SaveAs("img/5To7Ratio.png");
   c5->SaveAs("img/5To7Ratio.pdf");
 
-}
+  //alpha = (5.44-5)/(7-5) in MC
+  TH1D * alphaNum = (TH1D*) pythia8_544->Clone("relPlacement_alphaNum");
+  alphaNum->Add(pythia8_fromFile,-1);
+  TH1D * alphaDenom = (TH1D*) pythia8_7->Clone("relPlacement_alphaDenom");
+  alphaDenom->Add(pythia8_fromFile,-1);
+  TH1D * alpha = (TH1D*) alphaNum->Clone("alpha");
+  alpha->Divide(alphaDenom);
+  TH1D * alphaTimes7Data = (TH1D*)alpha->Clone("alphaTimes7Data");
+  alphaTimes7Data->Multiply(pp7);
+  TH1D * oneMinusalphaTimes5Data = (TH1D*)alpha->Clone("oneMinusalphaTimes5Data");
+  for(int i = 0; i<oneMinusalphaTimes5Data->GetSize(); i++){
+    oneMinusalphaTimes5Data->SetBinContent(i,1);
+    oneMinusalphaTimes5Data->SetBinError(i,0);
+  }
+  oneMinusalphaTimes5Data->Add(alpha,-1);
+  oneMinusalphaTimes5Data->Multiply(pp5);
+  
+  TH1D * relPlacement544 = (TH1D*) alphaTimes7Data->Clone("relPlacement544");
+  relPlacement544->Add(oneMinusalphaTimes5Data);
+  relPlacement544->Write();   
+
+  TH1D * relPlacement544VSextrap5 = (TH1D*)ppScaled->Clone("relPlacement544VSextrap5");
+  relPlacement544VSextrap5->Divide(relPlacement544);
+  
+  c5->SetLogx();
+  relPlacement544VSextrap5->SetTitle("");
+  relPlacement544VSextrap5->GetXaxis()->SetTitle("p_{T}");
+  relPlacement544VSextrap5->GetYaxis()->SetTitle("(Extrap from 5 TeV)/(Relative Placement)");
+  relPlacement544VSextrap5->GetYaxis()->SetRangeUser(0.5,1.5);
+  relPlacement544VSextrap5->SetMarkerStyle(8);
+  relPlacement544VSextrap5->SetLineColor(kBlack);
+  relPlacement544VSextrap5->Draw("");
+
+  c5->SaveAs("img/5vsRelativePlacement.C");
+  c5->SaveAs("img/5vsRelativePlacement.png");
+  c5->SaveAs("img/5vsRelativePlacement.pdf");
+} 
+
+
+
+ 
