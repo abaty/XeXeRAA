@@ -26,6 +26,47 @@
 #include <fstream>
 #include "../Settings.h"
 
+void getTheoryVitev(TGraph * vitev){
+  //Vitev**********************************************************************************************************
+  float temp_x;
+  float temp_y;
+  vector<float> x;
+  vector<float> y_d;
+  vector<float> y_u;
+  ifstream input_file_d("../theory/XeXe010chDN.txt");
+  ifstream input_file_u("../theory/XeXe010chUP.txt");
+  //get datai
+  std::cout << "reading theory prediction data" << std::endl;
+  while(!input_file_d.eof()){ 
+    input_file_d>>temp_x;
+    input_file_d>>temp_y;
+    std::cout << temp_x << " " << temp_y << std::endl;
+    x.push_back(temp_x);
+    y_d.push_back(temp_y);
+  }
+  while(!input_file_u.eof()){ 
+    input_file_u>>temp_x;
+    input_file_u>>temp_y;
+    std::cout << temp_y << std::endl;
+    y_u.push_back(temp_y);
+  }
+  std::cout << "done reading " << x.size() << " Points"  << std::endl;
+  
+  //put data in histograms
+  const int graphPts = 950;
+  //vitev = TGraph(2*graphPts);
+  for (int i=0;i<graphPts;i++) {
+    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
+    vitev->SetPoint(i,x[i],y_d[i]);
+    vitev->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
+  }
+  vitev->SetFillStyle(3002);
+  vitev->SetFillColor(kRed);
+  vitev->SetLineWidth(0);
+}
+//***************************************************************************************************8
+
+
 void RAA_plots(){
   TH1::SetDefaultSumw2();
   gStyle->SetErrorX(0);
@@ -153,6 +194,17 @@ void RAA_plots(){
     canv->SaveAs(Form("img/RAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/RAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
+
+    //stuff with theory
+    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10){
+      const int graphPts = 950;
+      TGraph * vitev = new TGraph(2*graphPts);
+      getTheoryVitev(vitev);
+      vitev->Draw("same f");
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    }
   }
 }
 
