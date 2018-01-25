@@ -1,4 +1,5 @@
 #include "../Settings.h"
+#include "HIN1515HyperonCorr/hyperonCorrection.C"
 #include "TFile.h"
 #include "TDirectory.h"
 #include "TCanvas.h"
@@ -28,7 +29,7 @@
 #include <string>
 #include <fstream>
 
-void ppRefAnalyzer(){
+void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);
   gStyle->SetErrorX(0);
@@ -39,7 +40,6 @@ void ppRefAnalyzer(){
   gStyle->SetPadTickX(1);
 
   Settings s;
-
 
   TFile * f = TFile::Open("pp5TeV_FromRAA.root","read");
   TH1D * ppSpec = (TH1D*) f->Get("Table 7/Hist1D_y1");
@@ -112,6 +112,18 @@ void ppRefAnalyzer(){
   Herw5scaled = (TH1D*)Herw5->Clone("Herw5scaled");
   Herw5rat = (TH1D*)Herw5->Clone("Herw5rat");
   Herw5rat->Divide(pp5NoError);
+
+  TH1D * hyperonCorr;
+  if(doRemoveHyperonCorr){
+    hyperonCorr = (TH1D*)pp5->Clone("hyperonPbPb");
+    returnHyperonCorrection(1,hyperonCorr,1,"HIN1515HyperonCorr/");
+    pp5->Divide(hyperonCorr);
+    pp5NoError->Divide(hyperonCorr);
+    for(int i = 1; i<pp5->GetSize()-1; i++){
+      pp5relSyst->SetBinContent(i,TMath::Power(pp5relSyst->GetBinContent(i)*pp5relSyst->GetBinContent(i)-(hyperonCorr->GetBinContent(i)-1)*(hyperonCorr->GetBinContent(i)-1),0.5));
+      pp5Syst->SetBinContent(i,TMath::Power(pp5Syst->GetBinContent(i)*pp5Syst->GetBinContent(i)-(hyperonCorr->GetBinContent(i)-1)*(hyperonCorr->GetBinContent(i)-1)*pp5->GetBinContent(i)*pp5->GetBinContent(i),0.5));
+    }
+  }
 
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
   canv2->SetBorderSize(0);
@@ -305,11 +317,11 @@ void ppRefAnalyzer(){
   }
 
 
-  pythia8_7scaled = (TH1D*)pythia8_7->Clone("pythia8_7scaled");
-  pythia8_7rat = (TH1D*)pythia8_7->Clone("pythia8_7rat");
+  TH1D* pythia8_7scaled = (TH1D*)pythia8_7->Clone("pythia8_7scaled");
+  TH1D* pythia8_7rat = (TH1D*)pythia8_7->Clone("pythia8_7rat");
   pythia8_7rat->Divide(pp7NoError);
-  EPOS7scaled = (TH1D*)EPOS7->Clone("EPOS7scaled");
-  EPOS7rat = (TH1D*)EPOS7->Clone("EPOS7rat");
+  TH1D* EPOS7scaled = (TH1D*)EPOS7->Clone("EPOS7scaled");
+  TH1D* EPOS7rat = (TH1D*)EPOS7->Clone("EPOS7rat");
   EPOS7rat->Divide(pp7NoError);
   /*Herw7scaled = (TH1D*)Herw7->Clone("Herw7scaled");
   Herw7rat = (TH1D*)Herw7->Clone("Herw7rat");
@@ -379,7 +391,7 @@ void ppRefAnalyzer(){
   extrapFactorPythia7->GetXaxis()->SetTitle("p_{T}");
   extrapFactorPythia7->SetTitle("");
   //extrapFactorPythia->Draw();
-  extrapFactorEPOS7 = (TH1D*)EPOS544->Clone("extrapFactorEPOS_from7TeV");
+  TH1D * extrapFactorEPOS7 = (TH1D*)EPOS544->Clone("extrapFactorEPOS_from7TeV");
   extrapFactorEPOS7->Divide(EPOS7);
   extrapFactorEPOS7->SetLineColor(kBlue);
   extrapFactorEPOS7->SetMarkerColor(kBlue);
