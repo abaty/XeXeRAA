@@ -10,14 +10,19 @@
 #include "../../Settings.h"
 #include "../../include/trackingBinMap.h"
 
+
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
 
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
-  TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
+  TH1D * hiBin_Weighted_h = new TH1D("hiBin","hiBin",200,0,200);
+  TH1D * vz_Weighted_h = new TH1D("vz","vz",120,-30,30);
+  TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
+
+
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   for(int c = 0; c<17; c++){
     nHit[c] = new TH1D(Form("nHit%d",c),Form("nHit%d",c),30,0,30);
