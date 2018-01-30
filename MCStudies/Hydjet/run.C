@@ -22,7 +22,6 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * vz_Weighted_h = new TH1D("vz_weight",";vz",120,-30,30);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
 
-
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   for(int c = 0; c<17; c++){
     nHit[c] = new TH1D(Form("nHit%d",c),Form("nHit%d",c),30,0,30);
@@ -33,6 +32,15 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     eta[c] = new TH1D(Form("eta%d",c),Form("eta%d",c),50,-3,3);
     phi[c] = new TH1D(Form("phi%d",c),Form("phi%d",c),50,-TMath::Pi(),TMath::Pi());
     caloMatch[c] = new TH1D(Form("caloMatch%d",c),Form("caloMatch%d",c),50,0,2);
+  }
+  //resolution plots
+  TH1D *reso_reco[s.ntrkBins], *reso_gen[s.ntrkBins], *reso_recoCut[s.ntrkBins], *reso_genCut[s.ntrkBins];
+  TH1D * dummy = new TH1D("dummy","",s.ntrkBins,s.xtrkbins);
+  for(int c = 0; c<s.ntrkBins; c++){
+    reso_reco[c] = new TH1D(Form("reso_reco_%d",c),"",30,0.85,1.15);
+    reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",30,0.85,1.15);
+    reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",30,0.85,1.15);
+    reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",30,0.85,1.15);
   }
 
   int nTrk;
@@ -56,6 +64,24 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   unsigned char trkNlayer[50000];
   unsigned char trkNdof[50000];
   float trkChi2[50000];
+
+  //gen
+  int nParticle;
+  float pPt[100000];
+  float pEta[100000];
+  float mtrkPt[100000];
+  float mtrkPtError[100000];
+  bool mhighPurity[100000];
+  float mtrkChi2[100000];
+  int mtrkNdof[100000];
+  int mtrkNHit[100000];
+  int mtrkNlayer[100000];
+  float mtrkDz1[100000];
+  float mtrkDzError1[100000];
+  float mtrkDxy1[100000];
+  float mtrkDxyError1[100000];
+  float mtrkPfEcal[100000];
+  float mtrkPfHcal[100000];
 
   for(unsigned int f = 0; f<fileList.size(); f++){
   //for(unsigned int f = 0; f<10; f++){
@@ -85,10 +111,26 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("trkNlayer",&trkNlayer);
     trk->SetBranchAddress("trkNdof",&trkNdof);
     trk->SetBranchAddress("trkNHit",&trkNHit);
-
     trk->SetBranchAddress("pfEcal",pfEcal);
     trk->SetBranchAddress("pfHcal",pfHcal);
-    
+
+    trk->SetBranchAddress("nParticle",&nParticle);   
+    trk->SetBranchAddress("pPt",pPt);   
+    trk->SetBranchAddress("pEta",pEta);   
+    trk->SetBranchAddress("mtrkPt",mtrkPt);
+    trk->SetBranchAddress("mtrkPtError",mtrkPtError);
+    trk->SetBranchAddress("mhighPurity",mhighPurity);
+    trk->SetBranchAddress("mtrkChi2",mtrkChi2);
+    trk->SetBranchAddress("mtrkNdof",mtrkNdof);
+    trk->SetBranchAddress("mtrkNHit",mtrkNHit);
+    trk->SetBranchAddress("mtrkNlayer",mtrkNlayer);
+    trk->SetBranchAddress("mtrkDz1",mtrkDz1);
+    trk->SetBranchAddress("mtrkDzError1",mtrkDzError1);
+    trk->SetBranchAddress("mtrkDxy1",mtrkDxy1);
+    trk->SetBranchAddress("mtrkDxyError1",mtrkDxyError1);
+    trk->SetBranchAddress("mtrkPfEcal",mtrkPfEcal);
+    trk->SetBranchAddress("mtrkPfHcal",mtrkPfHcal);
+ 
     for(int i = 0; i<trk->GetEntries(); i++){
       skim->GetEntry(i);
       evt->GetEntry(i);
@@ -134,7 +176,20 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         caloMatch[0]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j],w);
-      }//end of tracking stuff
+      }//end of reco tracking stuff
+
+      //gen particle loop
+      for(int j = 0; j<nParticle; j++){
+        if(mtrkPt[j]<=0) continue;//only matched gen particles
+        if(TMath::Abs(pEta[j])>1) continue;
+        if(!mhighPurity[j]) continue;
+        if(pPt[j]>0.5) reso_gen[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
+        if(mtrkPt[j]>0.5) reso_reco[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
+         
+        //put cuts here and do it again
+
+
+      }//end of gen particle loop
     }
   }
   output->Write();
