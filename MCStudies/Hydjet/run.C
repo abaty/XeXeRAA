@@ -18,8 +18,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
-  TH1D * hiBin_Weighted_h = new TH1D("hiBin","hiBin",200,0,200);
-  TH1D * vz_Weighted_h = new TH1D("vz","vz",120,-30,30);
+  TH1D * hiBin_Weighted_h = new TH1D("hiBin_weight",";hiBin",200,0,200);
+  TH1D * vz_Weighted_h = new TH1D("vz_weight",";vz",120,-30,30);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
 
 
