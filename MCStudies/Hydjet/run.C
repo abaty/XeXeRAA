@@ -9,11 +9,11 @@
 #include <string>
 #include "../../Settings.h"
 #include "../../include/trackingBinMap.h"
-
+#include "evtWeights/evtWeights.h"
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
-
+  EvtWeight evtW = EvtWeight();
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
@@ -99,39 +99,41 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(hiBin<0 || hiBin>199) continue;//protection
       hiBin_h->Fill(hiBin);
 
+      float w = evtW.getEvtWeight(vz,hiBin);
+      vz_Weighted_h->Fill(vz,w);
+      hiBin_Weighted_h->Fill(hiBin,w);
+
       trk->GetEntry(i);
       //for tracking
-      if(s.doTrackDists){
-        for(int j = 0; j<nTrk; j++){
-          if(!highPurity[j]) continue;     
-          if(trkPt[j]<0.5) continue;
-          if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
-          if(trkPtError[j]/trkPt[j]>0.1) continue;
-          if(trkNHit[j]<11) continue;
-          if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
-          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-          if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
-          
-          eta[0]->Fill(trkEta[j]);
-          eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
-          if(TMath::Abs(trkEta[j])>s.etaCut) continue;
-          
-          phi[0]->Fill(trkPhi[j]);
-          phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
-          DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
-          DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j]);
-          DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          nHit[0]->Fill(trkNHit[j]);
-          nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j]);
-          chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
-          ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
-          //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-          caloMatch[0]->Fill(Et/trkPt[j]);
-          caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
-        }
+      for(int j = 0; j<nTrk; j++){
+        if(!highPurity[j]) continue;     
+        if(trkPt[j]<0.5) continue;
+        if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
+        if(trkPtError[j]/trkPt[j]>0.1) continue;
+        if(trkNHit[j]<11) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
+        float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+        
+        eta[0]->Fill(trkEta[j],w);
+        eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j],w);
+        if(TMath::Abs(trkEta[j])>s.etaCut) continue;
+        
+        phi[0]->Fill(trkPhi[j],w);
+        phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j],w);
+        DCAz[0]->Fill(trkDz1[j]/trkDzError1[j],w);
+        DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j],w);
+        DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j],w);
+        DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j],w);
+        nHit[0]->Fill(trkNHit[j],w);
+        nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j],w);
+        chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
+        chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
+        ptErr[0]->Fill(trkPtError[j]/trkPt[j],w);
+        ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j],w);
+        //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+        caloMatch[0]->Fill(Et/trkPt[j],w);
+        caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j],w);
       }//end of tracking stuff
     }
   }
