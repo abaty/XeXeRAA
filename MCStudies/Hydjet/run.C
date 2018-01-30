@@ -37,10 +37,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D *reso_reco[s.ntrkBins], *reso_gen[s.ntrkBins], *reso_recoCut[s.ntrkBins], *reso_genCut[s.ntrkBins];
   TH1D * dummy = new TH1D("dummy","",s.ntrkBins,s.xtrkbins);
   for(int c = 0; c<s.ntrkBins; c++){
-    reso_reco[c] = new TH1D(Form("reso_reco_%d",c),"",30,0.85,1.15);
-    reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",30,0.85,1.15);
-    reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",30,0.85,1.15);
-    reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",30,0.85,1.15);
+    reso_reco[c] = new TH1D(Form("reso_reco_%d",c),"",30,0.9,1.1);
+    reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",30,0.9,1.1);
+    reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",30,0.9,1.1);
+    reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",30,0.9,1.1);
   }
 
   int nTrk;
