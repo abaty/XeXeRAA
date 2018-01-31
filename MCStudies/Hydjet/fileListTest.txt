@@ -1,0 +1,1 @@
+/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Official/HydjetMB/XeXeMinBias_5p44TeV-HydjetCymb5Ev8/crab_20180130_185945/180130_180000/0000/HiForestAOD_1.root
