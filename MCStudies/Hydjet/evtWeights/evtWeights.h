@@ -44,10 +44,17 @@ EventWeight::~EventWeight(){
 void makeEvtWeights(){
   TFile * data = TFile::Open("data.root","read");
   TH1D * d_vz = (TH1D*)data->Get("vz");
+  d_vz->Scale(1./d_vz->GetEntries());
   TH1D * d_hiBin = (TH1D*)data->Get("hiBin");
+  d_hiBin->Rebin(2);
+  d_hiBin->Scale(1./d_hiBin->GetEntries());
+
   TFile * mc = TFile::Open("mc.root","read");
-  TH1D * mc_vz = (TH1D*)data->Get("vz");
-  TH1D * mc_hiBin = (TH1D*)data->Get("hiBin");
+  TH1D * mc_vz = (TH1D*)mc->Get("vz");
+  mc_vz->Scale(1./mc_vz->GetEntries());
+  TH1D * mc_hiBin = (TH1D*)mc->Get("hiBin");
+  mc_hiBin->Rebin(2);
+  mc_hiBin->Scale(1./mc_hiBin->GetEntries());
 
   TFile * weights = TFile::Open("../evtWeights.root","recreate");
   TH1D * vz_w = (TH1D*)d_vz->Clone("vz_weight");
