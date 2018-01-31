@@ -133,6 +133,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("mtrkPfHcal",mtrkPfHcal);
  
     for(int i = 0; i<trk->GetEntries(); i++){
+      if(i%100==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
       skim->GetEntry(i);
       evt->GetEntry(i);
       if(!vtx) noVtxCent_h->Fill(hiBin);
