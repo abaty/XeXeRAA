@@ -10,6 +10,7 @@
 #include "../../Settings.h"
 #include "../../include/trackingBinMap.h"
 #include "evtWeights/evtWeights.h"
+#include "TMath.h"
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
@@ -185,10 +186,15 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(!mhighPurity[j]) continue;
         if(pPt[j]>0.5) reso_gen[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_reco[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
-         
-        //put cuts here and do it again
-
-
+        
+        if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>3 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>3) continue;
+        if(mtrkPtError[j]/mtrkPt[j]>0.1) continue;
+        if(mtrkNHit[j]<11) continue;
+        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
+        float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
+        if(pPt[j]>0.5) reso_genCut[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
+        if(mtrkPt[j]>0.5) reso_recoCut[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
       }//end of gen particle loop
     }
   }
