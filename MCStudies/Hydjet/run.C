@@ -155,12 +155,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       for(int j = 0; j<nTrk; j++){
         if(!highPurity[j]) continue;     
         if(trkPt[j]<0.5) continue;
-        //if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
-        //if(trkPtError[j]/trkPt[j]>0.1) continue;
-        //if(trkNHit[j]<11) continue;
-        //if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
+        if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
+        if(trkPtError[j]/trkPt[j]>0.1) continue;
+        if(trkNHit[j]<11) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-        //if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
         int statusIndex = 0;
         if(trkStatus[j]==1) statusIndex=1;
         else                statusIndex=2;       
