@@ -59,7 +59,7 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   delete l;
 }
 
-void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1, std::string MCLabel = "MB Hydjet"){
+void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1, std::string MCLabel = "MB Hydjet", int cuts = 2){
   c1->SetLeftMargin(0.2);
   if(doLogy==1) c1->SetLogy();
   h->SetTitle("");
@@ -88,6 +88,12 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   TLegend * l = new TLegend(0.7,0.55,0.88,0.875);
   l->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) l->AddEntry((TObject*)0,"|#eta|<1","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_z/#delta_z|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_xy/#delta_xy|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
+  if(cuts>1) l->AddEntry((TObject*)0,"nHits>=11","");
+  if(cuts>1) l->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
+  if(cuts>1) l->AddEntry((TObject*)0,"E_{T}^{calo}/p_{T}>0.5","");
   l->AddEntry(h,"Data","p");
   l->AddEntry(mc[0][0],MCLabel.c_str(),"l");
   l->AddEntry(mc[0][1],"MC Real Fraction","l");
@@ -133,7 +139,7 @@ int getHighCent(int i){
   return -1;
 }
 
-void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1, std::string MCLabel = "MB Hydjet"){
+void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1, std::string MCLabel = "MB Hydjet", int cuts = 2){
   TLegend * l[16]; 
   for(int i = 1; i<17; i++){
     c2->cd(i+4);
@@ -181,6 +187,12 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   TLegend * leg2 = new TLegend(0,0,1,1);
   leg2->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) leg2->AddEntry((TObject*)0,"|#eta|<1","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_z/#delta_z|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_xy/#delta_xy|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
+  if(cuts>1) leg2->AddEntry((TObject*)0,"nHits>=11","");
+  if(cuts>1) leg2->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
+  if(cuts>1) leg2->AddEntry((TObject*)0,"E_{T}^{calo}/p_{T}>0.5","");
   leg2->Draw("same");
 
   c2->SaveAs(Form("trkPlots/%s_array.png",fileLabel.c_str()));
@@ -191,7 +203,7 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   delete leg2;
 }
 
-void makeTrackingPlots(){
+void makeTrackingPlots(int cuts = 2){
   TH1::SetDefaultSumw2();
   gStyle->SetLegendBorderSize(0);
   gStyle->SetErrorX(0);
@@ -205,14 +217,14 @@ void makeTrackingPlots(){
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   TH1D *MCnHit[17][3], *MCchi2[17][3], *MCDCAz[17][3], *MCDCAxy[17][3], *MCptErr[17][3], *MCeta[17][3], *MCphi[17][3], *MCcaloMatch[17][3];
   for(int c = 0; c<17; c++){
-    nHit[c] = (TH1D*)f->Get(Form("nHit%d",c));
-    chi2[c] = (TH1D*)f->Get(Form("chi2%d",c));
-    ptErr[c] = (TH1D*)f->Get(Form("ptErr%d",c));
-    DCAz[c] = (TH1D*)f->Get(Form("DCAz%d",c));
-    DCAxy[c] = (TH1D*)f->Get(Form("DCAxy%d",c));
-    eta[c] = (TH1D*)f->Get(Form("eta%d",c));
-    phi[c] = (TH1D*)f->Get(Form("phi%d",c));
-    caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d",c));
+    nHit[c] = (TH1D*)f->Get(Form("nHit%d_cut%d",c,cuts));
+    chi2[c] = (TH1D*)f->Get(Form("chi2%d_cut%d",c,cuts));
+    ptErr[c] = (TH1D*)f->Get(Form("ptErr%d_cut%d",c,cuts));
+    DCAz[c] = (TH1D*)f->Get(Form("DCAz%d_cut%d",c,cuts));
+    DCAxy[c] = (TH1D*)f->Get(Form("DCAxy%d_cut%d",c,cuts));
+    eta[c] = (TH1D*)f->Get(Form("eta%d_cut%d",c,cuts));
+    phi[c] = (TH1D*)f->Get(Form("phi%d_cut%d",c,cuts));
+    caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d_cut%d",c,cuts));
     for(int c2 = 0; c2<3; c2++){
       MCnHit[c][c2] = (TH1D*)mc->Get(Form("nHit%d_%d",c,c2));
       MCchi2[c][c2] = (TH1D*)mc->Get(Form("chi2%d_%d",c,c2));
@@ -232,27 +244,27 @@ void makeTrackingPlots(){
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   makeVzCent(vz,hiBin,MCvz,MChiBin,c1);
 
-  makeTrkDistInclusive(nHit[0],MCnHit,c1,"nHits","nHits",0,0,0.12,generator);
-  makeTrkDistInclusive(chi2[0],MCchi2,c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator);
-  makeTrkDistInclusive(DCAz[0],MCDCAz,c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator);
-  makeTrkDistInclusive(DCAxy[0],MCDCAxy,c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator);
-  makeTrkDistInclusive(ptErr[0],MCptErr,c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator);
-  makeTrkDistInclusive(eta[0],MCeta,c1,"#eta","eta",0,0,0.04,generator);
-  makeTrkDistInclusive(phi[0],MCphi,c1,"#phi","phi",0,0,0.04,generator);
-  makeTrkDistInclusive(caloMatch[0],MCcaloMatch,c1,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator);
+  makeTrkDistInclusive(nHit[0],MCnHit,c1,"nHits","nHits",0,0,0.12,generator,cuts);
+  makeTrkDistInclusive(chi2[0],MCchi2,c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator,cuts);
+  makeTrkDistInclusive(DCAz[0],MCDCAz,c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator,cuts);
+  makeTrkDistInclusive(DCAxy[0],MCDCAxy,c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator,cuts);
+  makeTrkDistInclusive(ptErr[0],MCptErr,c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator,cuts);
+  makeTrkDistInclusive(eta[0],MCeta,c1,"#eta","eta",0,0,0.04,generator,cuts);
+  makeTrkDistInclusive(phi[0],MCphi,c1,"#phi","phi",0,0,0.04,generator,cuts);
+  makeTrkDistInclusive(caloMatch[0],MCcaloMatch,c1,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator,cuts);
   delete c1;
 
   //split by cent and pt
   TCanvas * c2 = new TCanvas("c2","c2",1000,1250);
   c2->Divide(4,5); 
-  makeTrkDistArray(nHit,MCnHit,c2,"nHits","nHits",0,0,0.25,generator);
-  makeTrkDistArray(chi2,MCchi2,c2,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator);
-  makeTrkDistArray(DCAz,MCDCAz,c2,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator);     
-  makeTrkDistArray(DCAxy,MCDCAxy,c2,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator);  
-  makeTrkDistArray(ptErr,MCptErr,c2,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator);
-  makeTrkDistArray(phi,MCphi,c2,"#phi","phi",0,0,0.04,generator);                
-  makeTrkDistArray(eta,MCeta,c2,"#eta","eta",0,0,0.04,generator);             
-  makeTrkDistArray(caloMatch,MCcaloMatch,c2,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator);
+  makeTrkDistArray(nHit,MCnHit,c2,"nHits","nHits",0,0,0.25,generator,cuts);
+  makeTrkDistArray(chi2,MCchi2,c2,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator,cuts);
+  makeTrkDistArray(DCAz,MCDCAz,c2,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator,cuts);     
+  makeTrkDistArray(DCAxy,MCDCAxy,c2,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator,cuts);  
+  makeTrkDistArray(ptErr,MCptErr,c2,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator,cuts);
+  makeTrkDistArray(phi,MCphi,c2,"#phi","phi",0,0,0.04,generator,cuts);                
+  makeTrkDistArray(eta,MCeta,c2,"#eta","eta",0,0,0.04,generator,cuts);             
+  makeTrkDistArray(caloMatch,MCcaloMatch,c2,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator,cuts);
 
   delete c2; 
 }
