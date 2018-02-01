@@ -166,34 +166,28 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         for(int j = 0; j<nTrk; j++){
           if(!highPurity[j]) continue;     
           if(trkPt[j]<0.5) continue;
+          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+          int bin = trkBinMap(hiBin,trkPt[j]);
+          
+          eta[0][0]->Fill(trkEta[j]);
+          eta[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkEta[j]);
+          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][0],phi[bin][0],trkPhi[j],DCAz[0][0],DCAz[bin][0],trkDz1[j]/trkDzError1[j],DCAxy[0][0],DCAxy[bin][0],trkDxy1[j]/trkDxyError1[j],nHit[0][0],nHit[bin][0],trkNHit[j],chi2[0][0],chi2[bin][0],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][0],ptErr[bin][0],trkPtError[j]/trkPt[j],caloMatch[0][0],caloMatch[bin][0],Et/trkPt[j]); 
+          
           if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
           if(trkPtError[j]/trkPt[j]>0.1) continue;
+          
+          eta[0][1]->Fill(trkEta[j]);
+          eta[trkBinMap(hiBin,trkPt[j])][1]->Fill(trkEta[j]);
+          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][1],phi[bin][1],trkPhi[j],DCAz[0][1],DCAz[bin][1],trkDz1[j]/trkDzError1[j],DCAxy[0][1],DCAxy[bin][1],trkDxy1[j]/trkDxyError1[j],nHit[0][1],nHit[bin][1],trkNHit[j],chi2[0][1],chi2[bin][1],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][1],ptErr[bin][1],trkPtError[j]/trkPt[j],caloMatch[0][1],caloMatch[bin][1],Et/trkPt[j]); 
+
           if(trkNHit[j]<11) continue;
           if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
-          float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
           if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
           
-          eta[0]->Fill(trkEta[j]);
-          eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
+          eta[0][2]->Fill(trkEta[j]);
+          eta[trkBinMap(hiBin,trkPt[j])][2]->Fill(trkEta[j]);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
-         
-          int bin = trkBinMap(hiBin,trkPt[j]);
-          fillTrkDists(phi[0],phi[bin],trkPhi[j],DCAz[0],DCAz[bin],trkDz1[j]/trkDzError1[j],DCAxy[0],DCAxy[bin],trkDxy1[j]/trkDxyError1[j],nHit[0],nHit[bin],trkNHit[j],chi2[0],chi2[bin],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0],ptErr[bin],trkPtError[j]/trkPt[j],caloMatch[0],caloMatch[bin],Et/trkPt[j]); 
-          //phi[0]->Fill(trkPhi[j]);
-          //phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
-          //DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
-          //DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j]);
-          //DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          //DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          //nHit[0]->Fill(trkNHit[j]);
-          //nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j]);
-          //chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          //chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          //ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
-          //ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
-          //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-          //caloMatch[0]->Fill(Et/trkPt[j]);
-          //caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
+          fillTrkDists(phi[0][2],phi[bin][2],trkPhi[j],DCAz[0][2],DCAz[bin][2],trkDz1[j]/trkDzError1[j],DCAxy[0][2],DCAxy[bin][2],trkDxy1[j]/trkDxyError1[j],nHit[0][2],nHit[bin][2],trkNHit[j],chi2[0][2],chi2[bin][2],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][2],ptErr[bin][2],trkPtError[j]/trkPt[j],caloMatch[0][2],caloMatch[bin][2],Et/trkPt[j]); 
         }
       }//end of tracking stuff
 
