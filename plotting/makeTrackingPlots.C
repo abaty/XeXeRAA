@@ -194,7 +194,7 @@ void makeTrackingPlots(){
   std::string generator = "MB Hydjet";
  
   TFile * f = TFile::Open("../output_0.root","read");
-  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Jan31.root","read"); 
+  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Jan31_noCutsTrkDists.root","read"); 
  
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   TH1D *MCnHit[17][3], *MCchi2[17][3], *MCDCAz[17][3], *MCDCAxy[17][3], *MCptErr[17][3], *MCeta[17][3], *MCphi[17][3], *MCcaloMatch[17][3];
