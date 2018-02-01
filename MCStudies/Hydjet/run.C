@@ -166,30 +166,38 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         else                statusIndex=2;       
  
         eta[0][0]->Fill(trkEta[j],w);
+        eta[0][statusIndex]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkEta[j],w);
         if(TMath::Abs(trkEta[j])>s.etaCut) continue;
         
         phi[0][0]->Fill(trkPhi[j],w);
+        phi[0][statusIndex]->Fill(trkPhi[j],w);
         phi[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkPhi[j],w);
         phi[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkPhi[j],w);
         DCAz[0][0]->Fill(trkDz1[j]/trkDzError1[j],w);
+        DCAz[0][statusIndex]->Fill(trkDz1[j]/trkDzError1[j],w);
         DCAz[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkDz1[j]/trkDzError1[j],w);
         DCAz[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkDz1[j]/trkDzError1[j],w);
         DCAxy[0][0]->Fill(trkDxy1[j]/trkDxyError1[j],w);
+        DCAxy[0][statusIndex]->Fill(trkDxy1[j]/trkDxyError1[j],w);
         DCAxy[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkDxy1[j]/trkDxyError1[j],w);
         DCAxy[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkDxy1[j]/trkDxyError1[j],w);
         nHit[0][0]->Fill(trkNHit[j],w);
+        nHit[0][statusIndex]->Fill(trkNHit[j],w);
         nHit[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkNHit[j],w);
         nHit[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkNHit[j],w);
         chi2[0][0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
+        chi2[0][statusIndex]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
         chi2[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
         chi2[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],w);
         ptErr[0][0]->Fill(trkPtError[j]/trkPt[j],w);
+        ptErr[0][statusIndex]->Fill(trkPtError[j]/trkPt[j],w);
         ptErr[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkPtError[j]/trkPt[j],w);
         ptErr[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(trkPtError[j]/trkPt[j],w);
         //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         caloMatch[0][0]->Fill(Et/trkPt[j],w);
+        caloMatch[0][statusIndex]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][0]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex]->Fill(Et/trkPt[j],w);
       }//end of reco tracking stuff

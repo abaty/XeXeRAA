@@ -59,7 +59,7 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   delete l;
 }
 
-void makeTrkDistInclusive(TH1D * h, TCanvas * c1, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1){
+void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string Xlabel, std::string fileLabel, bool doLogy = 0, float yMin = 0, float yMax = 1, std::string MCLabel = "MB Hydjet"){
   c1->SetLeftMargin(0.2);
   if(doLogy==1) c1->SetLogy();
   h->SetTitle("");
@@ -74,10 +74,26 @@ void makeTrkDistInclusive(TH1D * h, TCanvas * c1, std::string Xlabel, std::strin
   h->GetYaxis()->SetTitleOffset(2);
   h->Draw("");
 
-  TLegend * l = new TLegend(0.65,0.65,0.83,0.775);
+  mc[0][0]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][0]->SetLineColor(kBlack);
+  mc[0][0]->Draw("same hist");
+  mc[0][0]->Print("All");
+  mc[0][1]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][1]->SetLineColor(kRed);
+  mc[0][1]->Draw("same hist");
+  mc[0][1]->Print("All");
+  mc[0][2]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][2]->SetLineColor(kBlue);
+  mc[0][2]->Draw("same hist");
+  mc[0][1]->Print("All");
+
+  TLegend * l = new TLegend(0.7,0.55,0.88,0.875);
   l->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) l->AddEntry((TObject*)0,"|#eta|<1","");
   l->AddEntry(h,"Data","p");
+  l->AddEntry(mc[0][0],MCLabel.c_str(),"l");
+  l->AddEntry(mc[0][1],"MC Real Fraction","l");
+  l->AddEntry(mc[0][2],"MC Fake Fraction","l");
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
@@ -165,7 +181,9 @@ void makeTrackingPlots(){
   gStyle->SetLegendBorderSize(0);
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
-  
+ 
+  std::string generator = "MB Hydjet";
+ 
   TFile * f = TFile::Open("../output_0.root","read");
   TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Jan31.root","read"); 
  
@@ -199,14 +217,14 @@ void makeTrackingPlots(){
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   makeVzCent(vz,hiBin,MCvz,MChiBin,c1);
 
-  makeTrkDistInclusive(nHit[0],c1,"nHits","nHits",0,0,0.12);
-  makeTrkDistInclusive(chi2[0],c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075);
-  makeTrkDistInclusive(DCAz[0],c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1);
-  makeTrkDistInclusive(DCAxy[0],c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1);
-  makeTrkDistInclusive(ptErr[0],c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13);
-  makeTrkDistInclusive(eta[0],c1,"#eta","eta",0,0,0.04);
-  makeTrkDistInclusive(phi[0],c1,"#phi","phi",0,0,0.04);
-  makeTrkDistInclusive(caloMatch[0],c1,"E_{T}/p_{T}","caloMatch",0,0,0.08);
+  makeTrkDistInclusive(nHit[0],MCnHit,c1,"nHits","nHits",0,0,0.12,generator);
+  makeTrkDistInclusive(chi2[0],MCchi2,c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator);
+  makeTrkDistInclusive(DCAz[0],MCptErr,c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator);
+  makeTrkDistInclusive(DCAxy[0],MCDCAz,c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator);
+  makeTrkDistInclusive(ptErr[0],MCDCAxy,c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator);
+  makeTrkDistInclusive(eta[0],MCeta,c1,"#eta","eta",0,0,0.04,generator);
+  makeTrkDistInclusive(phi[0],MCphi,c1,"#phi","phi",0,0,0.04,generator);
+  makeTrkDistInclusive(caloMatch[0],MCcaloMatch,c1,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator);
   delete c1;
 
   //split by cent and pt
