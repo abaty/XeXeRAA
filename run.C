@@ -5,6 +5,7 @@
 #include "TMath.h"
 #include "Settings.h"
 #include "include/trackingBinMap.h"
+#include "include/fillTrkDists.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -43,17 +44,19 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
-  TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
+  TH1D *nHit[17][3], *chi2[17][3], *DCAz[17][3], *DCAxy[17][3], *ptErr[17][3], *eta[17][3], *phi[17][3], *caloMatch[17][3];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
-      nHit[c] = new TH1D(Form("nHit%d",c),Form("nHit%d",c),30,0,30);
-      chi2[c] = new TH1D(Form("chi2%d",c),Form("chi2%d",c),50,0,0.3);
-      ptErr[c] = new TH1D(Form("ptErr%d",c),Form("ptErr%d",c),50,0,0.2);
-      DCAz[c] = new TH1D(Form("DCAz%d",c),Form("DCAz%d",c),50,-5,5);
-      DCAxy[c] = new TH1D(Form("DCAxy%d",c),Form("DCAxy%d",c),50,-5,5);
-      eta[c] = new TH1D(Form("eta%d",c),Form("eta%d",c),50,-3,3);
-      phi[c] = new TH1D(Form("phi%d",c),Form("phi%d",c),50,-TMath::Pi(),TMath::Pi());
-      caloMatch[c] = new TH1D(Form("caloMatch%d",c),Form("caloMatch%d",c),50,0,2);
+      for(int c2 = 0; c<3; c2++){
+        nHit[c][c2] = new TH1D(Form("nHit%d_cut%d",c,c2),Form("nHit%d_cut%d",c,c2),30,0,30);
+        chi2[c][c2] = new TH1D(Form("chi2%d_cut%d",c,c2),Form("chi2%d_cut%d",c,c2),50,0,0.3);
+        ptErr[c][c2] = new TH1D(Form("ptErr%d_cut%d",c,c2),Form("ptErr%d_cut%d",c,c2),50,0,0.2);
+        DCAz[c][c2] = new TH1D(Form("DCAz%d_cut%d",c,c2),Form("DCAz%d_cut%d",c,c2),50,-5,5);
+        DCAxy[c][c2] = new TH1D(Form("DCAxy%d_cut%d",c,c2),Form("DCAxy%d_cut%d",c,c2),50,-5,5);
+        eta[c][c2] = new TH1D(Form("eta%d_cut%d",c,c2),Form("eta%d_cut%d",c,c2),50,-3,3);
+        phi[c][c2] = new TH1D(Form("phi%d_cut%d",c,c2),Form("phi%d_cut%d",c,c2),50,-TMath::Pi(),TMath::Pi());
+        caloMatch[c][c2] = new TH1D(Form("caloMatch%d_cut%d",c,c2),Form("caloMatch%d_cut%d",c,c2),50,0,2);
+      }
     }
   }
 
@@ -173,22 +176,24 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           eta[0]->Fill(trkEta[j]);
           eta[trkBinMap(hiBin,trkPt[j])]->Fill(trkEta[j]);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
-          
-          phi[0]->Fill(trkPhi[j]);
-          phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
-          DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
-          DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j]);
-          DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j]);
-          nHit[0]->Fill(trkNHit[j]);
-          nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j]);
-          chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
-          ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
-          ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
+         
+          int bin = trkBinMap(hiBin,trkPt[j]);
+          fillTrkDists(phi[0],phi[bin],trkPhi[j],DCAz[0],DCAz[bin],trkDz1[j]/trkDzError1[j],DCAxy[0],DCAxy[bin],trkDxy1[j]/trkDxyError1[j],nHit[0],nHit[bin],trkNHit[j],chi2[0],chi2[bin],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0],ptErr[bin],trkPtError[j]/trkPt[j],caloMatch[0],caloMatch[bin],Et/trkPt[j]); 
+          //phi[0]->Fill(trkPhi[j]);
+          //phi[trkBinMap(hiBin,trkPt[j])]->Fill(trkPhi[j]);
+          //DCAz[0]->Fill(trkDz1[j]/trkDzError1[j]);
+          //DCAz[trkBinMap(hiBin,trkPt[j])]->Fill(trkDz1[j]/trkDzError1[j]);
+          //DCAxy[0]->Fill(trkDxy1[j]/trkDxyError1[j]);
+          //DCAxy[trkBinMap(hiBin,trkPt[j])]->Fill(trkDxy1[j]/trkDxyError1[j]);
+          //nHit[0]->Fill(trkNHit[j]);
+          //nHit[trkBinMap(hiBin,trkPt[j])]->Fill(trkNHit[j]);
+          //chi2[0]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
+          //chi2[trkBinMap(hiBin,trkPt[j])]->Fill(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]);
+          //ptErr[0]->Fill(trkPtError[j]/trkPt[j]);
+          //ptErr[trkBinMap(hiBin,trkPt[j])]->Fill(trkPtError[j]/trkPt[j]);
           //float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-          caloMatch[0]->Fill(Et/trkPt[j]);
-          caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
+          //caloMatch[0]->Fill(Et/trkPt[j]);
+          //caloMatch[trkBinMap(hiBin,trkPt[j])]->Fill(Et/trkPt[j]);
         }
       }//end of tracking stuff
 

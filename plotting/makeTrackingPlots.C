@@ -172,17 +172,23 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   c2->cd(1);
   TLegend * leg = new TLegend(0,0,1,1);
   leg->AddEntry((TObject*)0,"Plots Normalized to Unity","");
-  leg->AddEntry((TObject*)0,"highPurity Tracks","");
-  if(strcmp(fileLabel.c_str(),"eta")!=0) leg->AddEntry((TObject*)0,"|#eta|<1","");
   leg->AddEntry(h[1],"Data","p");
   leg->AddEntry(mc[1][0],MCLabel.c_str(),"l");
   leg->AddEntry(mc[1][1],"MC Real Fraction","l");
-  leg->AddEntry(mc[1][2],"MC Fake Fraction","l");
+  leg->AddEntry(mc[1][2],"MC Fake+Secondary","l");
   leg->Draw("same");
+  c2->cd(2);
+  TLegend * leg2 = new TLegend(0,0,1,1);
+  leg2->AddEntry((TObject*)0,"highPurity Tracks","");
+  if(strcmp(fileLabel.c_str(),"eta")!=0) leg2->AddEntry((TObject*)0,"|#eta|<1","");
+  leg2->Draw("same");
+
   c2->SaveAs(Form("trkPlots/%s_array.png",fileLabel.c_str()));
   c2->SaveAs(Form("trkPlots/%s_array.pdf",fileLabel.c_str()));
   c2->SaveAs(Form("trkPlots/%s_array.C",fileLabel.c_str()));
   for(int i = 1; i<17; i++) delete l[i-1];
+  delete leg;
+  delete leg2;
 }
 
 void makeTrackingPlots(){
