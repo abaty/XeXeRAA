@@ -47,7 +47,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D *nHit[17][3], *chi2[17][3], *DCAz[17][3], *DCAxy[17][3], *ptErr[17][3], *eta[17][3], *phi[17][3], *caloMatch[17][3];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
-      for(int c2 = 0; c<3; c2++){
+      for(int c2 = 0; c2<3; c2++){
         nHit[c][c2] = new TH1D(Form("nHit%d_cut%d",c,c2),Form("nHit%d_cut%d",c,c2),30,0,30);
         chi2[c][c2] = new TH1D(Form("chi2%d_cut%d",c,c2),Form("chi2%d_cut%d",c,c2),50,0,0.3);
         ptErr[c][c2] = new TH1D(Form("ptErr%d_cut%d",c,c2),Form("ptErr%d_cut%d",c,c2),50,0,0.2);
@@ -138,6 +138,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
 
     for(int i = 0; i<trk->GetEntries(); i++){
+      if(i%100==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
       hlt->GetEntry(i);
       bool MinBias = false;
       for(int x = 0; x<21; x++) MinBias = MinBias || MB[x];
