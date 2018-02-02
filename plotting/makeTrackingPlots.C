@@ -88,8 +88,8 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   TLegend * l = new TLegend(0.7,0.55,0.88,0.875);
   l->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) l->AddEntry((TObject*)0,"|#eta|<1","");
-  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_z/#delta_z|<3","");
-  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_xy/#delta_xy|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_{z}/#delta_{z}|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_{xy}/#delta_{xy}|<3","");
   if(cuts>0) l->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
   if(cuts>1) l->AddEntry((TObject*)0,"nHits>=11","");
   if(cuts>1) l->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
@@ -187,8 +187,8 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   TLegend * leg2 = new TLegend(0,0,1,1);
   leg2->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) leg2->AddEntry((TObject*)0,"|#eta|<1","");
-  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_z/#delta_z|<3","");
-  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_xy/#delta_xy|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_{z}/#delta_{z}|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_{xy}/#delta_{xy}|<3","");
   if(cuts>0) leg2->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
   if(cuts>1) leg2->AddEntry((TObject*)0,"nHits>=11","");
   if(cuts>1) leg2->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
