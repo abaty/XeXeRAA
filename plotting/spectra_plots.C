@@ -145,7 +145,7 @@ void spectra_plots(){
   h[30]->Draw("same");
 
 
-  TLegend * specLeg = new TLegend(0.25,0.1,0.45,0.5);
+  TLegend * specLeg = new TLegend(0.25,0.1,0.55,0.5);
   //specLeg->SetFillStyle(0);
   specLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
   specLeg->AddEntry(h[0],Form("0-5%s (x10)","%"),"p");  
@@ -155,6 +155,7 @@ void spectra_plots(){
   specLeg->AddEntry(h[25],Form("50-70%s","%"),"p");  
   specLeg->AddEntry(h[30],Form("70-90%s","%"),"p");  
   specLeg->AddEntry(ppSpec,"Extrapolated pp","p"); 
+  specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
  
   pad2->cd();
@@ -196,6 +197,7 @@ void spectra_plots(){
   systLeg->AddEntry(XeXe_totSyst[0],Form("0-5%s","%"),"f");
   systLeg->AddEntry(XeXe_totSyst[30],Form("70-90%s","%"),"f");
   systLeg->AddEntry(pp_totSyst,"Extrapolated pp","f");
+  systLeg->SetFillStyle(0);
   gStyle->SetPadTickY(1);
   systLeg->SetLineColor(kBlack);
   systLeg->Draw("same");
