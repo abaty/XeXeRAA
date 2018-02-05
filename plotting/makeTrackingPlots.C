@@ -88,8 +88,8 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   TLegend * l = new TLegend(0.7,0.55,0.88,0.875);
   l->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) l->AddEntry((TObject*)0,"|#eta|<1","");
-  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_{z}/#delta_{z}|<3","");
-  if(cuts>0) l->AddEntry((TObject*)0,"|#sigma_{xy}/#delta_{xy}|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#delta_{z}/#sigma_{z}|<3","");
+  if(cuts>0) l->AddEntry((TObject*)0,"|#delta_{xy}/#sigma_{xy}|<3","");
   if(cuts>0) l->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
   if(cuts>1) l->AddEntry((TObject*)0,"nHits>=11","");
   if(cuts>1) l->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
@@ -98,13 +98,14 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   l->AddEntry(mc[0][0],MCLabel.c_str(),"l");
   l->AddEntry(mc[0][1],"MC Real Fraction","l");
   l->AddEntry(mc[0][2],"MC Fake Fraction","l");
+  l->SetFillStyle(0);
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
   //leg->AddEntry((TObject*)0,"highPurity Tracks","");
   l->Draw("same");
-  c1->SaveAs(Form("trkPlots/%s_Inclusive.png",fileLabel.c_str()));
-  c1->SaveAs(Form("trkPlots/%s_Inclusive.pdf",fileLabel.c_str()));
-  c1->SaveAs(Form("trkPlots/%s_Inclusive.C",fileLabel.c_str()));
+  c1->SaveAs(Form("trkPlots/%s_Inclusive_cuts%d.png",fileLabel.c_str(),cuts));
+  c1->SaveAs(Form("trkPlots/%s_Inclusive_cuts%d.pdf",fileLabel.c_str(),cuts));
+  c1->SaveAs(Form("trkPlots/%s_Inclusive_cuts%d.C",fileLabel.c_str(),cuts));
   
   delete l;
   
@@ -143,6 +144,7 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   TLegend * l[16]; 
   for(int i = 1; i<17; i++){
     c2->cd(i+4);
+    if(strcmp(fileLabel.c_str(),"pterror")==0) c2->cd(i+4)->SetLogy();
     l[i-1] = new TLegend(0.55,0.65,0.875,0.85);
     l[i-1]->AddEntry((TObject*)0,Form("%1.1f<p_{T}<%1.0f",getLowPt(i),getHighPt(i)),"");
     l[i-1]->AddEntry((TObject*)0,Form("%d-%d%%",getLowCent(i),getHighCent(i)),"");
@@ -171,6 +173,7 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
     mc[i][0]->Draw("same hist");
     h[i]->Draw("same");
 
+    l[i-1]->SetFillStyle(0);
     l[i-1]->Draw("same");
     h[i]->Draw("same"); 
   }
@@ -182,28 +185,31 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
   leg->AddEntry(mc[1][0],MCLabel.c_str(),"l");
   leg->AddEntry(mc[1][1],"MC Real Fraction","l");
   leg->AddEntry(mc[1][2],"MC Fake+Secondary","l");
+  leg->SetFillStyle(0);
   leg->Draw("same");
+
   c2->cd(2);
   TLegend * leg2 = new TLegend(0,0,1,1);
   leg2->AddEntry((TObject*)0,"highPurity Tracks","");
   if(strcmp(fileLabel.c_str(),"eta")!=0) leg2->AddEntry((TObject*)0,"|#eta|<1","");
-  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_{z}/#delta_{z}|<3","");
-  if(cuts>0) leg2->AddEntry((TObject*)0,"|#sigma_{xy}/#delta_{xy}|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#delta_{z}/#sigma_{z}|<3","");
+  if(cuts>0) leg2->AddEntry((TObject*)0,"|#delta_{xy}/#sigma_{xy}|<3","");
   if(cuts>0) leg2->AddEntry((TObject*)0,"#sigma_{p_{T}}/p_{T}<0.1","");
   if(cuts>1) leg2->AddEntry((TObject*)0,"nHits>=11","");
   if(cuts>1) leg2->AddEntry((TObject*)0,"#chi^{2}/ndof/nLayers<0.15","");
   if(cuts>1) leg2->AddEntry((TObject*)0,"E_{T}^{calo}/p_{T}>0.5","");
+  leg2->SetFillStyle(0);
   leg2->Draw("same");
 
-  c2->SaveAs(Form("trkPlots/%s_array.png",fileLabel.c_str()));
-  c2->SaveAs(Form("trkPlots/%s_array.pdf",fileLabel.c_str()));
-  c2->SaveAs(Form("trkPlots/%s_array.C",fileLabel.c_str()));
+  c2->SaveAs(Form("trkPlots/%s_array_cuts%d.png",fileLabel.c_str(),cuts));
+  c2->SaveAs(Form("trkPlots/%s_array_cuts%d.pdf",fileLabel.c_str(),cuts));
+  c2->SaveAs(Form("trkPlots/%s_array_cuts%d.C",fileLabel.c_str(),cuts));
   for(int i = 1; i<17; i++) delete l[i-1];
   delete leg;
   delete leg2;
 }
 
-void makeTrackingPlots(int cuts = 2){
+void makeTrackingPlots_Cuts(int cuts = 2){
   TH1::SetDefaultSumw2();
   gStyle->SetLegendBorderSize(0);
   gStyle->SetErrorX(0);
@@ -212,7 +218,7 @@ void makeTrackingPlots(int cuts = 2){
   std::string generator = "MB Hydjet";
  
   TFile * f = TFile::Open("../output_0.root","read");
-  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Jan31_noCutsTrkDists.root","read"); 
+  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb2.root","read"); 
  
   TH1D *nHit[17], *chi2[17], *DCAz[17], *DCAxy[17], *ptErr[17], *eta[17], *phi[17], *caloMatch[17];
   TH1D *MCnHit[17][3], *MCchi2[17][3], *MCDCAz[17][3], *MCDCAxy[17][3], *MCptErr[17][3], *MCeta[17][3], *MCphi[17][3], *MCcaloMatch[17][3];
@@ -226,14 +232,14 @@ void makeTrackingPlots(int cuts = 2){
     phi[c] = (TH1D*)f->Get(Form("phi%d_cut%d",c,cuts));
     caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d_cut%d",c,cuts));
     for(int c2 = 0; c2<3; c2++){
-      MCnHit[c][c2] = (TH1D*)mc->Get(Form("nHit%d_%d",c,c2));
-      MCchi2[c][c2] = (TH1D*)mc->Get(Form("chi2%d_%d",c,c2));
-      MCptErr[c][c2] = (TH1D*)mc->Get(Form("ptErr%d_%d",c,c2));
-      MCDCAz[c][c2] = (TH1D*)mc->Get(Form("DCAz%d_%d",c,c2));
-      MCDCAxy[c][c2] = (TH1D*)mc->Get(Form("DCAxy%d_%d",c,c2));
-      MCeta[c][c2] = (TH1D*)mc->Get(Form("eta%d_%d",c,c2));
-      MCphi[c][c2] = (TH1D*)mc->Get(Form("phi%d_%d",c,c2));
-      MCcaloMatch[c][c2] = (TH1D*)mc->Get(Form("caloMatch%d_%d",c,c2));
+      MCnHit[c][c2] = (TH1D*)mc->Get(Form("nHit%d_%d_cut%d",c,c2,cuts));
+      MCchi2[c][c2] = (TH1D*)mc->Get(Form("chi2%d_%d_cut%d",c,c2,cuts));
+      MCptErr[c][c2] = (TH1D*)mc->Get(Form("ptErr%d_%d_cut%d",c,c2,cuts));
+      MCDCAz[c][c2] = (TH1D*)mc->Get(Form("DCAz%d_%d_cut%d",c,c2,cuts));
+      MCDCAxy[c][c2] = (TH1D*)mc->Get(Form("DCAxy%d_%d_cut%d",c,c2,cuts));
+      MCeta[c][c2] = (TH1D*)mc->Get(Form("eta%d_%d_cut%d",c,c2,cuts));
+      MCphi[c][c2] = (TH1D*)mc->Get(Form("phi%d_%d_cut%d",c,c2,cuts));
+      MCcaloMatch[c][c2] = (TH1D*)mc->Get(Form("caloMatch%d_%d_cut%d",c,c2,cuts));
     }
   }
   TH1D * vz = (TH1D*)f->Get("vz");
@@ -244,27 +250,35 @@ void makeTrackingPlots(int cuts = 2){
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   makeVzCent(vz,hiBin,MCvz,MChiBin,c1);
 
-  makeTrkDistInclusive(nHit[0],MCnHit,c1,"nHits","nHits",0,0,0.12,generator,cuts);
-  makeTrkDistInclusive(chi2[0],MCchi2,c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator,cuts);
+  makeTrkDistInclusive(nHit[0],MCnHit,c1,"nHits","nHits",0,0,0.3,generator,cuts);
+  makeTrkDistInclusive(chi2[0],MCchi2,c1,"#chi^{2}/ndof/nLayers","chi2",0,0,0.1,generator,cuts);
   makeTrkDistInclusive(DCAz[0],MCDCAz,c1,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator,cuts);
   makeTrkDistInclusive(DCAxy[0],MCDCAxy,c1,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator,cuts);
-  makeTrkDistInclusive(ptErr[0],MCptErr,c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator,cuts);
   makeTrkDistInclusive(eta[0],MCeta,c1,"#eta","eta",0,0,0.04,generator,cuts);
   makeTrkDistInclusive(phi[0],MCphi,c1,"#phi","phi",0,0,0.04,generator,cuts);
-  makeTrkDistInclusive(caloMatch[0],MCcaloMatch,c1,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator,cuts);
+  makeTrkDistInclusive(caloMatch[0],MCcaloMatch,c1,"E_{T}/p_{T}","caloMatch",0,0,0.1,generator,cuts);
+  c1->SetLogy();
+  makeTrkDistInclusive(ptErr[0],MCptErr,c1,"#sigma_{p_{T}}/p_{T}","pterror",0,0.001,0.6,generator,cuts);
   delete c1;
 
   //split by cent and pt
   TCanvas * c2 = new TCanvas("c2","c2",1000,1250);
   c2->Divide(4,5); 
-  makeTrkDistArray(nHit,MCnHit,c2,"nHits","nHits",0,0,0.25,generator,cuts);
-  makeTrkDistArray(chi2,MCchi2,c2,"#chi^{2}/ndof/nLayers","chi2",0,0,0.075,generator,cuts);
+  makeTrkDistArray(nHit,MCnHit,c2,"nHits","nHits",0,0,0.3,generator,cuts);
+  makeTrkDistArray(chi2,MCchi2,c2,"#chi^{2}/ndof/nLayers","chi2",0,0,0.1,generator,cuts);
   makeTrkDistArray(DCAz,MCDCAz,c2,"d_{z}/#sigma_{z}","DCAz",0,0,0.1,generator,cuts);     
   makeTrkDistArray(DCAxy,MCDCAxy,c2,"d_{xy}/#sigma_{xy}","DCAxy",0,0,0.1,generator,cuts);  
-  makeTrkDistArray(ptErr,MCptErr,c2,"#sigma_{p_{T}}/p_{T}","pterror",0,0,0.13,generator,cuts);
   makeTrkDistArray(phi,MCphi,c2,"#phi","phi",0,0,0.04,generator,cuts);                
   makeTrkDistArray(eta,MCeta,c2,"#eta","eta",0,0,0.04,generator,cuts);             
-  makeTrkDistArray(caloMatch,MCcaloMatch,c2,"E_{T}/p_{T}","caloMatch",0,0,0.08,generator,cuts);
+  makeTrkDistArray(caloMatch,MCcaloMatch,c2,"E_{T}/p_{T}","caloMatch",0,0,0.1,generator,cuts);
+  for(int i = 1; i<21; i++){ c2->cd(i); c2->SetLogy();}
+  makeTrkDistArray(ptErr,MCptErr,c2,"#sigma_{p_{T}}/p_{T}","pterror",0,0.001,0.6,generator,cuts);
 
   delete c2; 
+}
+
+void makeTrackingPlots(){
+  makeTrackingPlots_Cuts(0);
+  makeTrackingPlots_Cuts(1);
+  makeTrackingPlots_Cuts(2);
 }
