@@ -61,15 +61,21 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   }
 
   //eff and fake plots
-  TH2D *gen2d, *reco2d, *recoNoFake2d, *matched2d;
+  TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatched2d_recoPt;
   gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  TH1D *gen[7], *reco[7], *recoNoFake[7], *matched[7];
+  reco2d = new TH2D("reco2d","",s.ntrkBins,s.xtrkbins,7,0,7);
+  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins,s.xtrkbins,7,0,7);
+  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins,s.xtrkbins,7,0,7);
+  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins,s.xtrkbins,7,0,7);
+  genMatched2d_recoPt = new TH2D("genMatched2d_recoPt","",s.ntrkBins,s.xtrkbins,7,0,7);
+  TH1D *gen[7], *reco[7], *recoNoFake[7], *recoMatched[7], *genMatched[7], *genMatched_recoPt[7];
   for(int c = 0; c<7; c++){
     gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins,s.xtrkbins); 
     reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins,s.xtrkbins);
-    reco[c]->Print("All"); 
     recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    matched[c] = new TH1D(Form("matched_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    genMatched_recoPt[c] = new TH1D(Form("genMatched_recoPt_%d",c),"",s.ntrkBins,s.xtrkbins); 
   }
 
   int nTrk;
@@ -299,7 +305,6 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         caloMatch[trkBinMap(hiBin,trkPt[j])][0][2]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][2]->Fill(Et/trkPt[j],w);
 
-        std::cout << centBin(hiBin) << std::endl;
         reco2d->Fill(trkPt[j],centBin(hiBin),w);
         reco[centBin(hiBin)]->Fill(trkPt[j],w);
         if(trkStatus[j]!=-999){
@@ -307,15 +312,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           recoNoFake[centBin(hiBin)]->Fill(trkPt[j],w);
         }
         if(trkStatus[j]==1){
-          matched2d->Fill(trkPt[j],centBin(hiBin),w);
-          matched[centBin(hiBin)]->Fill(trkPt[j],w);
+          recoMatched2d->Fill(trkPt[j],centBin(hiBin),w);
+          recoMatched[centBin(hiBin)]->Fill(trkPt[j],w);
         }
       }//end of reco tracking stuff
 
       //gen particle loop
       for(int j = 0; j<nParticle; j++){
-        if(mtrkPt[j]<=0) continue;//only matched gen particles
         if(TMath::Abs(pEta[j])>s.etaCut) continue;
+        gen2d->Fill(pPt[j],centBin(hiBin),w);
+        gen[centBin(hiBin)]->Fill(pPt[j],w);
+        
+        if(mtrkPt[j]<=0) continue;//only matched gen particles
         if(!mhighPurity[j]) continue;
         if(pPt[j]>0.5) reso_gen[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_reco[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
@@ -330,9 +338,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(pPt[j]>0.5) reso_genCut[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_recoCut[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
 
-        gen2d->Fill(mtrkPt[j],centBin(hiBin),w);
-        gen[centBin(hiBin)]->Fill(mtrkPt[j],w);
-
+        genMatched2d->Fill(pPt[j],centBin(hiBin),w);
+        genMatched[centBin(hiBin)]->Fill(pPt[j],w);
+        genMatched2d_recoPt->Fill(mtrkPt[j],centBin(hiBin),w);
+        genMatched_recoPt[centBin(hiBin)]->Fill(mtrkPt[j],w);
       }//end of gen particle loop
     }
   }
