@@ -204,7 +204,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
-        float weight = 1./0.7;
+        float weight = trkCorr->getTrkCorr(trkPt[j],hiBin);
+
         for(int c = 0; c<s.nCentBins; c++){
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
 
