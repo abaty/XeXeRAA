@@ -18,8 +18,7 @@ int centBin(int b){
   else if(b<60) return 2;
   else if(b<100) return 3;
   else if(b<140) return 4;
-  else if(b<180) return 5;
-  else return 6;
+  else return 5;
 }
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
@@ -62,14 +61,14 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   //eff and fake plots
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatched2d_recoPt;
-  gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  reco2d = new TH2D("reco2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins,s.xtrkbins,7,0,7);
-  genMatched2d_recoPt = new TH2D("genMatched2d_recoPt","",s.ntrkBins,s.xtrkbins,7,0,7);
-  TH1D *gen[7], *reco[7], *recoNoFake[7], *recoMatched[7], *genMatched[7], *genMatched_recoPt[7];
-  for(int c = 0; c<7; c++){
+  gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  reco2d = new TH2D("reco2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  genMatched2d_recoPt = new TH2D("genMatched2d_recoPt","",s.ntrkBins,s.xtrkbins,6,0,6);
+  TH1D *gen[6], *reco[6], *recoNoFake[6], *recoMatched[6], *genMatched[6], *genMatched_recoPt[6];
+  for(int c = 0; c<6; c++){
     gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins,s.xtrkbins); 
     reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins,s.xtrkbins);
     recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins,s.xtrkbins); 
