@@ -12,6 +12,16 @@
 #include "evtWeights/evtWeights.h"
 #include "TMath.h"
 
+int centBin(int b){
+  if(b<10) return 0;
+  else if(b<20) return 1;
+  else if(b<60) return 2;
+  else if(b<100) return 3;
+  else if(b<140) return 4;
+  else if(b<180) return 5;
+  else return 6;
+}
+
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
   EventWeight evtW = EventWeight();
@@ -24,6 +34,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
 
   TH1D *nHit[17][3][3], *chi2[17][3][3], *DCAz[17][3][3], *DCAxy[17][3][3], *ptErr[17][3][3], *eta[17][3][3], *phi[17][3][3], *caloMatch[17][3][3];
+
+
   for(int c = 0; c<17; c++){
     for(int c2 = 0; c2<3; c2++){
       for(int c3 = 0; c3<3; c3++){
@@ -46,6 +58,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",30,0.9,1.1);
     reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",30,0.9,1.1);
     reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",30,0.9,1.1);
+  }
+
+  //eff and fake plots
+  TH2D *gen2d, *reco2d, *recoNoFake2d, *matched2d;
+  gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,7,0,7);
+  TH1D *gen[7], *reco[7], *recoNoFake[7], *matched[7];
+  for(int c = 0; c<7; c++){
+    gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins,s.xtrkbins);
+    reco[c]->Print("All"); 
+    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    matched[c] = new TH1D(Form("matched_%d",c),"",s.ntrkBins,s.xtrkbins); 
   }
 
   int nTrk;
@@ -274,6 +298,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         caloMatch[0][statusIndex][2]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][0][2]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][2]->Fill(Et/trkPt[j],w);
+
+        std::cout << centBin(hiBin) << std::endl;
+        reco2d->Fill(trkPt[j],centBin(hiBin),w);
+        reco[centBin(hiBin)]->Fill(trkPt[j],w);
+        if(trkStatus[j]!=-999){
+          recoNoFake2d->Fill(trkPt[j],centBin(hiBin),w);
+          recoNoFake[centBin(hiBin)]->Fill(trkPt[j],w);
+        }
+        if(trkStatus[j]==1){
+          matched2d->Fill(trkPt[j],centBin(hiBin),w);
+          matched[centBin(hiBin)]->Fill(trkPt[j],w);
+        }
       }//end of reco tracking stuff
 
       //gen particle loop
@@ -290,8 +326,13 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
         float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
         if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
+  
         if(pPt[j]>0.5) reso_genCut[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_recoCut[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
+
+        gen2d->Fill(mtrkPt[j],centBin(hiBin),w);
+        gen[centBin(hiBin)]->Fill(mtrkPt[j],w);
+
       }//end of gen particle loop
     }
   }
