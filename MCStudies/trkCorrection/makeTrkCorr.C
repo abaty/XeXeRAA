@@ -10,25 +10,25 @@ void makeTrkCorr(){
   TFile * f = new TFile("../Hydjet/output_Feb6.root","read");
 
   
-  TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatched2d_recoPt;
+  TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
   gen2d = (TH2D*)f->Get("gen2d");
   reco2d = (TH2D*)f->Get("reco2d");
   recoNoFake2d = (TH2D*)f->Get("recoNoFake2d");
   recoMatched2d = (TH2D*)f->Get("recoMatched2d");
   genMatched2d = (TH2D*)f->Get("genMatched2d");
-  genMatched2d_recoPt = (TH2D*)f->Get("genMatched2d_recoPt");
+  genMatchedMult2d = (TH2D*)f->Get("genMatchedMult2d");
   
-  TH1D *gen[6], *reco[6], *recoNoFake[6], *recoMatched[6], *genMatched[6], *genMatched_recoPt[6];
+  TH1D *gen[6], *reco[6], *recoNoFake[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
   for(int c = 0; c<6; c++){
     gen[c] = (TH1D*)f->Get(Form("gen_%d",c));
     reco[c] = (TH1D*)f->Get(Form("reco_%d",c));
     recoNoFake[c] = (TH1D*)f->Get(Form("recoNoFake_%d",c));
     recoMatched[c] = (TH1D*)f->Get(Form("recoMatched_%d",c));
     genMatched[c] = (TH1D*)f->Get(Form("genMatched_%d",c));
-    genMatched_recoPt[c] = (TH1D*)f->Get(Form("genMatched_recoPt_%d",c));
+    genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d",c));
   }
 
-  TFile * output = new TFile("trkTables.root","recreate");
+  TFile * output = new TFile("Hydjet_Feb6.root","recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -83,21 +83,21 @@ void makeTrkCorr(){
   }
  
   //multiple reco 
-  TH2D * multiple2d = (TH2D*)recoMatched2d->Clone("multiple2d");  
-  multiple2d->Divide(genMatched2d_recoPt);  
+  TH2D * multiple2d = (TH2D*)genMatchedMult2d->Clone("multiple2d");  
+  multiple2d->Divide(gen2d);  
   for(int i = 1; i<multiple2d->GetXaxis()->GetNbins()+1; i++){
     for(int j = 1; j<multiple2d->GetYaxis()->GetNbins()+1; j++){
-      multiple2d->SetBinContent(i,j,multiple2d->GetBinContent(i,j)-1);
+      multiple2d->SetBinContent(i,j,multiple2d->GetBinContent(i,j));
     }
   }
   multiple2d->Write();
 
   TH1D * multiple[6];
   for(int c = 0; c<6; c++){
-    multiple[c] = (TH1D*)recoMatched[c]->Clone(Form("multiple_%d",c));  
-    multiple[c]->Divide(genMatched_recoPt[c]);  
+    multiple[c] = (TH1D*)genMatchedMult[c]->Clone(Form("multiple_%d",c));  
+    multiple[c]->Divide(gen[c]);  
     for(int i = 1; i<multiple[c]->GetXaxis()->GetNbins()+1; i++){
-      multiple[c]->SetBinContent(i,multiple[c]->GetBinContent(i)-1);
+      multiple[c]->SetBinContent(i,multiple[c]->GetBinContent(i));
     }
     multiple[c]->Write();
   }
