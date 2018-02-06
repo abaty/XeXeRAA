@@ -167,7 +167,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         eta[0][statusIndex][0]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][0][0]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][statusIndex][0]->Fill(trkEta[j],w);
-        if(TMath::Abs(trkEta[j])<1){
+        if(TMath::Abs(trkEta[j])<s.etaCut){
           phi[0][0][0]->Fill(trkPhi[j],w);
           phi[0][statusIndex][0]->Fill(trkPhi[j],w);
           phi[trkBinMap(hiBin,trkPt[j])][0][0]->Fill(trkPhi[j],w);
@@ -205,7 +205,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         eta[0][statusIndex][1]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][0][1]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][statusIndex][1]->Fill(trkEta[j],w);
-        if(TMath::Abs(trkEta[j])<1){
+        if(TMath::Abs(trkEta[j])<s.etaCut){
           phi[0][0][1]->Fill(trkPhi[j],w);
           phi[0][statusIndex][1]->Fill(trkPhi[j],w);
           phi[trkBinMap(hiBin,trkPt[j])][0][1]->Fill(trkPhi[j],w);
@@ -279,7 +279,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       //gen particle loop
       for(int j = 0; j<nParticle; j++){
         if(mtrkPt[j]<=0) continue;//only matched gen particles
-        if(TMath::Abs(pEta[j])>1) continue;
+        if(TMath::Abs(pEta[j])>s.etaCut) continue;
         if(!mhighPurity[j]) continue;
         if(pPt[j]>0.5) reso_gen[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_reco[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
