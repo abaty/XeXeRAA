@@ -28,7 +28,7 @@ void makeTrkCorr(){
     genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d",c));
   }
 
-  TFile * output = new TFile("Hydjet_Feb6.root","recreate");
+  TFile * output = new TFile("trkCorr_Hydjet_Feb6.root","recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
