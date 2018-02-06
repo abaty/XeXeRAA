@@ -6,7 +6,7 @@
 #include "Settings.h"
 #include "include/trackingBinMap.h"
 #include "include/fillTrkDists.h"
-
+#include "include/trackingCorrection.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -39,6 +39,7 @@ double findTaaAverage(int L, int H) {
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
+  TrackCorrection trkCorr = TrackCorrection("trkCorr_Hydjet_Feb6.root");
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
