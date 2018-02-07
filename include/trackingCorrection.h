@@ -56,7 +56,6 @@ TrackingCorrection::TrackingCorrection(std::string file){
 }
 
 TrackingCorrection::~TrackingCorrection(){
-  corr->Close();
 }
 
 

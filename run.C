@@ -39,7 +39,7 @@ double findTaaAverage(int L, int H) {
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
-  TrackCorrection trkCorr = TrackCorrection("trkCorr_Hydjet_Feb6.root");
+  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Hydjet_Feb6.root");
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
@@ -204,7 +204,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
-        float weight = trkCorr->getTrkCorr(trkPt[j],hiBin);
+        float weight = trkCorr.getTrkCorr(trkPt[j],hiBin);
 
         for(int c = 0; c<s.nCentBins; c++){
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
