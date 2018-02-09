@@ -28,6 +28,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include "TF1.h"
 
 void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   TH1::SetDefaultSumw2();
@@ -170,8 +171,8 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   EPOS5scaled->Draw("same p"); 
   Herw5scaled->Scale(30);
   Herw5scaled->SetMarkerStyle(28);
-  Herw5scaled->SetMarkerColor(kMagenta);
-  Herw5scaled->SetLineColor(kMagenta);
+  Herw5scaled->SetMarkerColor(kViolet);
+  Herw5scaled->SetLineColor(kViolet);
   Herw5scaled->Draw("same p"); 
  
   TLegend * specLeg = new TLegend(0.25,0.1,0.45,0.5);
@@ -219,7 +220,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   EPOS5rat->SetLineStyle(1);
   EPOS5rat->SetLineWidth(2);
   EPOS5rat->SetMarkerSize(0);
-  Herw5rat->SetLineColor(kMagenta);
+  Herw5rat->SetLineColor(kViolet);
   Herw5rat->SetLineStyle(1);
   Herw5rat->SetLineWidth(2);
   Herw5rat->SetMarkerSize(0);
@@ -263,7 +264,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia->GetYaxis()->SetRangeUser(0.9,1.4);
   extrapFactorPythia->GetXaxis()->SetTitle("p_{T}");
   extrapFactorPythia->SetTitle("");
-  //extrapFactorPythia->Draw();
+  extrapFactorPythia->Draw();
   extrapFactorEPOS = (TH1D*)EPOS544->Clone("extrapFactorEPOS");
   extrapFactorEPOS->Divide(EPOS5);
   extrapFactorEPOS->SetLineColor(kBlue);
@@ -273,27 +274,47 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorEPOS->GetYaxis()->SetRangeUser(0.9,1.4);
   extrapFactorEPOS->GetXaxis()->SetTitle("p_{T}");
   extrapFactorEPOS->SetTitle("");
-  extrapFactorEPOS->Draw("same");
   
   extrapFactorHerw = (TH1D*)Herw544->Clone("extrapFactorHerw");
   extrapFactorHerw->Divide(Herw5);
-  extrapFactorHerw->SetLineColor(kMagenta);
-  extrapFactorHerw->SetMarkerColor(kMagenta);
+  extrapFactorHerw->SetLineColor(kViolet);
+  extrapFactorHerw->SetMarkerColor(kViolet);
   extrapFactorHerw->SetMarkerStyle(28);
   extrapFactorHerw->GetYaxis()->SetTitle("5.44 TeV/5.02 TeV");
   extrapFactorHerw->GetYaxis()->SetRangeUser(0.9,1.4);
   extrapFactorHerw->GetXaxis()->SetTitle("p_{T}");
   extrapFactorHerw->SetTitle("");
-  extrapFactorHerw->Draw("same");
-
-  extrapFactorPythia->Draw("same");
 
   TLegend * specLeg2 = new TLegend(0.2,0.7,0.4,0.85);
   specLeg2->AddEntry(extrapFactorPythia,"Pythia 8","p");
   specLeg2->AddEntry(extrapFactorEPOS,"EPOS LHC","p");
   specLeg2->AddEntry(extrapFactorHerw,"Herwig++","p");
-  specLeg2->Draw("same");
-  
+ 
+  TF1 * extrapFuncPoly3 = new TF1("extrapFuncPoly3","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)",0.5,103.6);
+  extrapFuncPoly3->SetParameter(0,1);
+  extrapFuncPoly3->SetParameter(1,0);
+  extrapFuncPoly3->SetParameter(2,0);
+  extrapFuncPoly3->SetParameter(3,0);
+  extrapFactorPythia->Fit(extrapFuncPoly3,"EMR");
+
+  TF1 * extrapFuncPoly4 = new TF1("extrapFuncPoly4","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)",0.5,103.6);
+  extrapFuncPoly4->SetParameter(0,1);
+  extrapFuncPoly4->SetParameter(1,0);
+  extrapFuncPoly4->SetParameter(2,0);
+  extrapFuncPoly4->SetParameter(3,0);
+  extrapFuncPoly4->SetParameter(4,0);
+  extrapFuncPoly4->SetLineColor(kBlack);
+  extrapFactorPythia->Fit(extrapFuncPoly4,"EMR");
+  extrapFuncPoly4->Write();  
+
+
+  extrapFactorEPOS->Draw("same");
+  extrapFactorHerw->Draw("same");
+  extrapFactorPythia->SetLineWidth(2);
+  extrapFactorPythia->Draw("same");
+  specLeg2->AddEntry(extrapFuncPoly4,"Fit to Pythia 8","l");
+  specLeg2->Draw("same"); 
+
   c3->SaveAs("img/extrapolationFactorPythia8.png");
   c3->SaveAs("img/extrapolationFactorPythia8.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8.C");
@@ -404,8 +425,8 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   
   /*extrapFactorHerw = (TH1D*)Herw544->Clone("extrapFactorHerw");
   extrapFactorHerw->Divide(Herw5);
-  extrapFactorHerw->SetLineColor(kMagenta);
-  extrapFactorHerw->SetMarkerColor(kMagenta);
+  extrapFactorHerw->SetLineColor(kViolet);
+  extrapFactorHerw->SetMarkerColor(kViolet);
   extrapFactorHerw->SetMarkerStyle(28);
   extrapFactorHerw->GetYaxis()->SetTitle("5.44 TeV/5.02 TeV");
   extrapFactorHerw->GetYaxis()->SetRangeUser(0.9,1.4);
@@ -437,6 +458,15 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia->Write();
   extrapFactorPythia7->SetDirectory(output);
   extrapFactorPythia7->Write();
+
+  TH1D * ppScaledWithFit = (TH1D*)pp5->Clone("ppScaled_WithFit");
+  for(int i = 1; i<ppScaledWithFit->GetSize()-1; i++){
+    ppScaledWithFit->SetBinContent(i,ppScaledWithFit->GetBinContent(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
+    ppScaledWithFit->SetBinError(i,ppScaledWithFit->GetBinError(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
+  }
+  ppScaledWithFit->SetDirectory(output);
+  ppScaledWithFit->Write();
+
   TH1D * ppScaled = (TH1D*)pp5->Clone("ppScaled");
   ppScaled->Multiply(extrapFactorPythia);
   ppScaled->SetDirectory(output);
