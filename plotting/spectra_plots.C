@@ -37,7 +37,7 @@ void spectra_plots(){
   TH1D * pp_totSyst;
   TH1D * nVtx;
   TFile * f = TFile::Open("../output_0.root","read");
-  ppSpec = (TH1D*)f->Get("ppScaled");
+  ppSpec = (TH1D*)f->Get("ppScaled_WithFit");
   ppSpec->SetDirectory(0);
   pp_totSyst = (TH1D*)ppSpec->Clone("pp_syst");
   pp_totSyst->Reset();

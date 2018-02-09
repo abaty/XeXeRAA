@@ -71,8 +71,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   TH1D * scaledPP;
   if(jobNumber==0){
-    TFile * ppFile = TFile::Open("ppRef_Dec1_Pythia.root","read");
-    scaledPP = (TH1D*)ppFile->Get("ppScaled");
+    TFile * ppFile = TFile::Open("ppRef_Feb10_Pythia.root","read");
+    scaledPP = (TH1D*)ppFile->Get("ppScaled_WithFit");
     scaledPP->SetDirectory(output);
     ppFile->Close();
   }
