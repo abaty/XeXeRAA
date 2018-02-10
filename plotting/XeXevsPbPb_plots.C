@@ -174,31 +174,28 @@ void XeXevsPbPb_plots(){
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
-    h[c]->GetYaxis()->SetRangeUser(0.3,2);
+    h[c]->GetYaxis()->SetRangeUser(0.4,2);
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
-    /* 
-    TAAUncert = s.TAAuncert[c]/100.0;
-    lumiUncert = 0.023;//12% for pp lumi
-    bLumi->SetFillColor(kGray);
+     
+    TAAUncert = 0.05;//placeholder
     bTAA->SetFillColor(kBlue-9);
-    bLumi->SetLineWidth(0);
     bTAA->SetLineWidth(0);
-    bTAA->DrawBox(0.9,1-TAAUncert,TMath::Power(10,TMath::Log10(0.9)+(TMath::Log10(1.5)-TMath::Log10(0.9))/2.0),1+TAAUncert);
-    bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.9)+(TMath::Log10(1.5)-TMath::Log10(0.9))/2.0),1-lumiUncert,1.5,1+lumiUncert);
-    */  
+    bTAA->DrawBox(0.575,1-TAAUncert,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAUncert);
+    bTAA->DrawBox(0.7,0.675,0.85,0.725);
+      
 
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
     line1->SetLineWidth(2);
     line1->SetLineStyle(2);
     line1->Draw("same");
   
-    tex2->DrawLatex(0.9,0.9,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
+    tex2->DrawLatex(0.7,0.55,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.08);
-    tex->DrawLatex(0.8,1.03,"T_{AA} and lumi. uncertainty");
-    tex->DrawLatex(0.8,0.93,"|#eta|<1");
+    tex->DrawLatex(0.9,0.675,"T_{AA} uncertainty");
+    tex->DrawLatex(0.7,0.8,"|#eta|<1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);
@@ -206,13 +203,15 @@ void XeXevsPbPb_plots(){
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
       //b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-s.RAA_totSyst[c]->GetBinContent(i)));
       //b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+s.RAA_totSyst[c]->GetBinContent(i)));
-      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-0.1));
-      b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.1));
+      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-0.03));
+      b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.03));
       b[i-1]->Draw("same");
     }
 
-    extrapFunc->SetLineStyle(2); 
+    extrapFunc->SetLineStyle(10); 
+    extrapFunc->SetLineWidth(2); 
     extrapFunc->SetLineColor(kBlue); 
+    extrapFunc->SetRange(0.65,103.6); 
     extrapFunc->Draw("same");
     
     h[c]->SetMarkerSize(1.3);
