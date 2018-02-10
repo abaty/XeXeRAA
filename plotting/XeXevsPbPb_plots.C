@@ -168,13 +168,13 @@ void XeXevsPbPb_plots(){
     h[c]->SetMarkerStyle(8);
     h[c]->GetXaxis()->SetTitle("p_{T} (GeV)");
     h[c]->GetXaxis()->CenterTitle();
-    h[c]->GetYaxis()->SetTitle("R*_{AA}");
-    h[c]->GetYaxis()->SetTitleOffset(1.2);
+    h[c]->GetYaxis()->SetTitle("#frac{Y_{XeXe}<T_{AA}>^{PbPb}}{Y_{PbPb}<T_{AA}>^{XeXe}}");
+    h[c]->GetYaxis()->SetTitleOffset(1.5);
     h[c]->GetXaxis()->SetTitleOffset(1.2);
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
-    h[c]->GetYaxis()->SetRangeUser(0.0,3);
+    h[c]->GetYaxis()->SetRangeUser(0.3,2);
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
@@ -211,8 +211,8 @@ void XeXevsPbPb_plots(){
       b[i-1]->Draw("same");
     }
 
-    extrapFunc->SetLineStyle(3); 
-    extrapFunc->SetLineStyle(kRed+1); 
+    extrapFunc->SetLineStyle(2); 
+    extrapFunc->SetLineColor(kBlue); 
     extrapFunc->Draw("same");
     
     h[c]->SetMarkerSize(1.3);
