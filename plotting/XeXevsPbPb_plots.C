@@ -66,6 +66,13 @@ void XeXevsPbPb_plots(){
     PbPb_stat[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e1",i));
     PbPb_syst[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e2plus",i));
 
+    //manual patch for a missing data point
+    if(i==3){
+      PbPb[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.244e-9);
+      PbPb_stat[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),2e-11);
+      PbPb_syst[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.e-10);
+    }
+
     //put stat errors in right spot and scale by TAA
     for(int j = 0; j<PbPb[i-1]->GetSize(); j++){
       PbPb[i-1]->SetBinError(j,PbPb_stat[i-1]->GetBinContent(j));
@@ -87,7 +94,7 @@ void XeXevsPbPb_plots(){
     PbPb[i-1]->SetDirectory(0);
     PbPb_stat[i-1]->SetDirectory(0);
     PbPb_syst[i-1]->SetDirectory(0);
-    //PbPb[i-1]->Print("All");
+    PbPb[i-1]->Print("All");
     //PbPb_stat[i-1]->Print("All");
     //PbPb_syst[i-1]->Print("All");
     f1->Close();
@@ -210,8 +217,6 @@ void XeXevsPbPb_plots(){
     
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw("same");
-
-    h[c]->Print("All");
  
     int iPeriod = 0;
     lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
