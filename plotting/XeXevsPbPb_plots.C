@@ -25,49 +25,9 @@
 #include <string>
 #include <fstream>
 #include "../Settings.h"
+#include "TF1.h"
 
-void getTheoryVitev(TGraph * vitev){
-  //Vitev**********************************************************************************************************
-  float temp_x;
-  float temp_y;
-  vector<float> x;
-  vector<float> y_d;
-  vector<float> y_u;
-  ifstream input_file_d("../theory/XeXe010chDN.txt");
-  ifstream input_file_u("../theory/XeXe010chUP.txt");
-  //get datai
-  std::cout << "reading theory prediction data" << std::endl;
-  while(!input_file_d.eof()){ 
-    input_file_d>>temp_x;
-    input_file_d>>temp_y;
-    std::cout << temp_x << " " << temp_y << std::endl;
-    x.push_back(temp_x);
-    y_d.push_back(temp_y);
-  }
-  while(!input_file_u.eof()){ 
-    input_file_u>>temp_x;
-    input_file_u>>temp_y;
-    std::cout << temp_y << std::endl;
-    y_u.push_back(temp_y);
-  }
-  std::cout << "done reading " << x.size() << " Points"  << std::endl;
-  
-  //put data in histograms
-  const int graphPts = 950;
-  //vitev = TGraph(2*graphPts);
-  for (int i=0;i<graphPts;i++) {
-    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
-    vitev->SetPoint(i,x[i],y_d[i]);
-    vitev->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
-  }
-  vitev->SetFillStyle(3002);
-  vitev->SetFillColor(kRed);
-  vitev->SetLineWidth(0);
-}
-//***************************************************************************************************8
-
-
-void RAA_plots(){
+void XeXevsPbPb_plots(){
   TH1::SetDefaultSumw2();
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
@@ -79,15 +39,15 @@ void RAA_plots(){
  
   Settings s = Settings();
 
+  TFile * ppFit = TFile::Open("../ppRef_Feb10_Pythia.root","read");
+  TF1 * extrapFunc = (TF1*)ppFit->Get("extrapFuncPoly4");
+  
   TH1D * h[s.nCentBins];
-  TH1D * ppSpec;
   TH1D * nVtx;
   TFile * f = TFile::Open("../output_0.root","read");
-  ppSpec = (TH1D*)f->Get("ppScaled_WithFit");
   nVtx = (TH1D*)f->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
     h[c] = (TH1D*)f->Get(Form("HI_TaaWeighted_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
-    h[c]->Divide(ppSpec);
     h[c]->Scale(1.0/nVtx->GetBinContent(nVtx->GetXaxis()->FindBin(c)));
     h[c]->SetDirectory(0);
     h[c]->Print("All");
@@ -181,7 +141,7 @@ void RAA_plots(){
     h[c]->Draw("same");
   
     int iPeriod = 0;
-    lumi_sqrtS = " 27.4 pb^{-1} (5.02 TeV pp) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
+    lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
     extraText  = "Preliminary";
     //extraText  = "Unpublished";
@@ -191,20 +151,9 @@ void RAA_plots(){
     canv->Update();
     canv->RedrawAxis();
     canv->GetFrame()->Draw();    
-    canv->SaveAs(Form("img/RAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    canv->SaveAs(Form("img/RAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
-
-    //stuff with theory
-    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10){
-      const int graphPts = 950;
-      TGraph * vitev = new TGraph(2*graphPts);
-      getTheoryVitev(vitev);
-      vitev->Draw("same f");
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    }
   }
 }
 
