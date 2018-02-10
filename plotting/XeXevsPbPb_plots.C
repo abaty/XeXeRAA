@@ -54,6 +54,45 @@ void XeXevsPbPb_plots(){
   }
   f->Close();
 
+  TH1D * PbPb[6];
+  TH1D * PbPb_stat[6];
+  TH1D * PbPb_syst[6];
+
+  float TAA[6] = {26.0,20.5,11.5,3.82,0.934,0.152};
+
+  for(int i = 1; i<7; i++){
+    TFile * f1 = TFile::Open(Form("PbPbRAAs/HEPData-ins1496050-v1-Table%d.root",i),"read"); 
+    PbPb[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1",i));
+    PbPb_stat[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e1",i));
+    PbPb_syst[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e2plus",i));
+
+    //put stat errors in right spot and scale by TAA
+    for(int j = 0; j<PbPb[i-1]->GetSize(); j++){
+      PbPb[i-1]->SetBinError(j,PbPb_stat[i-1]->GetBinContent(j));
+    }
+    
+    if(i==1){
+      PbPb[i-1]->Scale(1.0/(10.*TAA[i-1]));
+      PbPb_syst[i-1]->Scale(1.0/(10.*TAA[i-1]));
+    }
+    else if(i==2){
+      PbPb[i-1]->Scale(1.0/(3.*TAA[i-1]));
+      PbPb_syst[i-1]->Scale(1.0/(3.*TAA[i-1]));
+    }
+    else {
+      PbPb[i-1]->Scale(1.0/TAA[i-1]);
+      PbPb_syst[i-1]->Scale(1.0/TAA[i-1]);
+    }
+
+    PbPb[i-1]->SetDirectory(0);
+    PbPb_stat[i-1]->SetDirectory(0);
+    PbPb_syst[i-1]->SetDirectory(0);
+    //PbPb[i-1]->Print("All");
+    //PbPb_stat[i-1]->Print("All");
+    //PbPb_syst[i-1]->Print("All");
+    f1->Close();
+  } 
+
   setTDRStyle();
   TLine * line1;
   TLatex * tex = new TLatex(0.1,0.1,"cent");
@@ -90,6 +129,33 @@ void XeXevsPbPb_plots(){
 
   for(int c = 0; c<s.nCentBins; c++){
     //plotting
+    if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30) continue;
+    int PbPbBin = c;
+    if(c==23) PbPbBin = 2;
+    if(c==24) PbPbBin = 3;
+    if(c==25) PbPbBin = 4;
+    if(c==30) PbPbBin = 5;
+    
+    for(int i = 1; i<h[c]->GetSize(); i++){
+      if(i==1 || i==2){
+        h[c]->SetBinContent(i,0);
+        h[c]->SetBinError(i,0);
+        continue;
+      }
+
+      float relErr = h[c]->GetBinError(i)/h[c]->GetBinContent(i);
+      float PbPbContent = PbPb[PbPbBin]->GetBinContent(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)));
+      float PbPbRelErr = PbPb[PbPbBin]->GetBinError(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+ 
+      h[c]->SetBinContent(i,h[c]->GetBinContent(i)/PbPbContent);
+      h[c]->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
+
+      if(h[c]->GetBinContent(i)==0){
+        h[c]->SetBinContent(i,0);
+        h[c]->SetBinError(i,0);
+      }
+    }    
+
     canv->Clear();
     h[c]->SetLineColor(kBlack);
     h[c]->SetMarkerStyle(8);
@@ -101,7 +167,7 @@ void XeXevsPbPb_plots(){
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
-    h[c]->GetYaxis()->SetRangeUser(0,1.6);
+    h[c]->GetYaxis()->SetRangeUser(0.0,3);
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
@@ -121,7 +187,7 @@ void XeXevsPbPb_plots(){
     line1->SetLineStyle(2);
     line1->Draw("same");
   
-    tex2->DrawLatex(0.9,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
+    tex2->DrawLatex(0.9,0.9,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.08);
     tex->DrawLatex(0.8,1.03,"T_{AA} and lumi. uncertainty");
@@ -137,9 +203,16 @@ void XeXevsPbPb_plots(){
       b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.1));
       b[i-1]->Draw("same");
     }
+
+    extrapFunc->SetLineStyle(3); 
+    extrapFunc->SetLineStyle(kRed+1); 
+    extrapFunc->Draw("same");
+    
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw("same");
-  
+
+    h[c]->Print("All");
+ 
     int iPeriod = 0;
     lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
@@ -153,7 +226,7 @@ void XeXevsPbPb_plots(){
     canv->GetFrame()->Draw();    
     canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
+    canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
   }
 }
 
