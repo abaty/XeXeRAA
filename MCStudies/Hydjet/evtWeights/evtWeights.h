@@ -50,13 +50,14 @@ void makeEvtWeights(){
   d_hiBin->Scale(1./d_hiBin->GetEntries());
 
   TFile * mc = TFile::Open("mc.root","read");
+//  TFile * mc = TFile::Open("EPOS_mc.root","read");
   TH1D * mc_vz = (TH1D*)mc->Get("vz");
   mc_vz->Scale(1./mc_vz->GetEntries());
   TH1D * mc_hiBin = (TH1D*)mc->Get("hiBin");
   mc_hiBin->Rebin(2);
   mc_hiBin->Scale(1./mc_hiBin->GetEntries());
 
-  TFile * weights = TFile::Open("../evtWeights.root","recreate");
+  TFile * weights = TFile::Open("../evtWeights_EPOS.root","recreate");
   TH1D * vz_w = (TH1D*)d_vz->Clone("vz_weight");
   vz_w->Divide(mc_vz);
   TH1D * hiBin_w = (TH1D*)d_hiBin->Clone("hiBin_weight");

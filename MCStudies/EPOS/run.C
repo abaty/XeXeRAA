@@ -9,7 +9,7 @@
 #include <string>
 #include "../../Settings.h"
 #include "../../include/trackingBinMap.h"
-#include "evtWeights/evtWeights.h"
+#include "../Hydjet/evtWeights/evtWeights.h"
 #include "TMath.h"
 
 int centBin(int b){
@@ -31,6 +31,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * hiBin_Weighted_h = new TH1D("hiBin_weight",";hiBin",200,0,200);
   TH1D * vz_Weighted_h = new TH1D("vz_weight",";vz",120,-30,30);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
+  TH1D * nEvt_h = new TH1D("nEvt_h","nEvt_h",3,0,3);
 
   TH1D *nHit[17][3][3], *chi2[17][3][3], *DCAz[17][3][3], *DCAxy[17][3][3], *ptErr[17][3][3], *eta[17][3][3], *phi[17][3][3], *caloMatch[17][3][3];
 
@@ -172,6 +173,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(i%100==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
       skim->GetEntry(i);
       evt->GetEntry(i);
+      nEvt_h->Fill(1);
       if(!vtx) noVtxCent_h->Fill(hiBin);
       if(!beam || !vtx || !hfCoinc) continue;
       vz_h->Fill(vz);
