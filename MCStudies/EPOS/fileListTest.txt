@@ -1,0 +1,1 @@
+/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Official/EPOSMB/XeXeMinBias_5p44TeV-ReggeGribovPartonMC_EposLHC/crab_20180130_200016/180130_190029/0000/HiForestAOD_1.root
