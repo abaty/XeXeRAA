@@ -63,6 +63,9 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   TH1D * Herw5 = (TH1D*)fHerw->Get("Herwigpp_5");
   TH1D * Herw544 = (TH1D*)fHerw->Get("Herwigpp_544");
 
+  TFile * xtFile = TFile::Open("x_t_check/xtScaling.root");
+  TH1D * xtScaled = (TH1D*)xtFile->Get("xtPPRef544");
+
   TFile * output = TFile::Open("ppRef_Extrapolated.root","recreate");
 
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
@@ -576,6 +579,22 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   c5->SaveAs("img/5vsRelativePlacement.C");
   c5->SaveAs("img/5vsRelativePlacement.png");
   c5->SaveAs("img/5vsRelativePlacement.pdf");
+
+  TH1D * xt544VSextrap5 = (TH1D*)ppScaled->Clone("xt544VSextrap5");
+  xt544VSextrap5->Divide(xtScaled);
+  xt544VSextrap5->GetXaxis()->SetRangeUser(15,105);
+  xt544VSextrap5->GetXaxis()->SetTitle("p_{T}");
+  xt544VSextrap5->GetYaxis()->SetTitle("(Extrap from 5 TeV)/(x_{T} scaling)");
+  xt544VSextrap5->GetYaxis()->SetRangeUser(0.9,1.1);
+  xt544VSextrap5->SetMarkerStyle(8);
+  xt544VSextrap5->SetLineColor(kBlack);
+  xt544VSextrap5->Draw("");
+  
+  c5->SaveAs("img/5vsXTScaled.C");
+  c5->SaveAs("img/5vsXTScaled.png");
+  c5->SaveAs("img/5vsXTScaled.pdf");
+  
+  
 } 
 
 

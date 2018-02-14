@@ -6,7 +6,7 @@
 #include "TMath.h"
 #include "TF1.h"
 
-void globalPoly2Fit(int i, TF1 * f, TGraphErrors * g0, TGraphErrors * g1, TGraphErrors * g2, TGraphErrors * g5, TGraphErrors * g7, TGraphErrors * g13){
+void globalPoly2Fit(int i, TF1 * f, TF1 * fErr, TGraphErrors * g0, TGraphErrors * g1, TGraphErrors * g2, TGraphErrors * g5, TGraphErrors * g7, TGraphErrors * g13){
   TGraphErrors * g = new TGraphErrors(6);
   double x, y;
   g0->GetPoint(0,x,y);
@@ -30,11 +30,22 @@ void globalPoly2Fit(int i, TF1 * f, TGraphErrors * g0, TGraphErrors * g1, TGraph
   g->SetPointError(5,0,g13->GetErrorY(0));
   g->Print("All");
 
-  g->Fit(Form("f%d",i),"EMR0");
+  TFitResultPtr t = g->Fit(Form("f%d",i),"SEMR0");
+  t->Print("V");
+  TMatrixDSym m = t->GetCovarianceMatrix();
+  fErr->SetParameter(0,m(0,0));
+  fErr->SetParameter(1,2*m(0,1));
+  fErr->SetParameter(2,2*m(0,2)+m(1,1));
+  fErr->SetParameter(3,2*m(1,2));
+  fErr->SetParameter(4,m(2,2));
+  //std::cout << TMath::Power(m(0,0),2) << " " << 2*m(0,1)*TMath::Log(5.44) << " " << (2*m(0,2)+TMath::Power(m(1,1),2))*TMath::Power(TMath::Log(5.44),2) << " " << 2*m(1,2)*TMath::Power(TMath::Log(5.44),3) << " " << TMath::Power(m(2,2),2)*TMath::Power(TMath::Log(5.44),4)  << std::endl;
+  //std::cout << fErr->Eval(5.44) << " " << f->Eval(5.44) <<  std::endl;
+  //std::cout << TMath::Power(TMath::Abs(fErr->Eval(5.44)),0.5)/f->Eval(5.44) << std::endl;
   f->Draw("same");
 }
 
 void makeXtPlot(){
+  TFile * output = TFile::Open("xtScaling.root","recreate");
   const int xtBins = 8;
 
   //5TeV data from hepdata
@@ -47,21 +58,24 @@ void makeXtPlot(){
     ppSpec->SetBinError(i,TMath::Power(ppSpec_stat->GetBinContent(i)*ppSpec_stat->GetBinContent(i)+ppSpec_syst->GetBinContent(i)*ppSpec_syst->GetBinContent(i)+ppSpec_lumi->GetBinContent(i)*ppSpec_lumi->GetBinContent(i),0.5));
   }
 
+  output->cd();
+
   //ignore 7000 here, i's for 5020 GeV
   TCanvas * c1 = new TCanvas("c1","",800,600);
   c1->SetLogx();
   c1->SetLogy();
-  ppSpec->GetXaxis()->SetRangeUser(10,80);
+  ppSpec->GetXaxis()->SetRangeUser(20,105);
   ppSpec->GetYaxis()->SetTitle("");
+  ppSpec->GetXaxis()->SetTitle("p_{T} GeV");
   ppSpec->Draw();
   
 
-  float xLow = 10;
-  float xHigh = 100;
+  float xLow = 20;
+  float xHigh = 105;
   TF1 *cms_5020_fit = new TF1("cms_5020_fit","[0]*pow(1.0+(x/[1]),[2])",xLow,xHigh);
   cms_5020_fit->SetLineWidth(1);
-  cms_5020_fit->SetParameters(3,1,-6.5);
-  TFitResultPtr r = ppSpec->Fit(cms_5020_fit,"REMEXSI");
+  cms_5020_fit->SetParameters(3.3,1.11,-6.58);
+  TFitResultPtr r = ppSpec->Fit(cms_5020_fit,"REMIS");
   std::cout << "Chi2/ndof: " << r->Chi2()/r->Ndf() << std::endl;
   
   c1->SaveAs("img/5TeV_PowerLawFit.C");
@@ -88,6 +102,9 @@ void makeXtPlot(){
   c2->SetLogx();
   residuals->SetMarkerStyle(8);
   residuals->GetXaxis()->SetRangeUser(xLow,xHigh);
+  residuals->SetTitle("");
+  residuals->GetXaxis()->SetTitle("p_{T} (GeV)");
+  residuals->GetYaxis()->SetTitle("Fit Residuals");
   residuals->Draw("AP");
   c2->SaveAs("img/5TeV_Residuals.C");
   c2->SaveAs("img/5TeV_Residuals.png");
@@ -122,9 +139,12 @@ void makeXtPlot(){
   c->SetLogx();
 
   TGraphErrors *g0, *g1, *g2, *g5, *g7, *g13;
+  TGraphErrors *xt544 = new TGraphErrors(xtBins);
+  TGraph *errU[xtBins];
+  TGraph *errD[xtBins];
   TF1 * f[xtBins];
+  TF1 * fErr[xtBins];
 
-  //for(int i = 0; i<xtBins; i++){
   for(int i = 0; i<xtBins; i++){
     c->Clear();
     dummy->GetYaxis()->SetRangeUser(0,yMax[i]);
@@ -199,13 +219,23 @@ void makeXtPlot(){
     g13->SetMarkerSize(1.5);
 
     dummy->Draw();
-    g0->Draw("PZ same"); 
-    g1->Draw("PZ same"); 
-    g2->Draw("PZ same"); 
-    g5->Draw("PZ same"); 
-    g7->Draw("PZ same"); 
-    g13->Draw("PZ same"); 
- 
+    
+    f[i] = new TF1(Form("f%d",i),"[0]+[1]*TMath::Log(x)+[2]*TMath::Log(x)*TMath::Log(x)",0.8,14);
+    fErr[i] = new TF1(Form("fErr%d",i),"[0]+[1]*TMath::Log(x)+[2]*TMath::Log(x)*TMath::Log(x)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)",0.8,14);
+    f[i]->SetLineWidth(1);
+    f[i]->SetLineColor(kBlack);
+    f[i]->SetParameters(5,0,0);
+    globalPoly2Fit(i,f[i],fErr[i],g0,g1,g2,g5,g7,g13);
+
+    errU[i] = new TGraph(2000);
+    errU[i]->SetFillColor(kGray);
+    for(int j = 0; j<1000; j++){
+      float x = 0.8+(float)j/1000.0*(14-0.8);
+      float err = TMath::Power(fErr[i]->Eval(5.44),0.5);
+      errU[i]->SetPoint(j,x,f[i]->Eval(x)+err);
+      errU[i]->SetPoint(1999-j,x,f[i]->Eval(x)-err);
+    }
+
     TLegend * l = new TLegend(0.1,0.6,0.8,0.9);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
@@ -215,6 +245,7 @@ void makeXtPlot(){
     l->AddEntry(g5,"CMS 5.02 TeV","p");
     l->AddEntry(g7,"CMS 7.00 TeV","p");
     l->AddEntry(g13,"CMS 13.0 TeV (Unpublished)","p");
+    l->AddEntry(f[i],"Parabola fit in #sqrt{s}","l");
     l->Draw("same");
 
     TLegend * l2 = new TLegend(0.55,0.1,0.8,0.3);
@@ -223,11 +254,19 @@ void makeXtPlot(){
     l2->AddEntry((TObject*)0,Form("x_{T} = %1.4f",xtValue[i]),"");
     l2->Draw("same");
 
-    f[i] = new TF1(Form("f%d",i),"[0]+[1]*TMath::Log(x)+[2]*TMath::Log(x)*TMath::Log(x)",0.8,14);
-    f[i]->SetLineWidth(1);
-    f[i]->SetLineColor(kBlack);
-    f[i]->SetParameters(5,0,0);
-    globalPoly2Fit(i,f[i],g0,g1,g2,g5,g7,g13);
+    errU[i]->Draw("F same");
+    f[i]->Draw("same"); 
+    g0->Draw("PZ same"); 
+    g1->Draw("PZ same"); 
+    g2->Draw("PZ same"); 
+    g5->Draw("PZ same"); 
+    g7->Draw("PZ same"); 
+    g13->Draw("PZ same"); 
+
+    xt544->SetPoint(i,xtValue[i]*5440./2.0,f[i]->Eval(5.44)*TMath::Power(5440.,-4.9)*2*TMath::Power(10,9));
+    //std::cout << getErrorFromFit(f[i],5.440) << std::endl;
+    float fitError = TMath::Power(fErr[i]->Eval(5.44),0.5)/f[i]->Eval(5.44);
+    xt544->SetPointError(i,0,f[i]->Eval(5.44)*TMath::Power(5440.,-4.9)*2*TMath::Power(10,9)*fitError);
 
     c->SaveAs(Form("img/xtPlot_%d.pdf",i));
     c->SaveAs(Form("img/xtPlot_%d.png",i));
@@ -244,6 +283,52 @@ void makeXtPlot(){
     delete g7;
     delete g13;
   }
+  xt544->Print("All");
+
+  TCanvas * c3 = new TCanvas("c3","c3",800,600);
+  c3->SetLogy();
+  c3->SetLogx();
+  xt544->SetTitle("");
+  xt544->GetXaxis()->SetRangeUser(8,110);
+  xt544->GetXaxis()->SetMoreLogLabels(1);
+  xt544->GetXaxis()->SetTitle("p_{T} (GeV)");
+  xt544->GetYaxis()->SetTitle("E#frac{d^{3}#sigma}{d^{3}p} (mb GeV^{2})");
+  xt544->Draw("AP");
+  TF1 *f544_fit = new TF1("f544_fit","[0]*pow(1.0+(x/[1]),[2])",xLow,xHigh);
+  f544_fit->SetLineWidth(1);
+  f544_fit->SetParameters(0.7,3,-7);
+  TFitResultPtr xtFitResult = xt544->Fit("f544_fit","REMS");
+  std::cout << "Chi2/ndof: " << xtFitResult->Chi2()/xtFitResult->Ndf() << std::endl;
+  c3->SaveAs("img/544Fit.png");
+  c3->SaveAs("img/544Fit.pdf");
+  c3->SaveAs("img/544Fit.C");
 
 
+  const int ntrkBins = 32;
+  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
+  TH1D * ppRef544 = new TH1D("xtPPRef544",";p_{T};",ntrkBins,xtrkbins);
+  for(int i = 1; i<ppRef544->GetSize()-1; i++){
+    if(ppRef544->GetBinCenter(i)<xLow || ppRef544->GetBinCenter(i)>xHigh){
+      ppRef544->SetBinContent(i,0);
+      ppRef544->SetBinError(i,0);
+      continue;
+    }
+    float bw = ppRef544->GetBinWidth(i);
+    float center = ppRef544->GetBinCenter(i);
+    ppRef544->SetBinContent(i,f544_fit->Integral(ppRef544->GetBinLowEdge(i),ppRef544->GetBinLowEdge(i+1))/bw);
+    float relativeError = 0;
+    float dist = 1000;
+    for(int j = 0; j<xt544->GetN(); j++){
+      double x, y;
+      xt544->GetPoint(j,x,y);
+      if(TMath::Abs(x-center)<dist){
+        dist = TMath::Abs(x-center);
+        relativeError = xt544->GetErrorY(j)/y;
+      }
+    }
+
+    ppRef544->SetBinError(i,ppRef544->GetBinContent(i)*relativeError);
+  }
+  ppRef544->Print("All");
+  output->Write();
 }
