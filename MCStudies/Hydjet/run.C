@@ -131,7 +131,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
     skim->SetBranchAddress("pPAprimaryVertexFilter",&vtx);
     skim->SetBranchAddress("pBeamScrapingFilter",&beam);
-    skim->SetBranchAddress("phfCoincFilter2",&hfCoinc);
+    skim->SetBranchAddress("phfCoincFilter3",&hfCoinc);
     trk->SetBranchAddress("nTrk",&nTrk);
     trk->SetBranchAddress("trkPt",trkPt);
     trk->SetBranchAddress("trkPhi",trkPhi);
