@@ -41,9 +41,11 @@ double findTaaAverage(int L, int H) {
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
   TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Hydjet_Feb6.root");
+  TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,900000);
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
+  TH1D * hiBinNoWeight_h = new TH1D("hiBinNoWeight","hiBinNoWeight",200,0,200);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
@@ -152,17 +154,19 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(!vtx) noVtxCent_h->Fill(hiBin);
       if(!beam || !vtx || !hfCoinc) continue;
 
+      float evtW = 1.0/evtSelEff->Eval(hiHF);
 
-      vz_h->Fill(vz);
+      vz_h->Fill(vz,evtW);
       if(TMath::Abs(vz)>15) continue;
       for(int c = 0; c<s.nCentBins; c++){
         if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
-        if(c<20) s.nVtx->Fill(c);
-        nVtxMoreBin->Fill(c);
-        s.nVtx_int[c]++;
+        if(c<20) s.nVtx->Fill(c,evtW);
+        nVtxMoreBin->Fill(c,evtW);
+        s.nVtx_float[c] += evtW;
       }
       if(hiBin<0 || hiBin>199) continue;//protection
-      hiBin_h->Fill(hiBin);
+      hiBin_h->Fill(hiBin,evtW);
+      hiBinNoWeight_h->Fill(hiBin,evtW);
 
       trk->GetEntry(i);
       //for tracking
@@ -173,25 +177,25 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
           int bin = trkBinMap(hiBin,trkPt[j]);
           
-          eta[0][0]->Fill(trkEta[j]);
-          eta[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkEta[j]);
-          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][0],phi[bin][0],trkPhi[j],DCAz[0][0],DCAz[bin][0],trkDz1[j]/trkDzError1[j],DCAxy[0][0],DCAxy[bin][0],trkDxy1[j]/trkDxyError1[j],nHit[0][0],nHit[bin][0],trkNHit[j],chi2[0][0],chi2[bin][0],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][0],ptErr[bin][0],trkPtError[j]/trkPt[j],caloMatch[0][0],caloMatch[bin][0],Et/trkPt[j]); 
+          eta[0][0]->Fill(trkEta[j],evtW);
+          eta[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkEta[j],evtW);
+          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][0],phi[bin][0],trkPhi[j],DCAz[0][0],DCAz[bin][0],trkDz1[j]/trkDzError1[j],DCAxy[0][0],DCAxy[bin][0],trkDxy1[j]/trkDxyError1[j],nHit[0][0],nHit[bin][0],trkNHit[j],chi2[0][0],chi2[bin][0],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][0],ptErr[bin][0],trkPtError[j]/trkPt[j],caloMatch[0][0],caloMatch[bin][0],Et/trkPt[j],evtW); 
           
           if(TMath::Abs(trkDz1[j]/trkDzError1[j])>3 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>3) continue;
           if(trkPtError[j]/trkPt[j]>0.1) continue;
           
-          eta[0][1]->Fill(trkEta[j]);
-          eta[trkBinMap(hiBin,trkPt[j])][1]->Fill(trkEta[j]);
-          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][1],phi[bin][1],trkPhi[j],DCAz[0][1],DCAz[bin][1],trkDz1[j]/trkDzError1[j],DCAxy[0][1],DCAxy[bin][1],trkDxy1[j]/trkDxyError1[j],nHit[0][1],nHit[bin][1],trkNHit[j],chi2[0][1],chi2[bin][1],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][1],ptErr[bin][1],trkPtError[j]/trkPt[j],caloMatch[0][1],caloMatch[bin][1],Et/trkPt[j]); 
+          eta[0][1]->Fill(trkEta[j],evtW);
+          eta[trkBinMap(hiBin,trkPt[j])][1]->Fill(trkEta[j],evtW);
+          if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][1],phi[bin][1],trkPhi[j],DCAz[0][1],DCAz[bin][1],trkDz1[j]/trkDzError1[j],DCAxy[0][1],DCAxy[bin][1],trkDxy1[j]/trkDxyError1[j],nHit[0][1],nHit[bin][1],trkNHit[j],chi2[0][1],chi2[bin][1],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][1],ptErr[bin][1],trkPtError[j]/trkPt[j],caloMatch[0][1],caloMatch[bin][1],Et/trkPt[j],evtW); 
 
           if(trkNHit[j]<11) continue;
           if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
           if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
           
-          eta[0][2]->Fill(trkEta[j]);
-          eta[trkBinMap(hiBin,trkPt[j])][2]->Fill(trkEta[j]);
+          eta[0][2]->Fill(trkEta[j],evtW);
+          eta[trkBinMap(hiBin,trkPt[j])][2]->Fill(trkEta[j],evtW);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
-          fillTrkDists(phi[0][2],phi[bin][2],trkPhi[j],DCAz[0][2],DCAz[bin][2],trkDz1[j]/trkDzError1[j],DCAxy[0][2],DCAxy[bin][2],trkDxy1[j]/trkDxyError1[j],nHit[0][2],nHit[bin][2],trkNHit[j],chi2[0][2],chi2[bin][2],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][2],ptErr[bin][2],trkPtError[j]/trkPt[j],caloMatch[0][2],caloMatch[bin][2],Et/trkPt[j]); 
+          fillTrkDists(phi[0][2],phi[bin][2],trkPhi[j],DCAz[0][2],DCAz[bin][2],trkDz1[j]/trkDzError1[j],DCAxy[0][2],DCAxy[bin][2],trkDxy1[j]/trkDxyError1[j],nHit[0][2],nHit[bin][2],trkNHit[j],chi2[0][2],chi2[bin][2],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][2],ptErr[bin][2],trkPtError[j]/trkPt[j],caloMatch[0][2],caloMatch[bin][2],Et/trkPt[j],evtW); 
         }
       }//end of tracking stuff
 
@@ -205,7 +209,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
-        float weight = trkCorr.getTrkCorr(trkPt[j],hiBin);
+        float weight = trkCorr.getTrkCorr(trkPt[j],hiBin)*evtW;
 
         for(int c = 0; c<s.nCentBins; c++){
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
@@ -233,7 +237,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     //RAA
     if(jobNumber==0){
       RAA[c] = (TH1D*) s.HI_TaaWeighted[c]->Clone(Form("RAA_SingleThreadDEBUGONLY_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      RAA[c]->Scale(1.0/(float)s.nVtx_int[c]);
+      RAA[c]->Scale(1.0/(float)s.nVtx_float[c]);
       RAA[c]->Divide(scaledPP);
     }
   }

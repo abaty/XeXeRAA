@@ -25,7 +25,7 @@ class Settings{
   TH1D * HI[nCentBins]; 
   TH1D * HI_TaaWeighted[nCentBins]; 
   TH1D * nVtx;
-  int nVtx_int[nCentBins];
+  float nVtx_float[nCentBins];
 
   private:
 
