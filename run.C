@@ -166,7 +166,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       }
       if(hiBin<0 || hiBin>199) continue;//protection
       hiBin_h->Fill(hiBin,evtW);
-      hiBinNoWeight_h->Fill(hiBin,evtW);
+      hiBinNoWeight_h->Fill(hiBin);
 
       trk->GetEntry(i);
       //for tracking
