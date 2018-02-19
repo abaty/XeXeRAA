@@ -150,7 +150,6 @@
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_73.root
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_74.root
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_75.root
-/mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_76.root
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_77.root
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_78.root
 /mnt/hadoop/cms/store/user/abaty/XeXe_reRECO_v3/MB10/HIMinimumBias10/crab_20180215_191622/180215_181638/0000/HiForestAOD_79.root
