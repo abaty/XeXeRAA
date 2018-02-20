@@ -59,9 +59,9 @@ void XeXevsPbPb_plots(){
   TH1D * PbPb_syst[6];
 
   float TAA[6] = {26.0,20.5,11.5,3.82,0.934,0.152};
+  TFile * f1 = TFile::Open("PbPbRAAs/HEPData-ins1496050-v2-root.root","read"); 
 
   for(int i = 1; i<7; i++){
-    TFile * f1 = TFile::Open(Form("PbPbRAAs/HEPData-ins1496050-v1-Table%d.root",i),"read"); 
     PbPb[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1",i));
     PbPb_stat[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e1",i));
     PbPb_syst[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e2plus",i));
@@ -97,8 +97,8 @@ void XeXevsPbPb_plots(){
     PbPb[i-1]->Print("All");
     //PbPb_stat[i-1]->Print("All");
     //PbPb_syst[i-1]->Print("All");
-    f1->Close();
   } 
+  f1->Close();
 
   setTDRStyle();
   TLine * line1;
