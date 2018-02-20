@@ -227,6 +227,7 @@ void RAA_plots(){
     }
 
     TLegend * leg = new TLegend(0.5,0.7,0.85,0.9);
+    leg->SetFillStyle(0);
     //31 is 0-10%, removed for now
     if(!(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30 && c!=20)){
       int cc = c;
