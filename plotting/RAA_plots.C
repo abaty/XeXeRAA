@@ -243,7 +243,7 @@ void RAA_plots(){
       PbPb[cc]->Draw("same");
       
       h[c]->SetFillColor(kRed-7);
-      h[c]->SetFillStyle(1);
+      h[c]->SetFillStyle(1001);
       leg->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb","pl");
       leg->Draw("same");
