@@ -67,11 +67,11 @@ void XeXevsPbPb_plots(){
     PbPb_syst[i-1] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e2plus",i));
 
     //manual patch for a missing data point
-    if(i==3){
-      PbPb[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.244e-9);
-      PbPb_stat[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),2e-11);
-      PbPb_syst[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.e-10);
-    }
+    //if(i==3){
+    //  PbPb[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.244e-9);
+    //  PbPb_stat[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),2e-11);
+    //  PbPb_syst[i-1]->SetBinContent(PbPb[i-1]->FindBin(80),1.e-10);
+    //}
 
     //put stat errors in right spot and scale by TAA
     for(int j = 0; j<PbPb[i-1]->GetSize(); j++){

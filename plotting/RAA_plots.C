@@ -79,6 +79,26 @@ void RAA_plots(){
  
   Settings s = Settings();
 
+  //loading 5.02 TeV PbPb
+  TFile * f1 = TFile::Open("PbPbRAAs/HEPData-ins1496050-v2-root.root","read"); 
+  TH1D * PbPb[8];
+  TH1D * PbPb_stat[8];
+  TH1D * PbPb_syst[8];
+  TH1D * PbPb_systTAAU[8];
+  TH1D * PbPb_systTAAD[8];
+  TH1D * PbPb_systLumi[8];
+  for(int i = 0; i<8; i++){
+    PbPb[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1",i+8));
+    PbPb_stat[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e1",i+8));
+    PbPb_syst[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e2",i+8));
+    PbPb_systTAAU[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e3plus",i+8));
+    PbPb_systTAAD[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e3minus",i+8));
+    PbPb_systLumi[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e4",i+8));
+    for(int j = 1; j<PbPb[i]->GetSize(); j++){
+      PbPb[i]->SetBinError(j,PbPb_stat[i]->GetBinContent(j));
+    }
+  }//done loading PbPb
+
   TH1D * h[s.nCentBins];
   TH1D * ppSpec;
   TH1D * nVtx;
@@ -101,7 +121,11 @@ void RAA_plots(){
   TBox* bLumi = new TBox(0.1,0.1,0.15,0.2); 
   TBox* bTAA = new TBox(0.15,0.1,0.2,0.2); 
   TBox* b[s.ntrkBins];
-  for(int i = 0; i<s.ntrkBins; i++) b[i] = new TBox(0.1,0.1,0.2,0.2); 
+  TBox* bPbPb[s.ntrkBins];
+  for(int i = 0; i<s.ntrkBins; i++){
+    b[i] = new TBox(0.1,0.1,0.2,0.2); 
+    bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
+  }
 
   int W = 800;
   int H = 700;//700
@@ -135,7 +159,7 @@ void RAA_plots(){
     h[c]->SetMarkerStyle(8);
     h[c]->GetXaxis()->SetTitle("p_{T} (GeV)");
     h[c]->GetXaxis()->CenterTitle();
-    h[c]->GetYaxis()->SetTitle("R*_{AA}");
+    h[c]->GetYaxis()->SetTitle("R_{AA}*, R_{AA}");
     h[c]->GetYaxis()->SetTitleOffset(1.2);
     h[c]->GetXaxis()->SetTitleOffset(1.2);
     h[c]->GetYaxis()->CenterTitle();
@@ -175,11 +199,58 @@ void RAA_plots(){
       //b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+s.RAA_totSyst[c]->GetBinContent(i)));
       b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-0.1));
       b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.1));
+      
       b[i-1]->Draw("same");
+    }
+    for(int i = 1; i< (h[0]->GetSize()-1); i++){
+      //PbPb syst error boxes    
+      //31 is 0-10%, removed for now  
+      if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30 && c!=20) continue;
+      int cc = c;
+      if(c==23) cc=2;
+      if(c==24) cc=3;
+      if(c==25) cc=4;
+      if(c==30) cc=5;
+      if(c==31) cc=6;
+      if(c==20) cc=7;
+      if(i>2){
+        bPbPb[i-3]->SetFillStyle(0);
+        bPbPb[i-3]->SetLineColor(kBlue);
+        bPbPb[i-3]->SetX1(h[c]->GetXaxis()->GetBinLowEdge(i));
+        bPbPb[i-3]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
+        float errU = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAU[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
+        float errD = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAD[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
+        bPbPb[i-3]->SetY1(PbPb[cc]->GetBinContent(i-2)+errU);
+        bPbPb[i-3]->SetY2(PbPb[cc]->GetBinContent(i-2)-errD);
+        bPbPb[i-3]->Draw("same");
+      }
+    }
+
+    TLegend * leg = new TLegend(0.5,0.7,0.85,0.9);
+    //31 is 0-10%, removed for now
+    if(!(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30 && c!=20)){
+      int cc = c;
+      if(c==23) cc=2;
+      if(c==24) cc=3;
+      if(c==25) cc=4;
+      if(c==30) cc=5;
+      if(c==31) cc=6;
+      if(c==20) cc=7;
+      PbPb[cc]->SetMarkerColor(kBlue);
+      PbPb[cc]->SetLineColor(kBlue);
+      PbPb[cc]->SetMarkerStyle(24);
+      PbPb[cc]->SetMarkerSize(1.3);
+      PbPb[cc]->Draw("same");
+      
+      h[c]->SetFillColor(kRed-7);
+      h[c]->SetFillStyle(1);
+      leg->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
+      leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb","pl");
+      leg->Draw("same");
     }
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw("same");
-  
+ 
     int iPeriod = 0;
     lumi_sqrtS = " 27.4 pb^{-1} (5.02 TeV pp) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
