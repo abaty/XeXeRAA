@@ -15,7 +15,7 @@
 
 //FIXME preliminary
 double findTaaAverage(int L, int H) {
-  if(L==0 && H==10) return 13.9;
+  /*if(L==0 && H==10) return 13.9;
   if(L==10 && H==20) return 10.8;
   if(L==20 && H==30) return 8.47;
   if(L==30 && H==40) return 6.60;
@@ -34,7 +34,58 @@ double findTaaAverage(int L, int H) {
   if(L==0 && H==200) return 2.96;
   if(L==100 && H==140) return 0.509;
   if(L==140 && H==180) return 0.111;
-  if(L==100 && H==180) return 0.310;
+  if(L==100 && H==180) return 0.310;*/
+  
+  //v2
+  if(L==0    && H==200 ) return         2.88;
+  if(L==0    && H==5*2 ) return 	13.7;	
+  if(L==5*2  && H==10*2) return 	10.6;	
+  if(L==10*2 && H==15*2) return 	8.28;	
+  if(L==15*2 && H==20*2) return 	6.41;	
+  if(L==20*2 && H==25*2) return 	4.92;	
+  if(L==25*2 && H==30*2) return 	3.75;	
+  if(L==35*2 && H==40*2) return 	2.08;	
+  if(L==40*2 && H==45*2) return 	1.52;	
+  if(L==45*2 && H==50*2) return 	1.09;	
+  if(L==50*2 && H==55*2) return 	0.772;	
+  if(L==55*2 && H==60*2) return 	0.539;	
+  if(L==60*2 && H==65*2) return 	0.37;	
+  if(L==65*2 && H==70*2) return 	0.252;	
+  if(L==70*2 && H==75*2) return 	0.172;	
+  if(L==75*2 && H==80*2) return 	0.118;	
+  if(L==80*2 && H==85*2) return 	0.0816;	
+  if(L==85*2 && H==90*2) return 	0.0573;	
+  if(L==90*2 && H==95*2) return 	0.0409;	
+  if(L==95*2 && H==100*2) return 	0.0273;	
+  if(L==0*2  && H==10*2) return 	12.2;	
+  if(L==10*2 && H==20*2) return 	7.34;	
+  if(L==20*2 && H==30*2) return 	4.33;	
+  if(L==30*2 && H==40*2) return 	2.45;	
+  if(L==40*2 && H==50*2) return 	1.3;	
+  if(L==50*2 && H==60*2) return 	0.656;	
+  if(L==60*2 && H==70*2) return 	0.311;	
+  if(L==70*2 && H==80*2) return 	0.145;	
+  if(L==80*2 && H==90*2) return 	0.0694;	
+  if(L==90*2 && H==100*2) return 	0.0341;	
+  if(L==0*2  && H==20*2) return 	9.75;	
+  if(L==20*2 && H==40*2) return 	3.39;	
+  if(L==40*2 && H==60*2) return 	0.98;	
+  if(L==60*2 && H==80*2) return 	0.228;	
+  if(L==80*2 && H==100*2) return 	0.0518;	
+  if(L==0*2  && H==50*2) return 	5.52;	
+  if(L==50*2 && H==100*2) return 	0.243;	
+  if(L==0*2  && H==30*2) return 	7.95;	
+  if(L==30*2 && H==50*2) return 	1.88;	
+  if(L==50*2 && H==70*2) return 	0.483;	
+  if(L==70*2 && H==90*2) return 	0.107;	
+  if(L==70*2 && H==100*2) return 	0.0828;	
+  if(L==10*2 && H==30*2) return 	5.84;	
+  if(L==30*2 && H==100*2) return 	0.709;	
+  if(L==50*2 && H==80*2) return 	0.37;	
+  if(L==40*2 && H==100*2) return 	0.42;	
+  if(L==50*2 && H==90*2) return 	0.295;	
+  if(L==50*2 && H==80*2) return 	0.37;	
+
   return 1.0;
 }
 
@@ -109,6 +160,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   //for(unsigned int f = 0; f<10; f++){
     std::cout << "File: " << f << std::endl;
     TFile * input = TFile::Open(fileList.at(f).c_str(),"read");
+    std::cout << input->GetSize() << std::endl;
     TTree * hlt = (TTree*)input->Get("hltanalysisReco/HltTree");
     TTree * skim = (TTree*)input->Get("skimanalysis/HltTree");
     TTree * evt = (TTree*)input->Get("hiEvtAnalyzer/HiTree");
@@ -242,6 +294,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     }
   }
   
+  TH1D * jobsFinished = new TH1D("jobsFinished","jobsFinished",1,0,2);
+  jobsFinished->Fill(1);
   output->Write();
   output->Close();
 }

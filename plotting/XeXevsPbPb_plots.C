@@ -168,7 +168,7 @@ void XeXevsPbPb_plots(){
     h[c]->SetMarkerStyle(8);
     h[c]->GetXaxis()->SetTitle("p_{T} (GeV)");
     h[c]->GetXaxis()->CenterTitle();
-    h[c]->GetYaxis()->SetTitle("#frac{Y_{XeXe}<T_{AA}>^{PbPb}}{Y_{PbPb}<T_{AA}>^{XeXe}}");
+    h[c]->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
     h[c]->GetYaxis()->SetTitleOffset(1.5);
     h[c]->GetXaxis()->SetTitleOffset(1.2);
     h[c]->GetYaxis()->CenterTitle();

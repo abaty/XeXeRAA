@@ -289,16 +289,44 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorHerw->SetTitle("");
 
   TLegend * specLeg2 = new TLegend(0.2,0.7,0.4,0.85);
-  specLeg2->AddEntry(extrapFactorPythia,"Pythia 8","p");
-  specLeg2->AddEntry(extrapFactorEPOS,"EPOS LHC","p");
-  specLeg2->AddEntry(extrapFactorHerw,"Herwig++","p");
+  specLeg2->AddEntry(extrapFactorPythia,"Pythia 8","pl");
+  specLeg2->AddEntry(extrapFactorEPOS,"EPOS LHC","pl");
+  specLeg2->AddEntry(extrapFactorHerw,"Herwig++","pl");
+  
+  TF1 * extrapFuncLogistic = new TF1("extrapLogistic","[0]+[3]*TMath::Log(x)+[1]*((TMath::Log(x)-[2])/TMath::Power(1+TMath::Power(TMath::Log(x)-[2],2),0.5))",0.5,103.6);
+  extrapFuncLogistic->SetParameter(0,1.1);
+  extrapFuncLogistic->SetParameter(1,0.1);
+  extrapFuncLogistic->SetParameter(2,50);
+  extrapFuncLogistic->SetLineColor(kCyan+1);
+  extrapFactorPythia->Fit(extrapFuncLogistic,"EMR");
+  extrapFuncLogistic->Write();  
+  
+  TF1 * extrapFuncLogistic2 = new TF1("extrapLogistic2","[0]+[4]*TMath::Log(x)+[1]*TMath::Log(x)*TMath::Log(x)+[2]*TMath::TanH(TMath::Log(x)-[3])",0.5,103.6);
+  //TF1 * extrapFuncLogistic2 = new TF1("extrapLogistic2","[0]+[2]*TMath::Log(x)+[1]*TMath::Log(x)*TMath::Log(x)",0.5,103.6);
+  extrapFuncLogistic2->SetParameter(0,1.1);
+  extrapFuncLogistic2->SetParameter(1,0.1);
+  extrapFuncLogistic2->SetParameter(2,1);
+  extrapFuncLogistic2->SetLineColor(kBlue);
+  extrapFactorPythia->Fit(extrapFuncLogistic2,"EMR");
+  extrapFuncLogistic2->Write();  
  
   TF1 * extrapFuncPoly3 = new TF1("extrapFuncPoly3","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)",0.5,103.6);
   extrapFuncPoly3->SetParameter(0,1);
   extrapFuncPoly3->SetParameter(1,0);
   extrapFuncPoly3->SetParameter(2,0);
   extrapFuncPoly3->SetParameter(3,0);
+  extrapFuncPoly3->SetLineColor(kGreen);
   extrapFactorPythia->Fit(extrapFuncPoly3,"EMR");
+  extrapFuncPoly3->Write();
+  
+  TF1 * extrapFuncPoly5 = new TF1("extrapFuncPoly5","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",0.5,103.6);
+  extrapFuncPoly5->SetParameter(0,1);
+  extrapFuncPoly5->SetParameter(1,0);
+  extrapFuncPoly5->SetParameter(2,0);
+  extrapFuncPoly5->SetParameter(3,0);
+  extrapFuncPoly5->SetLineColor(kGreen+2);
+  extrapFactorPythia->Fit(extrapFuncPoly5,"EMR");
+  extrapFuncPoly5->Write();
 
   TF1 * extrapFuncPoly4 = new TF1("extrapFuncPoly4","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)",0.5,103.6);
   extrapFuncPoly4->SetParameter(0,1);
@@ -309,7 +337,8 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncPoly4->SetLineColor(kBlack);
   extrapFactorPythia->Fit(extrapFuncPoly4,"EMR");
   extrapFuncPoly4->Write();  
-
+  
+  extrapFuncPoly4->Draw("same");
 
   extrapFactorEPOS->Draw("same");
   extrapFactorHerw->Draw("same");
@@ -325,6 +354,66 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   c3->SaveAs("img/extrapolationFactorPythia8Logx.png");
   c3->SaveAs("img/extrapolationFactorPythia8Logx.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8Logx.C");
+
+  //clean up c3 a bit
+  for(int i = 1; i<extrapFactorHerw->GetSize()-1;i++){
+    if(extrapFactorHerw->GetBinCenter(i)<25){
+      extrapFactorHerw->SetBinContent(i,0);
+      extrapFactorHerw->SetBinError(i,0);
+    }
+    if(extrapFactorEPOS->GetBinError(i)/extrapFactorEPOS->GetBinContent(i)>0.2){
+      extrapFactorEPOS->SetBinContent(i,0);
+      extrapFactorEPOS->SetBinError(i,0);
+    }
+  }
+  extrapFactorPythia->GetYaxis()->CenterTitle();
+  extrapFactorPythia->GetYaxis()->SetTitle("Extrapolation Factor");
+  extrapFactorPythia->GetXaxis()->SetTitle("p_{T} (GeV)");
+  extrapFactorPythia->GetXaxis()->CenterTitle();
+  extrapFactorPythia->GetYaxis()->SetTitleOffset(1.2);
+  extrapFactorPythia->SetLineColor(kRed);
+  extrapFactorPythia->SetLineWidth(2);
+  extrapFactorPythia->SetMarkerColor(kRed);
+  extrapFactorPythia->Draw("");
+  extrapFuncPoly4->SetLineColor(kBlack);
+  extrapFuncPoly4->Draw("same");
+  extrapFactorEPOS->SetMarkerStyle(24);
+  extrapFactorEPOS->SetLineWidth(1);
+  extrapFactorEPOS->Draw("same");
+  extrapFactorHerw->SetLineWidth(1);
+  extrapFactorHerw->Draw("same");
+  //TH1D * extrapFactorPythiaClone = (TH1D*)extrapFactorPythia->Clone("extraFactorPythiaClone");
+  //extrapFactorPythiaClone->Draw("same");
+  specLeg2->SetX2NDC(0.7); 
+  specLeg2->SetY1NDC(0.6); 
+  specLeg2->Draw("same"); 
+  c3->SetLogx(0);
+  c3->SaveAs("img/extrapolationFactorPythia8_cleaned.png");
+  c3->SaveAs("img/extrapolationFactorPythia8_cleaned.pdf");
+  c3->SaveAs("img/extrapolationFacotrPythia8_cleaned.C");
+  c3->SetLogx();
+  c3->SaveAs("img/extrapolationFactorPythia8Logx_cleaned.png");
+  c3->SaveAs("img/extrapolationFactorPythia8Logx_cleaned.pdf");
+  c3->SaveAs("img/extrapolationFacotrPythia8Logx_cleaned.C");
+
+  //showfits
+  extrapFactorPythia->GetYaxis()->SetRangeUser(1,1.25);;
+  extrapFactorPythia->Draw("");
+  extrapFuncPoly4->Draw("same");
+  extrapFuncPoly3->Draw("same");
+  extrapFuncPoly5->Draw("same");
+  extrapFuncLogistic->Draw("same");
+  extrapFuncLogistic2->Draw("same");
+  
+  c3->SetLogx(0);
+  c3->SaveAs("img/extrapolationFactorPythia8_Fits.png");
+  c3->SaveAs("img/extrapolationFactorPythia8_Fits.pdf");
+  c3->SaveAs("img/extrapolationFacotrPythia8_Fits.C");
+  c3->SetLogx();
+  c3->SaveAs("img/extrapolationFactorPythia8Logx_Fits.png");
+  c3->SaveAs("img/extrapolationFactorPythia8Logx_Fits.pdf");
+  c3->SaveAs("img/extrapolationFacotrPythia8Logx_Fits.C");
+
 
   //******************************************************************************************
   //******************************************************************************************
