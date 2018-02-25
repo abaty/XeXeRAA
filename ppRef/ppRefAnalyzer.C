@@ -297,6 +297,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncLogistic->SetParameter(0,1.1);
   extrapFuncLogistic->SetParameter(1,0.1);
   extrapFuncLogistic->SetParameter(2,50);
+  extrapFuncLogistic->SetParameter(3,0);
   extrapFuncLogistic->SetLineColor(kCyan+1);
   extrapFactorPythia->Fit(extrapFuncLogistic,"EMR");
   extrapFuncLogistic->Write();  
@@ -405,6 +406,16 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncLogistic->Draw("same");
   extrapFuncLogistic2->Draw("same");
   
+  TLegend * specLegFit = new TLegend(0.2,0.5,0.4,0.85);
+  specLegFit->AddEntry(extrapFactorPythia,"Pythia 8","pl");
+  specLegFit->AddEntry((TObject*)0,"x = log(p_{T})","");
+  specLegFit->AddEntry(extrapFuncPoly4,"a+bx+cx^{2}+dx^{3}+ex^{4}","l");
+  specLegFit->AddEntry(extrapFuncPoly3,"a+bx+cx^{2}+dx^{3}","l");
+  specLegFit->AddEntry(extrapFuncPoly5,"a+bx+cx^{2}+dx^{3}+ex^{4}+fx^{5}","l");
+  specLegFit->AddEntry(extrapFuncLogistic,"a+bx+#frac{c(x-d)}{#sqrt{1+(x-d)^{2}}}","l");
+  specLegFit->AddEntry(extrapFuncLogistic2,"a+bx+cx^{2}+d(Tanh(x-e))","l");
+  specLegFit->Draw("same");
+
   c3->SetLogx(0);
   c3->SaveAs("img/extrapolationFactorPythia8_Fits.png");
   c3->SaveAs("img/extrapolationFactorPythia8_Fits.pdf");
@@ -414,6 +425,19 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   c3->SaveAs("img/extrapolationFactorPythia8Logx_Fits.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8Logx_Fits.C");
 
+  TH1D * extrapPythiaFitUncert = (TH1D*) extrapFactorPythia->Clone("extrapFactorPythiaFitUncert");
+  for(int i = 1; i<extrapPythiaFitUncert->GetSize()-1; i++){
+    float uncert = 0;
+    float b = extrapPythiaFitUncert->GetBinCenter(i);
+    float fit1 = extrapFuncPoly4->Eval(b);
+    float fit2 = TMath::Abs(extrapFuncPoly3->Eval(b)-fit1)/fit1;
+    float fit3 = TMath::Abs(extrapFuncPoly5->Eval(b)-fit1)/fit1;
+    float fit4 = TMath::Abs(extrapFuncLogistic->Eval(b)-fit1)/fit1;
+    float fit5 = TMath::Abs(extrapFuncLogistic2->Eval(b)-fit1)/fit1;
+    uncert = TMath::Max(TMath::Max(TMath::Max(fit2,fit3),fit4),fit5);
+    extrapPythiaFitUncert->SetBinContent(i,uncert);
+  }
+  extrapPythiaFitUncert->Write();
 
   //******************************************************************************************
   //******************************************************************************************
