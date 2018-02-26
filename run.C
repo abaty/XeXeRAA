@@ -15,27 +15,6 @@
 
 //FIXME preliminary
 double findTaaAverage(int L, int H) {
-  /*if(L==0 && H==10) return 13.9;
-  if(L==10 && H==20) return 10.8;
-  if(L==20 && H==30) return 8.47;
-  if(L==30 && H==40) return 6.60;
-  if(L==40 && H==50) return 5.1;
-  if(L==50 && H==60) return 3.89;
-  if(L==60 && H==80) return 2.56;
-  if(L==80 && H==100) return 1.37;
-  if(L==100 && H==120) return 0.69;
-  if(L==120 && H==140) return 0.328;
-  if(L==140 && H==160) return 0.151;
-  if(L==160 && H==200) return 0.053;
-  if(L==0 && H==20) return 12.3;
-  if(L==20 && H==60) return 6.01;
-  if(L==60 && H==100) return 1.96;
-  if(L==100 && H==200) return 0.255;
-  if(L==0 && H==200) return 2.96;
-  if(L==100 && H==140) return 0.509;
-  if(L==140 && H==180) return 0.111;
-  if(L==100 && H==180) return 0.310;*/
-  
   //v2
   if(L==0    && H==200 ) return         2.88;
   if(L==0    && H==5*2 ) return 	13.7;	
@@ -95,6 +74,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
+  TH1D * evtCount = new TH1D("evtCount","evtCount",10,0,10);
+  TH1D * evtCount_weight = new TH1D("evtCount_weight","evtCount_weight",10,0,10);
+
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
   TH1D * hiBinNoWeight_h = new TH1D("hiBinNoWeight","hiBinNoWeight",200,0,200);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
@@ -158,9 +140,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   for(unsigned int f = 0; f<fileList.size(); f++){
   //for(unsigned int f = 0; f<10; f++){
-    std::cout << "File: " << f << std::endl;
     TFile * input = TFile::Open(fileList.at(f).c_str(),"read");
-    std::cout << input->GetSize() << std::endl;
     TTree * hlt = (TTree*)input->Get("hltanalysisReco/HltTree");
     TTree * skim = (TTree*)input->Get("skimanalysis/HltTree");
     TTree * evt = (TTree*)input->Get("hiEvtAnalyzer/HiTree");
@@ -195,18 +175,32 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
 
     for(int i = 0; i<trk->GetEntries(); i++){
-      if(i%100==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
+      if(i%1000==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
       hlt->GetEntry(i);
-      bool MinBias = false;
-      for(int x = 0; x<21; x++) MinBias = MinBias || MB[x];
-      if(!MinBias) continue;
-
       skim->GetEntry(i);
       evt->GetEntry(i);
-      if(!vtx) noVtxCent_h->Fill(hiBin);
-      if(!beam || !vtx || !hfCoinc) continue;
-
+      bool MinBias = false;
       float evtW = 1.0/evtSelEff->Eval(hiHF);
+      
+      evtCount->Fill(1);
+      evtCount_weight->Fill(1,evtW);
+
+      for(int x = 0; x<21; x++) MinBias = MinBias || MB[x];
+      if(!MinBias) continue;
+      evtCount->Fill(2);
+      evtCount_weight->Fill(2,evtW);
+
+      if(!vtx) noVtxCent_h->Fill(hiBin);
+      if(!beam) continue;
+      evtCount->Fill(3);
+      evtCount_weight->Fill(3,evtW);
+      if(!vtx) continue;
+      evtCount->Fill(4);
+      evtCount_weight->Fill(4,evtW);
+      if(!hfCoinc) continue;
+      evtCount->Fill(5);
+      evtCount_weight->Fill(5,evtW);
+
 
       vz_h->Fill(vz,evtW);
       if(TMath::Abs(vz)>15) continue;
