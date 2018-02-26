@@ -247,6 +247,7 @@ void RAA_plots(){
       h[c]->SetFillStyle(1001);
       leg->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb","pl");
+      leg->SetBorderSize(0);
       leg->Draw("same");
     }
     h[c]->SetMarkerSize(1.3);

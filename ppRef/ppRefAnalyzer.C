@@ -69,6 +69,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   TFile * output = TFile::Open("ppRef_Extrapolated.root","recreate");
 
   TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
+  TH1D * pp5plusStat = new TH1D("pp5plusStat","pp5plusStat",s.ntrkBins,s.xtrkbins);
   TH1D * pp5NoError = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
   TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
   TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins,s.xtrkbins);
@@ -91,6 +92,9 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   for(int i = 1; i<pp5->GetSize()-1; i++){
     pp5->SetBinContent(i,ppSpec->GetBinContent(i));
     pp5->SetBinError(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5));
+    pp5plusStat->SetBinContent(i,ppSpec->GetBinContent(i));
+    pp5plusStat->SetBinError(i,ppSpec_stat->GetBinContent(i));
+
     pp5NoError->SetBinContent(i,ppSpec->GetBinContent(i));
     pp5Syst->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5));
     pp5relSyst->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i),2)+TMath::Power(ppSpec_lumi->GetBinContent(i),2)+TMath::Power(ppSpec_stat->GetBinContent(i),2),0.5)/pp5->GetBinContent(i));
@@ -106,6 +110,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   }
 
   pp5->Scale(70);
+  pp5plusStat->Scale(70);
   pp5Syst->Scale(70);
   pp5NoError->Scale(70);
   pythia8_5rat = (TH1D*)pythia8_5->Clone("pythia8_5rat");
@@ -575,13 +580,22 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia7->SetDirectory(output);
   extrapFactorPythia7->Write();
 
-  TH1D * ppScaledWithFit = (TH1D*)pp5->Clone("ppScaled_WithFit");
+  TH1D * ppScaledWithFit = (TH1D*)pp5plusStat->Clone("ppScaled_WithFit");
+  TH1D * ppScaledSyst_NoLumi = (TH1D*)ppSpec_syst->Clone("ppScaledSyst_NoLumi");
+  TH1D * ppScaledSyst = (TH1D*)ppSpec_syst->Clone("ppScaledSyst");
   for(int i = 1; i<ppScaledWithFit->GetSize()-1; i++){
     ppScaledWithFit->SetBinContent(i,ppScaledWithFit->GetBinContent(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
     ppScaledWithFit->SetBinError(i,ppScaledWithFit->GetBinError(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
+
+    ppScaledSyst_NoLumi->SetBinContent(i,TMath::Power(TMath::Power(ppScaledSyst_NoLumi->GetBinContent(i)/ppSpec->GetBinContent(i),2)+TMath::Power(extrapPythiaFitUncert->GetBinContent(i),2),0.5));
+    ppScaledSyst->SetBinContent(i,TMath::Power(TMath::Power(ppScaledSyst_NoLumi->GetBinContent(i),2)+0.023*0.023,0.5));
   }
   ppScaledWithFit->SetDirectory(output);
   ppScaledWithFit->Write();
+  ppScaledSyst_NoLumi->SetDirectory(output);
+  ppScaledSyst_NoLumi->Write();
+  ppScaledSyst->SetDirectory(output);
+  ppScaledSyst->Write();
 
   TH1D * ppScaled = (TH1D*)pp5->Clone("ppScaled");
   ppScaled->Multiply(extrapFactorPythia);

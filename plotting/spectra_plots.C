@@ -36,13 +36,16 @@ void spectra_plots(){
   TH1D * ppSpec;
   TH1D * pp_totSyst;
   TH1D * nVtx;
-  TFile * f = TFile::Open("../output_0.root","read");
-  ppSpec = (TH1D*)f->Get("ppScaled_WithFit");
+  TFile * fpp = TFile::Open("../ppRef_Feb26_Pythia.root","read");
+  ppSpec = (TH1D*)fpp->Get("ppScaled_WithFit");
   ppSpec->SetDirectory(0);
-  pp_totSyst = (TH1D*)ppSpec->Clone("pp_syst");
-  pp_totSyst->Reset();
+  pp_totSyst = (TH1D*)fpp->Get("ppScaledSyst");
   pp_totSyst->SetLineColor(kBlack);
+  pp_totSyst->SetLineWidth(2);
+  pp_totSyst->SetFillStyle(3003);
+  pp_totSyst->SetFillColor(kBlack);
   pp_totSyst->SetDirectory(0);
+  TFile * f = TFile::Open("../output_0.root","read");
   nVtx = (TH1D*)f->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
     h[c] = (TH1D*)f->Get(Form("HI_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
@@ -53,6 +56,7 @@ void spectra_plots(){
     XeXe_totSyst[c]->Reset();
     XeXe_totSyst[c]->SetDirectory(0);
     XeXe_totSyst[c]->SetLineColor(kBlack);
+    XeXe_totSyst[c]->SetLineWidth(2);
   }
   f->Close();
 
@@ -65,7 +69,10 @@ void spectra_plots(){
   
   //pp systematic
   for(int i = 1; i<pp_totSyst->GetSize()-1; i++){
-    pp_totSyst->SetBinContent(i,0.06);
+    pp_totSyst->SetBinError(i,0);
+    if(i>ppSpec->GetSize()-1){
+      pp_totSyst->SetBinContent(i,0);
+    }
   }
 
   setTDRStyle();
