@@ -1,3 +1,4 @@
+#include "TLegend.h"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TCanvas.h"
@@ -74,4 +75,35 @@ void trkCorrPlots(){
   makeArray(c1, multiple, multiple2, "multiple reco rate","multiple");
 }
 
-
+void speciesCorrPlots(){
+  gStyle->SetErrorX(0);
+  gStyle->SetOptStat(0);
+  TFile * f = TFile::Open("trkCorr_Feb26_wSpeciesCorr.root","read");
+  TH1D * speciesCorr[6];
+  TCanvas * c1 = new TCanvas("c1","c1",800,600);
+  TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
+  for(int i = 0; i<6; i++){
+    speciesCorr[i] = (TH1D*)f->Get(Form("speciesCorrSyst1D_%d",i));
+    speciesCorr[i]->GetXaxis()->SetRangeUser(0.5,12);
+    speciesCorr[i]->SetMarkerStyle(8);
+    speciesCorr[i]->SetMarkerColor(kBlack);
+    speciesCorr[i]->SetLineColor(kBlack);
+    speciesCorr[i]->GetXaxis()->SetTitle("p_{T}");
+    speciesCorr[i]->GetYaxis()->SetTitle("Correction factor");
+    speciesCorr[i]->SetLineColor(kBlack);
+    speciesCorr[i]->Draw();
+    l->Clear();
+    l->SetLineWidth(0);
+    l->SetFillStyle(0);
+    if(i==0) l->AddEntry((TObject*)0,"0-5%","");
+    if(i==1) l->AddEntry((TObject*)0,"5-10%","");
+    if(i==2) l->AddEntry((TObject*)0,"10-30%","");
+    if(i==3) l->AddEntry((TObject*)0,"30-50%","");
+    if(i==4) l->AddEntry((TObject*)0,"50-70%","");
+    if(i==5) l->AddEntry((TObject*)0,"70-100%","");
+    l->Draw("same");
+    c1->SaveAs(Form("img/speciesCorr_%d.png",i));
+    c1->SaveAs(Form("img/speciesCorr_%d.pdf",i));
+    c1->SaveAs(Form("img/speciesCorr_%d.C",i));
+  } 
+}
