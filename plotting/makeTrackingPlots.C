@@ -12,7 +12,7 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   c1->SetLeftMargin(0.12);
   vz->GetXaxis()->SetTitle("v_{z}");
   vz->GetYaxis()->SetTitle("normalized to unity");
-  vz->Scale(1.0/vz->GetEntries());
+  vz->Scale(1.0/vz->Integral(1,vz->GetSize()-1));
   vz->SetMarkerColor(kBlack);
   vz->SetLineColor(kBlack);
   vz->SetMarkerStyle(8);
@@ -36,11 +36,12 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   hiBin->GetXaxis()->SetTitle("hiBin");
   hiBin->GetYaxis()->SetTitle("normalized to unity");
   hiBin->Rebin(4);
-  hiBin->Scale(1.0/hiBin->GetEntries());
+  hiBin->Scale(1.0/hiBin->Integral(1,200));
   hiBin->SetMarkerColor(kBlack);
   hiBin->SetLineColor(kBlack);
   hiBin->SetMarkerStyle(8);
   hiBin->GetYaxis()->SetTitleOffset(1.2);
+  hiBin->GetYaxis()->SetRangeUser(0,0.025);
   hiBin->Draw("");
   MChiBin->Rebin(4);
   MChiBin->Scale(1.0/MChiBin->GetEntries());
@@ -216,9 +217,11 @@ void makeTrackingPlots_Cuts(int cuts = 2){
   gStyle->SetOptStat(0);
  
   std::string generator = "MB Hydjet";
+  //std::string generator = "MB EPOS";
  
   TFile * f = TFile::Open("../output_0.root","read");
-  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb2.root","read"); 
+  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb26.root","read"); 
+  //TFile * mc = TFile::Open("MCTrackingRootFiles/EPOS_Feb26.root","read"); 
   //etaLT2p5 below 
   //TFile * f = TFile::Open("MCTrackingRootFiles/output_Feb6_etaLT2p5_Data.root","read");
   //TFile * mc = TFile::Open("MCTrackingRootFiles/output_Feb6_etaLT2p5.root","read"); 

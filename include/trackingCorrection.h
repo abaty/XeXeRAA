@@ -7,18 +7,20 @@
 class TrackingCorrection{
 
   public:
-    TrackingCorrection(std::string file);
+    TrackingCorrection(std::string file, bool isSpeciesCorr);
     ~TrackingCorrection();
 
     float getTrkCorr(float pt, int cent);
 
   private:
+    bool hasSpeciesCorr;
     TFile * corr;
     TH2D * eff;
     TH2D * fake;
     TH2D * sec;
+    TH2D * speciesCorr;
 
-    int centBin(int b);
+     int centBin(int b);
 };
 
 int TrackingCorrection::centBin(int b){
@@ -44,15 +46,20 @@ float TrackingCorrection::getTrkCorr(float pt, int cent){
   if(s==1) s=0;//protection against zeroes
   float e = eff->GetBinContent(p,c);
   if(e==0) e=1;//protection against nans
+  float species = 1;
+  if(hasSpeciesCorr) species = speciesCorr->GetBinContent(p,c);
 
-  return (1-f)*(1-s)/(e);
+  return species*(1-f)*(1-s)/(e);
 }
 
-TrackingCorrection::TrackingCorrection(std::string file){
+TrackingCorrection::TrackingCorrection(std::string file, bool isSpeciesCorr = true){
+  hasSpeciesCorr = isSpeciesCorr;
+
   TFile * corr = TFile::Open(file.c_str(),"read");
   eff = (TH2D*)corr->Get("efficiency2d");
   fake = (TH2D*)corr->Get("fake2d");
   sec = (TH2D*)corr->Get("secondary2d");
+  if(hasSpeciesCorr) speciesCorr = (TH2D*)corr->Get("speciesCorr");
 }
 
 TrackingCorrection::~TrackingCorrection(){

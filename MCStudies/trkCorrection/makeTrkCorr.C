@@ -7,7 +7,8 @@ void makeTrkCorr(){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  TFile * f = new TFile("../Hydjet/output_Feb6.root","read");
+  //TFile * f = new TFile("../Hydjet/output_Feb26.root","read");
+  TFile * f = new TFile("../EPOS/output_0_Feb26.root","read");
 
   
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
@@ -28,7 +29,8 @@ void makeTrkCorr(){
     genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d",c));
   }
 
-  TFile * output = new TFile("trkCorr_Hydjet_Feb6.root","recreate");
+ // TFile * output = new TFile("trkCorr_Hydjet_Feb6.root","recreate");
+ TFile * output = new TFile("trkCorr_EPOS_Feb26.root","recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -101,7 +103,62 @@ void makeTrkCorr(){
     }
     multiple[c]->Write();
   }
-  
+}
 
+void makeSpeciesCorr(){
+  //primary correction
+  TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
+  //secondary correction
+  TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
+
+  TH2D * eff, *fake, *sec, *multiple;
+  TH2D * eff2;
+  TH1D * eff1d;
+
+  eff = (TH2D*)f1->Get("efficiency2d");
+  eff2 = (TH2D*)f2->Get("efficiency2d");
+  fake = (TH2D*)f1->Get("fake2d");
+  sec = (TH2D*)f1->Get("secondary2d");
+  multiple = (TH2D*)f1->Get("multiple2d");
+  
+  eff1d = (TH1D*)f1->Get("efficiency_0");
+
+  TFile * output = TFile::Open("trkCorr_Feb26_wSpeciesCorr.root","recreate");
+  eff->SetDirectory(output);
+  fake->SetDirectory(output);
+  sec->SetDirectory(output);
+  multiple->SetDirectory(output);
+  eff->Write();
+  fake->Write();
+  sec->Write();
+  multiple->Write();
+
+  TH2D * speciesCorr = (TH2D*)eff->Clone("speciesCorr");
+  TH2D * speciesCorrSyst = (TH2D*)eff->Clone("speciesCorrSyst");
+
+  TH1D * speciesCorrSyst1D[6];
+
+  for(int i = 1; i<speciesCorr->GetXaxis()->GetNbins()+1;i++){
+    for(int j = 1; j<speciesCorr->GetYaxis()->GetNbins()+1;j++){
+      speciesCorr->SetBinContent(i,j,1);
+      if(speciesCorr->GetXaxis()->GetBinCenter(i)>14) continue;
+      speciesCorr->SetBinContent(i,j,2*eff->GetBinContent(i,j)/(eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)));    
+      speciesCorr->SetBinError(i,j,TMath::Power(TMath::Power(2*eff2->GetBinContent(i,j)/TMath::Power((eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)),2)*eff->GetBinError(i,j),2)+TMath::Power(2*eff->GetBinContent(i,j)/TMath::Power((eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)),2)*eff2->GetBinError(i,j),2),0.5));    
+      speciesCorrSyst->SetBinContent(i,j,speciesCorr->GetBinContent(i,j)-1);
+      speciesCorrSyst->SetBinError(i,j,speciesCorr->GetBinError(i,j));
+    }
+  }
+  speciesCorr->Write();
+  speciesCorrSyst->Write();
+
+  for(int i = 0; i<6; i++){
+    speciesCorrSyst1D[i] = (TH1D*)eff1d->Clone(Form("speciesCorrSyst1D_%d",i));
+    speciesCorrSyst1D[i]->Reset();
+    for(int j = 1; j<speciesCorrSyst1D[i]->GetSize()-1; j++){
+      speciesCorrSyst1D[i]->SetBinContent(j,speciesCorrSyst->GetBinContent(j,i+1));
+      speciesCorrSyst1D[i]->SetBinError(j,speciesCorrSyst->GetBinError(j,i+1));
+    }
+    speciesCorrSyst1D[i]->Write();
+  }
 
 }

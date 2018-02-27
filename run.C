@@ -70,7 +70,7 @@ double findTaaAverage(int L, int H) {
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
-  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Hydjet_Feb6.root");
+  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Feb26_wSpeciesCorr.root");
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
   TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");

@@ -25,7 +25,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
   EventWeight evtW = EventWeight();
 
-  TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
+  TFile * output = TFile::Open(Form("output_EPOS_%d.root",jobNumber),"recreate");
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * hiBin_Weighted_h = new TH1D("hiBin_weight",";hiBin",200,0,200);

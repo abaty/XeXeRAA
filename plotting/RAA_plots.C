@@ -169,16 +169,16 @@ void RAA_plots(){
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
-    /* 
-    TAAUncert = s.TAAuncert[c]/100.0;
-    lumiUncert = 0.023;//12% for pp lumi
+    
+    float TAAUncert = s.TAAuncert[c]/100.0;
+    float lumiUncert = 0.023;//12% for pp lumi
     bLumi->SetFillColor(kGray);
     bTAA->SetFillColor(kBlue-9);
     bLumi->SetLineWidth(0);
     bTAA->SetLineWidth(0);
-    bTAA->DrawBox(0.9,1-TAAUncert,TMath::Power(10,TMath::Log10(0.9)+(TMath::Log10(1.5)-TMath::Log10(0.9))/2.0),1+TAAUncert);
-    bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.9)+(TMath::Log10(1.5)-TMath::Log10(0.9))/2.0),1-lumiUncert,1.5,1+lumiUncert);
-    */  
+    bTAA->DrawBox(0.55,1-TAAUncert,TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.775)-TMath::Log10(0.55))/2.0),1+TAAUncert);
+    bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.775)-TMath::Log10(0.55))/2.0),1-lumiUncert,0.775,1+lumiUncert);
+      
 
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
     line1->SetLineWidth(2);
