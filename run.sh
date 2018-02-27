@@ -20,8 +20,8 @@ echo | awk -v j=$1 -v k=$2 -v l=$3 -v m=$4 '{print "./run.exe "j" "k" "l" "m}' |
 
 
 echo "copying output..."
-gfal-copy -f output_$1.root gsiftp://se01.cmsaf.mit.edu:2811//cms/store/user/$USER/condor_tests/
+gfal-copy -f output_data_$1.root gsiftp://se01.cmsaf.mit.edu:2811//cms/store/user/$USER/condor_tests/
 echo "Cleaning up..."
-rm output_$1.root
+rm output_data_$1.root
 echo "done!"
 

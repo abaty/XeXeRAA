@@ -73,7 +73,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Feb26_wSpeciesCorr.root");
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
-  TFile * output = TFile::Open(Form("output_%d.root",jobNumber),"recreate");
+  TFile * output = TFile::Open(Form("output_data_%d.root",jobNumber),"recreate");
   TH1D * evtCount = new TH1D("evtCount","evtCount",10,0,10);
   TH1D * evtCount_weight = new TH1D("evtCount_weight","evtCount_weight",10,0,10);
 
