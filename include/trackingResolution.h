@@ -22,6 +22,7 @@ class TrackingResolution{
 
 float TrackingResolution::getSmearing(float pt){
   float sigma = 0.015;
+  if(pt<=0.5) sigma = reso->GetBinContent(reso->FindBin(1));
   if(pt>0.5 && pt<103.6) sigma = reso->GetBinContent(reso->FindBin(pt));
   return pt*r->Gaus(1,sigma);
 }
