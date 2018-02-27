@@ -23,6 +23,7 @@ class Settings{
 
   bool doTrackDists = true;
 
+  TH1D * HI_smeared[nCentBins]; 
   TH1D * HI[nCentBins]; 
   TH1D * HI_TaaWeighted[nCentBins]; 
   TH1D * nVtx;

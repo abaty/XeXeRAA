@@ -8,6 +8,7 @@
 #include "include/trackingBinMap.h"
 #include "include/fillTrkDists.h"
 #include "include/trackingCorrection.h"
+#include "include/trackingResolution.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -70,7 +71,8 @@ double findTaaAverage(int L, int H) {
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
-  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Feb26_wSpeciesCorr.root");
+  TrackingResolution trkReso = TrackingResolution("resolutions_Feb27.root");
+  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_Feb26_wSpeciesCorr.root",true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
   TFile * output = TFile::Open(Form("output_data_%d.root",jobNumber),"recreate");
@@ -100,10 +102,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   s.nVtx = new TH1D("nVtx","nVtx",20,0,20);
   for(int c = 0; c<s.nCentBins; c++){
+    s.HI_smeared[c] = new TH1D(Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_TaaWeighted[c] = new TH1D(Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
   }
-
 
   TH1D * scaledPP;
   if(jobNumber==0){
@@ -254,14 +256,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
- 
+
+         
         float weight = trkCorr.getTrkCorr(trkPt[j],hiBin)*evtW;
+        float smearPt = trkReso.getSmearing(trkPt[j]);
+        float smearWeight = trkCorr.getTrkCorr(smearPt,hiBin)*evtW;
 
         for(int c = 0; c<s.nCentBins; c++){
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
 
           float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
           s.HI[c]->Fill(trkPt[j],weight/binCenter);
+          s.HI_smeared[c]->Fill(smearPt,smearWeight/binCenter);
         }//cent bin loop
       }//trk loop
     }//event loop
@@ -278,7 +284,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       s.HI_TaaWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa)); 
       s.HI_TaaWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa));
       s.HI[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
+      s.HI_smeared[c]->SetBinContent(i,s.HI_smeared[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
+      s.HI_smeared[c]->SetBinError(i,s.HI_smeared[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
     }
     //RAA
     if(jobNumber==0){

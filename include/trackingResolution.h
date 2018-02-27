@@ -1,5 +1,5 @@
-#ifndef TRKCORR
-#define TRKCORR
+#ifndef TRKRESO
+#define TRKRESO
 #include "TH2D.h"
 #include "TFile.h"
 #include <string>
@@ -23,7 +23,7 @@ class TrackingResolution{
 float TrackingResolution::getSmearing(float pt){
   float sigma = 0.015;
   if(pt>0.5 && pt<103.6) sigma = reso->GetBinContent(reso->FindBin(pt));
-  return r->Gaus(1,sigma);
+  return pt*r->Gaus(1,sigma);
 }
 
 TrackingResolution::TrackingResolution(std::string file){
