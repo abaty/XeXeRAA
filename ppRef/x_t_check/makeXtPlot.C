@@ -64,11 +64,15 @@ void makeXtPlot(){
   TCanvas * c1 = new TCanvas("c1","",800,600);
   c1->SetLogx();
   c1->SetLogy();
+  //ppSpec->GetXaxis()->SetRangeUser(0.5,105);
   ppSpec->GetXaxis()->SetRangeUser(20,105);
   ppSpec->GetYaxis()->SetTitle("");
   ppSpec->GetXaxis()->SetTitle("p_{T} GeV");
   ppSpec->Draw();
   
+
+  //float xLow = 0.5;
+  //float xHigh = 105;
 
   float xLow = 20;
   float xHigh = 105;
@@ -77,6 +81,7 @@ void makeXtPlot(){
   cms_5020_fit->SetParameters(3.3,1.11,-6.58);
   TFitResultPtr r = ppSpec->Fit(cms_5020_fit,"REMIS");
   std::cout << "Chi2/ndof: " << r->Chi2()/r->Ndf() << std::endl;
+  std::cout << cms_5020_fit->GetParameter(0) << " " << cms_5020_fit->GetParameter(1) << " " << cms_5020_fit->GetParameter(2) << std::endl;
   
   c1->SaveAs("img/5TeV_PowerLawFit.C");
   c1->SaveAs("img/5TeV_PowerLawFit.png");
@@ -106,6 +111,10 @@ void makeXtPlot(){
   residuals->GetXaxis()->SetTitle("p_{T} (GeV)");
   residuals->GetYaxis()->SetTitle("Fit Residuals");
   residuals->Draw("AP");
+  //TF1 * residFit = new TF1("residFit","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)+[6]*TMath::Power(TMath::Log(x),6)+[7]*TMath::Power(TMath::Log(x),7)",0.5,120);
+  //residFit->SetParameters(1,0,0,0,0,0,0,0);
+  //residuals->Fit("residFit","REMIS");
+
   c2->SaveAs("img/5TeV_Residuals.C");
   c2->SaveAs("img/5TeV_Residuals.png");
   c2->SaveAs("img/5TeV_Residuals.pdf");

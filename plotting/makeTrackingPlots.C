@@ -283,8 +283,69 @@ void makeTrackingPlots_Cuts(int cuts = 2){
   delete c2; 
 }
 
+void resolutionSyst(){
+  TFile * f = TFile::Open("../output_0.root","read");
+  TH1D * smeared[8];
+  TH1D * nominal[8];
+  nominal[0] = (TH1D*)f->Get("HI_0_5");
+  smeared[0] = (TH1D*)f->Get("HIsmeared_0_5");
+  smeared[0]->Divide(nominal[0]);
+  nominal[1] = (TH1D*)f->Get("HI_5_10");
+  smeared[1] = (TH1D*)f->Get("HIsmeared_5_10");
+  smeared[1]->Divide(nominal[1]);
+  nominal[2] = (TH1D*)f->Get("HI_10_30");
+  smeared[2] = (TH1D*)f->Get("HIsmeared_10_30");
+  smeared[2]->Divide(nominal[2]);
+  nominal[3] = (TH1D*)f->Get("HI_30_50");
+  smeared[3] = (TH1D*)f->Get("HIsmeared_30_50");
+  smeared[3]->Divide(nominal[3]);
+  nominal[4] = (TH1D*)f->Get("HI_50_70");
+  smeared[4] = (TH1D*)f->Get("HIsmeared_50_70");
+  smeared[4]->Divide(nominal[4]);
+  nominal[5] = (TH1D*)f->Get("HI_70_90");
+  smeared[5] = (TH1D*)f->Get("HIsmeared_70_90");
+  smeared[5]->Divide(nominal[5]);
+  nominal[6] = (TH1D*)f->Get("HI_0_10");
+  smeared[6] = (TH1D*)f->Get("HIsmeared_0_10");
+  smeared[6]->Divide(nominal[6]);
+  nominal[7] = (TH1D*)f->Get("HI_0_100");
+  smeared[7] = (TH1D*)f->Get("HIsmeared_0_100");
+  smeared[7]->Divide(nominal[7]);
+
+  TCanvas * c1 = new TCanvas("c1","",800,600);
+  TLegend * l = new TLegend(0.3,0.7,0.6,0.9);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  c1->SetLogx();
+  for(int c = 0; c<8; c++){
+    smeared[c]->GetYaxis()->SetTitle("smeared/nominal");
+    smeared[c]->GetYaxis()->SetRangeUser(0.9,1.1);
+    smeared[c]->GetXaxis()->SetTitle("p_{T}");
+    smeared[c]->SetMarkerStyle(8);
+    smeared[c]->SetLineColor(kBlack);
+    smeared[c]->SetMarkerColor(kBlack);
+    smeared[c]->SetTitle("");
+    smeared[c]->Draw();
+    l->Clear();
+    if(c==0)l->AddEntry((TObject*)0,"0-5%","");
+    if(c==1)l->AddEntry((TObject*)0,"5-10%","");
+    if(c==2)l->AddEntry((TObject*)0,"10-30%","");
+    if(c==3)l->AddEntry((TObject*)0,"30-50%","");
+    if(c==4)l->AddEntry((TObject*)0,"50-70%","");
+    if(c==5)l->AddEntry((TObject*)0,"70-90%","");
+    if(c==6)l->AddEntry((TObject*)0,"0-10%","");
+    if(c==7)l->AddEntry((TObject*)0,"0-100%","");
+    l->Draw("same");
+    c1->SaveAs(Form("trkPlots/trkResoSyst_%d.png",c));
+    c1->SaveAs(Form("trkPlots/trkResoSyst_%d.pdf",c));
+    c1->SaveAs(Form("trkPlots/trkResoSyst_%d.C",c));
+  }
+  delete c1;
+}
+
 void makeTrackingPlots(){
   makeTrackingPlots_Cuts(0);
   makeTrackingPlots_Cuts(1);
   makeTrackingPlots_Cuts(2);
+  resolutionSyst();
 }
