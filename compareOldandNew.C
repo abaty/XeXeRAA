@@ -6,6 +6,8 @@ void compareOldandNew()
 {
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   
+  gStyle->SetOptStat(0);
+
   int centBounds[7] = {0,5,10,30,50,70,90};
   for(int i = 0 ; i<6; i++){
   const char * histName = "HI";
@@ -19,9 +21,11 @@ void compareOldandNew()
   //den->Scale(1.0/den->GetEntries());
   num->Divide(den);
   num->GetYaxis()->SetTitle("(With hiHF cut)/(No Cut)");
+  num->GetXaxis()->SetTitle("p_{T}");
   num->GetYaxis()->SetRangeUser(0.7,1.3);
   num->GetXaxis()->SetRangeUser(0.5,105);
   num->Print("All");
+  num->SetStats(0);
   num->Draw();
   c1->SetLogx();
   c1->SaveAs(Form("plots/HI_%d_%d.png",centBounds[i],centBounds[i+1]));
