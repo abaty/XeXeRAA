@@ -22,6 +22,7 @@ class Settings{
   float TAAuncert[nCentBins] = {0.74,0.75,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,2.5,0.1,0.1,1.7,4.6,7.9,0.1,0.1,0.1,0.1,6.9,0.74,0.1};
 
   bool doTrackDists = true;
+  bool doRejectPU = false;
 
   TH1D * HI_smeared[nCentBins]; 
   TH1D * HI[nCentBins]; 

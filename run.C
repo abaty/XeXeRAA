@@ -80,6 +80,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * evtCount_weight = new TH1D("evtCount_weight","evtCount_weight",10,0,10);
 
   TH1D * hiBin_h = new TH1D("hiBin","hiBin",200,0,200);
+  TH1D * hiHF_h = new TH1D("hiHF_h","hiHF_h",3500,0,7000);
   TH1D * hiBinNoWeight_h = new TH1D("hiBinNoWeight","hiBinNoWeight",200,0,200);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
@@ -183,6 +184,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       evt->GetEntry(i);
       bool MinBias = false;
       float evtW = 1.0/evtSelEff->Eval(hiHF);
+      if(hiHF>3300 && s.doRejectPU) continue;
       
       evtCount->Fill(1);
       evtCount_weight->Fill(1,evtW);
@@ -215,6 +217,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       if(hiBin<0 || hiBin>199) continue;//protection
       hiBin_h->Fill(hiBin,evtW);
       hiBinNoWeight_h->Fill(hiBin);
+      hiHF_h->Fill(hiHF,evtW);
 
       trk->GetEntry(i);
       //for tracking
