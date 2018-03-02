@@ -23,7 +23,7 @@ int centBin(int b){
 }
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
-  float qScaleCutoff = 0.6;
+  float qScaleCutoff = 0.5;
 
   Settings s = Settings();
   EventWeight evtW = EventWeight();
@@ -63,8 +63,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   }
 
   //eff and fake plots
-  static const int ntrkBins2 = 21;
-  double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.2  , 3.2  , 4.8  , 6.4  , 9.6 , 14.4, 24.0, 35.2, 48.0,73.6,103.6};
+  //static const int ntrkBins2 = 22;
+  //double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.2  , 3.2  , 4.8  , 6.4  , 9.6 , 14.4, 24.0, 35.2, 48.0,73.6,103.6,133.6};
+  static const int ntrkBins2 = 34;
+  double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6,120,140};
 
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
   gen2d = new TH2D("gen2d","",ntrkBins2,xtrkbins2,6,0,6);
@@ -198,7 +200,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       hiBin_h->Fill(hiBin,weight);
 
       float w = evtW.getEvtWeight(vz,hiBin);
-      if(w>500000) w=1;
+      //there are basically no events iwth hiBin>186, so remove them to avoid huge weights
+      if(hiBin>186) w=0;
+
       w=w*weight;
       vz_Weighted_h->Fill(vz,w);
       hiBin_Weighted_h->Fill(hiBin,w);
