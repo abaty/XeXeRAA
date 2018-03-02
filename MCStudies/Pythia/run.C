@@ -11,6 +11,7 @@
 #include "../../include/trackingBinMap.h"
 #include "../Hydjet/evtWeights/evtWeights.h"
 #include "TMath.h"
+#include "TEfficiency.h"
 
 int centBin(int b){
   if(b<10) return 0;
@@ -22,6 +23,8 @@ int centBin(int b){
 }
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
+  float qScaleCutoff = 0.6;
+
   Settings s = Settings();
   EventWeight evtW = EventWeight();
 
@@ -60,23 +63,30 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   }
 
   //eff and fake plots
+  static const int ntrkBins2 = 21;
+  double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.2  , 3.2  , 4.8  , 6.4  , 9.6 , 14.4, 24.0, 35.2, 48.0,73.6,103.6};
+
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
-  gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  reco2d = new TH2D("reco2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  recoNoFake2d_sig = new TH2D("recoNoFake2d_sig","",s.ntrkBins,s.xtrkbins,6,0,6);
-  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  genMatchedMult2d = new TH2D("genMatchedMult2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  gen2d = new TH2D("gen2d","",ntrkBins2,xtrkbins2,6,0,6);
+  reco2d = new TH2D("reco2d","",ntrkBins2,xtrkbins2,6,0,6);
+  recoNoFake2d = new TH2D("recoNoFake2d","",ntrkBins2,xtrkbins2,6,0,6);
+  recoNoFake2d_sig = new TH2D("recoNoFake2d_sig","",ntrkBins2,xtrkbins2,6,0,6);
+  recoMatched2d = new TH2D("recoMatched2d","",ntrkBins2,xtrkbins2,6,0,6);
+  genMatched2d = new TH2D("genMatched2d","",ntrkBins2,xtrkbins2,6,0,6);
+  genMatchedMult2d = new TH2D("genMatchedMult2d","",ntrkBins2,xtrkbins2,6,0,6);
   TH1D *gen[6], *reco[6], *recoNoFake[6], *recoNoFake_sig[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
   for(int c = 0; c<6; c++){
-    gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins,s.xtrkbins);
-    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    recoNoFake_sig[c] = new TH1D(Form("recoNoFake_sig_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    gen[c] = new TH1D(Form("gen_%d",c),"",ntrkBins2,xtrkbins2); 
+    reco[c] = new TH1D(Form("reco_%d",c),"",ntrkBins2,xtrkbins2);
+    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",ntrkBins2,xtrkbins2); 
+    recoNoFake_sig[c] = new TH1D(Form("recoNoFake_sig_%d",c),"",ntrkBins2,xtrkbins2); 
+    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",ntrkBins2,xtrkbins2); 
+    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",ntrkBins2,xtrkbins2); 
+    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",ntrkBins2,xtrkbins2); 
+  }
+  TH2D * qScaleVsPt[6];
+  for(int c = 0; c<6; c++){
+    qScaleVsPt[c] = new TH2D(Form("qScaleVsPt_%d",c),"",ntrkBins2,xtrkbins2,30,0,1.5);
   }
 
   int nTrk;
@@ -200,7 +210,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkPt[j]<0.5) continue;
        
         //cut to keep weights reasonable
-        if(trkPt[j]>0.66*pthat) continue;
+        if(trkPt[j]>qScaleCutoff*pthat) continue;
  
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         int statusIndex = 0;
@@ -335,16 +345,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         }
       }//end of reco tracking stuff
 
+
       //gen particle loop
       for(int j = 0; j<nParticle; j++){
         if(TMath::Abs(pEta[j])>s.etaCut) continue;
 
         //cut to keep weights reasonable
-        if(pPt[j]>0.66*pthat) continue;
+        if(pPt[j]>qScaleCutoff *pthat) continue;
 
         gen2d->Fill(pPt[j],centBin(hiBin),w);
         gen[centBin(hiBin)]->Fill(pPt[j],w);
-        
+        qScaleVsPt[centBin(hiBin)]->Fill(pPt[j],pPt[j]/pthat,w);    
+    
         if(mtrkPt[j]<=0) continue;//only matched gen particles
         if(!mhighPurity[j]) continue;
         if(pPt[j]>0.5) reso_gen[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);

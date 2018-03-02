@@ -22,7 +22,7 @@ void fillResoPoint(TH1D * r, int bin, std::string name){
 
   TCanvas * c = new TCanvas("c","c",400,400);
   h->Draw("h");
-  h->Fit("f1","LEMR");
+  h->Fit("f1","EMR");
 
   std::cout << f1->GetParameter(1) << " " << f1->GetParameter(2) << std::endl;
   std::cout << f1->GetParError(1) << " " << f1->GetParError(2) << std::endl;
@@ -79,7 +79,7 @@ void trkReso(){
   recoCutRes->Draw("same");
 
   TLegend * canv = new TLegend(0.3,0.6,0.8,0.85);
-  canv->AddEntry((TObject*)0,"Hydjet MB","");
+  canv->AddEntry((TObject*)0,"Pythia+Hydjet","");
   canv->AddEntry((TObject*)0,"|#eta|<1","");
   canv->AddEntry(recoRes,"HighPurity Only","p");
   canv->AddEntry(recoCutRes,"All Trk Selections","p");
@@ -109,7 +109,7 @@ void trkReso(){
   genCutRes->Draw("same");
 
   canv = new TLegend(0.3,0.6,0.8,0.85);
-  canv->AddEntry((TObject*)0,"Hydjet MB","");
+  canv->AddEntry((TObject*)0,"Pythia+Hydjet MB","");
   canv->AddEntry((TObject*)0,"|#eta|<1","");
   canv->AddEntry(genRes,"HighPurity Only","p");
   canv->AddEntry(genCutRes,"All Trk Selections","p");

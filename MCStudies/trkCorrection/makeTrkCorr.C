@@ -1,6 +1,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TFile.h"
+#include "TGraphAsymmErrors.h"
 #include <iostream>
 
 void makeTrkCorr(bool isEmbedded = true){
@@ -44,10 +45,15 @@ void makeTrkCorr(bool isEmbedded = true){
   efficiency2d->Write();
 
   TH1D * efficiency[6];
+  TGraphAsymmErrors * effGraph[6];
   for(int c = 0; c<6; c++){
     efficiency[c] = (TH1D*)genMatched[c]->Clone(Form("efficiency_%d",c));  
     efficiency[c]->Divide(gen[c]);  
     efficiency[c]->Write();
+    effGraph[c] = new TGraphAsymmErrors();
+    effGraph[c]->SetName(Form("effGraph_%d",c));
+    effGraph[c]->BayesDivide(genMatched[c],gen[c]);
+    effGraph[c]->Write();
   }
 
   //fake rate
@@ -61,6 +67,7 @@ void makeTrkCorr(bool isEmbedded = true){
   fake2d->Write();
 
   TH1D * fake[6];
+  TGraphAsymmErrors * fakeGraph[6];
   for(int c = 0; c<6; c++){
     fake[c] = (TH1D*)recoNoFake[c]->Clone(Form("fake_%d",c));  
     fake[c]->Divide(reco[c]);  
@@ -68,6 +75,10 @@ void makeTrkCorr(bool isEmbedded = true){
       fake[c]->SetBinContent(i,1-fake[c]->GetBinContent(i));
     }
     fake[c]->Write();
+    fakeGraph[c] = new TGraphAsymmErrors();
+    fakeGraph[c]->SetName(Form("fakeGraph_%d",c));
+    fakeGraph[c]->BayesDivide(recoNoFake[c],reco[c]);
+    fakeGraph[c]->Write();  
   }
 
   //secondary
@@ -81,6 +92,7 @@ void makeTrkCorr(bool isEmbedded = true){
   secondary2d->Write();
 
   TH1D * secondary[6];
+  TGraphAsymmErrors * secGraph[6];
   for(int c = 0; c<6; c++){
     secondary[c] = (TH1D*)recoMatched[c]->Clone(Form("secondary_%d",c));  
     secondary[c]->Divide(recoNoFake_sig[c]);  
@@ -88,6 +100,10 @@ void makeTrkCorr(bool isEmbedded = true){
       secondary[c]->SetBinContent(i,1-secondary[c]->GetBinContent(i));
     }
     secondary[c]->Write();
+    secGraph[c] = new TGraphAsymmErrors();
+    secGraph[c]->SetName(Form("secGraph_%d",c));
+    secGraph[c]->BayesDivide(recoMatched[c],recoNoFake_sig[c]);
+    secGraph[c]->Write();  
   }
  
   //multiple reco 
