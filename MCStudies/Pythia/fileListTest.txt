@@ -1,0 +1,1 @@
+/mnt/hadoop/cms/store/user/abaty/XeXeRAAMC/Official/Pythia_plus_Hydjet_pthat15/Dijet15_EmbedHydjet_XeXe/crab_20180301_182509/180301_172533/0000/HiForestAOD_1.root
