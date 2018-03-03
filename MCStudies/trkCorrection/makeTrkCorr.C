@@ -127,7 +127,7 @@ void makeTrkCorr(bool isEmbedded = true){
   TF1 * effFit[6], *fakeFit[6], *secFit[6];
   for(int c = 0; c<6; c++){
     std::cout << "Fitting iteration " << c << std::endl;
-    effFit[c] = new TF1(Form("effFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",1,140);
+    effFit[c] = new TF1(Form("effFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",1.0,140);
     effFit[c]->SetParameters(0.6,0.1,0,0,0);
     effGraph[c]->Fit(Form("effFit_%d",c),"0ERM");
  
@@ -147,13 +147,49 @@ void makeTrkCorr(bool isEmbedded = true){
     secFit[c]->Write();  
   }
  
-  
+  TH2D * efficiency2d_Smoothed = (TH2D*)efficiency2d->Clone("efficiency2d_Smoothed");
+  TH2D * fake2d_Smoothed = (TH2D*)fake2d->Clone("fake2d_Smoothed");
+  TH2D * secondary2d_Smoothed = (TH2D*)secondary2d->Clone("secondary2d_Smoothed");
+  TH1D * efficiency_smooth[6], * fake_smooth[6], * secondary_smooth[6];
+  for(int c = 0; c<6; c++){
+    efficiency_smooth[c] = (TH1D*)efficiency[c]->Clone(Form("efficiency_smooth_%d",c));
+    fake_smooth[c] = (TH1D*)fake[c]->Clone(Form("fake_smooth_%d",c));
+    secondary_smooth[c] = (TH1D*)secondary[c]->Clone(Form("secondary_smooth_%d",c));
+  }
+  for(int i = 0; i<efficiency2d_Smoothed->GetXaxis()->GetNbins(); i++){
+    for(int j = 0; j<6; j++){
+      float pt = efficiency2d_Smoothed->GetXaxis()->GetBinCenter(i+1);
+      secondary2d_Smoothed->SetBinContent(i+1,j+1,1-secFit[j]->Eval(pt));
+      secondary_smooth[j]->SetBinContent(i+1,1-secFit[j]->Eval(pt));
+      if(pt>1.0){
+        efficiency2d_Smoothed->SetBinContent(i+1,j+1,effFit[j]->Eval(pt));
+        efficiency_smooth[j]->SetBinContent(i+1,effFit[j]->Eval(pt));
+      }  
+      if(pt>3.2){
+        fake2d_Smoothed->SetBinContent(i+1,j+1,1-fakeFit[j]->Eval(pt));
+        fake_smooth[j]->SetBinContent(i+1,1-fakeFit[j]->Eval(pt));
+      }
+      secondary_smooth[j]->SetBinError(i+1,0);
+      fake_smooth[j]->SetBinError(i+1,0);
+      efficiency_smooth[j]->SetBinError(i+1,0);
+    }
+  }
+  secondary2d_Smoothed->Write();
+  efficiency2d_Smoothed->Write();
+  fake2d_Smoothed->Write();
+  for(int c = 0; c<6; c++){
+    efficiency_smooth[c]->Write();
+    fake_smooth[c]->Write();
+    secondary_smooth[c]->Write();
+  }
+
+ 
 
 }
 
 void makeSpeciesCorr(){
   //primary correction
-  TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
+  TFile * f1 = TFile::Open("trkCorr_Pythia_March1.root","read");
   //secondary correction
   TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
 
@@ -161,15 +197,16 @@ void makeSpeciesCorr(){
   TH2D * eff2;
   TH1D * eff1d;
 
-  eff = (TH2D*)f1->Get("efficiency2d");
+  eff = (TH2D*)f1->Get("efficiency2d_Smoothed");
   eff2 = (TH2D*)f2->Get("efficiency2d");
-  fake = (TH2D*)f1->Get("fake2d");
-  sec = (TH2D*)f1->Get("secondary2d");
+  fake = (TH2D*)f1->Get("fake2d_Smoothed");
+  fake2 = (TH2D*)f1->Get("fake2d");
+  sec = (TH2D*)f1->Get("secondary2d_Smoothed");
   multiple = (TH2D*)f1->Get("multiple2d");
   
   eff1d = (TH1D*)f1->Get("efficiency_0");
 
-  TFile * output = TFile::Open("trkCorr_Feb26_wSpeciesCorr.root","recreate");
+  TFile * output = TFile::Open("trkCorr_March3_wSpeciesCorr.root","recreate");
   eff->SetDirectory(output);
   fake->SetDirectory(output);
   sec->SetDirectory(output);
@@ -183,27 +220,47 @@ void makeSpeciesCorr(){
   TH2D * speciesCorrSyst = (TH2D*)eff->Clone("speciesCorrSyst");
 
   TH1D * speciesCorrSyst1D[6];
+  for(int i = 0; i<6; i++){
+    speciesCorrSyst1D[i] = (TH1D*)eff1d->Clone(Form("speciesCorrSyst1D_ForPlots_%d",i));
+    speciesCorrSyst1D[i]->Reset();
+  }
 
   for(int i = 1; i<speciesCorr->GetXaxis()->GetNbins()+1;i++){
     for(int j = 1; j<speciesCorr->GetYaxis()->GetNbins()+1;j++){
+      float e1 = eff->GetBinContent(i,j);
+      float e2 = eff2->GetBinContent(i,j);
+      e1 = e1/(1-fake->GetBinContent(i,j));
+      e2 = e2/(1-fake2->GetBinContent(i,j));
       speciesCorr->SetBinContent(i,j,1);
+      speciesCorr->SetBinError(i,j,0);
+
+      //default uncertainty
+      speciesCorrSyst->SetBinContent(i,j,0.03);
+      speciesCorrSyst->SetBinError(i,j,0);
       if(speciesCorr->GetXaxis()->GetBinCenter(i)>14) continue;
-      speciesCorr->SetBinContent(i,j,2*eff->GetBinContent(i,j)/(eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)));    
+      //if(speciesCorr->GetXaxis()->GetBinCenter(i)<1) continue;
+      speciesCorr->SetBinContent(i,j,2*e1/(e1+e2));    
       speciesCorr->SetBinError(i,j,TMath::Power(TMath::Power(2*eff2->GetBinContent(i,j)/TMath::Power((eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)),2)*eff->GetBinError(i,j),2)+TMath::Power(2*eff->GetBinContent(i,j)/TMath::Power((eff->GetBinContent(i,j)+eff2->GetBinContent(i,j)),2)*eff2->GetBinError(i,j),2),0.5));    
       speciesCorrSyst->SetBinContent(i,j,speciesCorr->GetBinContent(i,j)-1);
       speciesCorrSyst->SetBinError(i,j,speciesCorr->GetBinError(i,j));
+      
+      speciesCorrSyst1D[j-1]->SetBinContent(i,speciesCorrSyst->GetBinContent(i,j));
+      speciesCorrSyst1D[j-1]->SetBinError(i,speciesCorrSyst->GetBinError(i,j));
+      
+      //removing negative high-pt points
+      //reset to default uncertainty here
+      if(speciesCorr->GetXaxis()->GetBinCenter(i)>3 && speciesCorr->GetBinContent(i,j)<1){
+        speciesCorr->SetBinContent(i,j,1);    
+        speciesCorr->SetBinError(i,j,0);    
+        speciesCorrSyst->SetBinContent(i,j,0.03);
+        speciesCorrSyst->SetBinError(i,j,0);
+      }
     }
   }
   speciesCorr->Write();
   speciesCorrSyst->Write();
 
   for(int i = 0; i<6; i++){
-    speciesCorrSyst1D[i] = (TH1D*)eff1d->Clone(Form("speciesCorrSyst1D_%d",i));
-    speciesCorrSyst1D[i]->Reset();
-    for(int j = 1; j<speciesCorrSyst1D[i]->GetSize()-1; j++){
-      speciesCorrSyst1D[i]->SetBinContent(j,speciesCorrSyst->GetBinContent(j,i+1));
-      speciesCorrSyst1D[i]->SetBinError(j,speciesCorrSyst->GetBinError(j,i+1));
-    }
     speciesCorrSyst1D[i]->Write();
   }
 }

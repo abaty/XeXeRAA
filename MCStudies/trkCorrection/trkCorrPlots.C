@@ -1,10 +1,61 @@
 #include "TLegend.h"
+#include "tdrstyle.C"
+#include "CMS_lumi.C"
 #include "TFile.h"
 #include "TH1D.h"
 #include "TCanvas.h"
 #include <string>
 #include <cstring>
 #include "TGraphAsymmErrors.h"
+
+void speciesCorrPlots(){
+  gStyle->SetErrorX(0);
+  gStyle->SetOptStat(0);
+  TFile * f = TFile::Open("trkCorr_March3_wSpeciesCorr.root","read");
+  TH1D * speciesCorr[6];
+  TCanvas * c1 = new TCanvas("c1","c1",800,600);
+  TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
+  for(int i = 0; i<6; i++){
+    speciesCorr[i] = (TH1D*)f->Get(Form("speciesCorrSyst1D_ForPlots_%d",i));
+    speciesCorr[i]->GetXaxis()->SetRangeUser(0.5,14);
+    speciesCorr[i]->SetMarkerStyle(8);
+    speciesCorr[i]->SetMarkerColor(kBlack);
+    speciesCorr[i]->SetLineColor(kBlack);
+    speciesCorr[i]->GetXaxis()->SetTitle("p_{T}");
+    speciesCorr[i]->GetYaxis()->SetTitle("Correction factor");
+    speciesCorr[i]->SetLineColor(kBlack);
+    speciesCorr[i]->Draw();
+    l->Clear();
+    l->SetLineWidth(0);
+    l->SetFillStyle(0);
+    if(i==0) l->AddEntry((TObject*)0,"0-5%","");
+    if(i==1) l->AddEntry((TObject*)0,"5-10%","");
+    if(i==2) l->AddEntry((TObject*)0,"10-30%","");
+    if(i==3) l->AddEntry((TObject*)0,"30-50%","");
+    if(i==4) l->AddEntry((TObject*)0,"50-70%","");
+    if(i==5) l->AddEntry((TObject*)0,"70-100%","");
+    l->Draw("same");
+
+    TLine * line1 = new TLine();
+    line1->SetLineColor(kRed);
+    line1->SetLineWidth(2);
+    for(int j = 1; j<speciesCorr[i]->GetSize()-1; j++){
+      if(speciesCorr[i]->GetBinContent(j)<0 && speciesCorr[i]->GetBinCenter(j)>3){
+        line1->SetX1(speciesCorr[i]->GetBinCenter(j)-0.3);
+        line1->SetX2(speciesCorr[i]->GetBinCenter(j)-0.3);
+        line1->SetY1(-0.07);
+        line1->SetY2(0.07);
+        break;
+      }
+    }
+    line1->Draw("same");
+
+    c1->SaveAs(Form("img/speciesCorr_%d.png",i));
+    c1->SaveAs(Form("img/speciesCorr_%d.pdf",i));
+    c1->SaveAs(Form("img/speciesCorr_%d.C",i));
+    delete line1;
+  } 
+}
 
 void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors ** eff2, TGraphAsymmErrors ** eff3, std::string yTitle, std::string outTitle, TF1 ** fit, bool doFit = false ,bool isZoom = false){
 
@@ -152,7 +203,7 @@ void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::st
 
 
 void trkCorrPlots(){
-  TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb6.root","read");
+  TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
   TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
   TFile * f3 = TFile::Open("trkCorr_Pythia_March1.root","read");
   gStyle->SetOptStat(0);
@@ -203,51 +254,58 @@ void trkCorrPlots(){
   makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",secFit,true,true);
   makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",secFit,true,false);
 
+
+  setTDRStyle();
   TCanvas * c2 = new TCanvas("c2","c2",800,700);
   c2->SetLogx();
-  TH1D * dummy = new TH1D("dummy","dummy",10,0.5,103.6);
+  c2->SetTickx(1);
+  c2->SetTicky(1);
+  TH1D * dummy = new TH1D("dummy","",10,0.5,103.6);
   dummy->GetXaxis()->SetTitle("p_{T} (GeV)");
-  dummy->GetYaxis()->SetTitle("Tracking Efficiency");
+  dummy->GetXaxis()->CenterTitle();
+  dummy->GetYaxis()->SetTitle("XeXe Tracking Efficiency");
+  dummy->GetYaxis()->CenterTitle();
+  dummy->GetYaxis()->SetRangeUser(0,1);
+  dummy->GetYaxis()->SetTitleOffset(1.2);
   dummy->Draw();
+  TH1D * efficiencySmooth[6];
   for(int i = 0; i<6; i++){
-    effFit[i]->SetLineColor(i);
-    effFit[i]->Draw("same");
-  }  
+    efficiencySmooth[i] = (TH1D*)f3->Get(Form("efficiency_smooth_%d",i));
+    if(i==0) efficiencySmooth[i]->SetLineColor(kBlack);
+    if(i==1) efficiencySmooth[i]->SetLineColor(kBlack);
+    if(i==2) efficiencySmooth[i]->SetLineColor(kBlue);
+    if(i==3) efficiencySmooth[i]->SetLineColor(kBlue);
+    if(i==4) efficiencySmooth[i]->SetLineColor(kRed);
+    if(i==5) efficiencySmooth[i]->SetLineColor(kRed);
+    if(i==1 || i==3 || i==5) efficiencySmooth[i]->SetLineStyle(3);
+    efficiencySmooth[i]->SetLineWidth(2);
+    efficiencySmooth[i]->SetMarkerStyle(1);
+    efficiencySmooth[i]->Draw("same C");
+  } 
+  TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.6);
+  trkEffLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
+  trkEffLeg->AddEntry((TObject*)0,"Pythia 8 + Hydjet",""); 
+  trkEffLeg->AddEntry(efficiencySmooth[0],"0-5%","l"); 
+  trkEffLeg->AddEntry(efficiencySmooth[1],"5-10%","l"); 
+  trkEffLeg->AddEntry(efficiencySmooth[2],"10-30%","l"); 
+  trkEffLeg->AddEntry(efficiencySmooth[3],"30-50%","l"); 
+  trkEffLeg->AddEntry(efficiencySmooth[4],"50-70%","l"); 
+  trkEffLeg->AddEntry(efficiencySmooth[5],"70-100%","l"); 
+  trkEffLeg->SetBorderSize(0);
+  trkEffLeg->Draw("same");
+  
+  int iPeriod = 0;
+  lumi_sqrtS = "";
+  writeExtraText = true;  
+  extraText  = "Preliminary";
+  //extraText  = "Unpublished";
+  CMS_lumi( c2, iPeriod, 11 );
+
   c2->SaveAs("img/effFitsStacked.png");
   c2->SaveAs("img/effFitsStacked.pdf");
   c2->SaveAs("img/effFitsStacked.C");
 
+  
+  speciesCorrPlots();
 }
 
-void speciesCorrPlots(){
-  gStyle->SetErrorX(0);
-  gStyle->SetOptStat(0);
-  TFile * f = TFile::Open("trkCorr_Feb26_wSpeciesCorr.root","read");
-  TH1D * speciesCorr[6];
-  TCanvas * c1 = new TCanvas("c1","c1",800,600);
-  TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
-  for(int i = 0; i<6; i++){
-    speciesCorr[i] = (TH1D*)f->Get(Form("speciesCorrSyst1D_%d",i));
-    speciesCorr[i]->GetXaxis()->SetRangeUser(0.5,12);
-    speciesCorr[i]->SetMarkerStyle(8);
-    speciesCorr[i]->SetMarkerColor(kBlack);
-    speciesCorr[i]->SetLineColor(kBlack);
-    speciesCorr[i]->GetXaxis()->SetTitle("p_{T}");
-    speciesCorr[i]->GetYaxis()->SetTitle("Correction factor");
-    speciesCorr[i]->SetLineColor(kBlack);
-    speciesCorr[i]->Draw();
-    l->Clear();
-    l->SetLineWidth(0);
-    l->SetFillStyle(0);
-    if(i==0) l->AddEntry((TObject*)0,"0-5%","");
-    if(i==1) l->AddEntry((TObject*)0,"5-10%","");
-    if(i==2) l->AddEntry((TObject*)0,"10-30%","");
-    if(i==3) l->AddEntry((TObject*)0,"30-50%","");
-    if(i==4) l->AddEntry((TObject*)0,"50-70%","");
-    if(i==5) l->AddEntry((TObject*)0,"70-100%","");
-    l->Draw("same");
-    c1->SaveAs(Form("img/speciesCorr_%d.png",i));
-    c1->SaveAs(Form("img/speciesCorr_%d.pdf",i));
-    c1->SaveAs(Form("img/speciesCorr_%d.C",i));
-  } 
-}
