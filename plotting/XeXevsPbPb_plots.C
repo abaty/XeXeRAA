@@ -39,7 +39,7 @@ void XeXevsPbPb_plots(){
  
   Settings s = Settings();
 
-  TFile * ppFit = TFile::Open("../ppRef_Feb26_Pythia.root","read");
+  TFile * ppFit = TFile::Open("../ppRef_March3_Pythia.root","read");
   TF1 * extrapFunc = (TF1*)ppFit->Get("extrapFuncPoly4");
   
   TH1D * h[s.nCentBins];

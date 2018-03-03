@@ -36,7 +36,7 @@ void spectra_plots(){
   TH1D * ppSpec;
   TH1D * pp_totSyst;
   TH1D * nVtx;
-  TFile * fpp = TFile::Open("../ppRef_Feb26_Pythia.root","read");
+  TFile * fpp = TFile::Open("../ppRef_March3_Pythia.root","read");
   ppSpec = (TH1D*)fpp->Get("ppScaled_WithFit");
   ppSpec->SetDirectory(0);
   pp_totSyst = (TH1D*)fpp->Get("ppScaledSyst");

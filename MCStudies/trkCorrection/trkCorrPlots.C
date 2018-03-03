@@ -294,6 +294,7 @@ void trkCorrPlots(){
   trkEffLeg->SetBorderSize(0);
   trkEffLeg->Draw("same");
   
+  setTDRStyle();
   int iPeriod = 0;
   lumi_sqrtS = "";
   writeExtraText = true;  

@@ -31,6 +31,8 @@
 #include "TF1.h"
 
 void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
+  setTDRStyle();
+  gStyle->SetOptFit(0);
   TH1::SetDefaultSumw2();
   gStyle->SetOptStat(0);
   gStyle->SetErrorX(0);
@@ -390,10 +392,21 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorHerw->Draw("same");
   //TH1D * extrapFactorPythiaClone = (TH1D*)extrapFactorPythia->Clone("extraFactorPythiaClone");
   //extrapFactorPythiaClone->Draw("same");
+  specLeg2->SetX1NDC(0.3); 
   specLeg2->SetX2NDC(0.7); 
-  specLeg2->SetY1NDC(0.6); 
+  specLeg2->SetY1NDC(0.55); 
+  specLeg2->SetY2NDC(0.75); 
+  specLeg2->SetFillStyle(0); 
   specLeg2->Draw("same"); 
   c3->SetLogx(0);
+  
+  int iPeriod = 0;
+  lumi_sqrtS = "";
+  writeExtraText = true;  
+  extraText  = "Preliminary";
+  //extraText  = "Unpublished";
+  CMS_lumi( c3, iPeriod, 11 );
+
   c3->SaveAs("img/extrapolationFactorPythia8_cleaned.png");
   c3->SaveAs("img/extrapolationFactorPythia8_cleaned.pdf");
   c3->SaveAs("img/extrapolationFacotrPythia8_cleaned.C");
@@ -419,6 +432,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   specLegFit->AddEntry(extrapFuncPoly5,"a+bx+cx^{2}+dx^{3}+ex^{4}+fx^{5}","l");
   specLegFit->AddEntry(extrapFuncLogistic,"a+bx+#frac{c(x-d)}{#sqrt{1+(x-d)^{2}}}","l");
   specLegFit->AddEntry(extrapFuncLogistic2,"a+bx+cx^{2}+d(Tanh(x-e))","l");
+  specLegFit->SetFillStyle(0);
   specLegFit->Draw("same");
 
   c3->SetLogx(0);
