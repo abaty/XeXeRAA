@@ -3,6 +3,7 @@
 #include "TFile.h"
 #include "TGraphAsymmErrors.h"
 #include <iostream>
+#include "TF1.h"
 
 void makeTrkCorr(bool isEmbedded = true){
   TH1::SetDefaultSumw2();
@@ -53,7 +54,6 @@ void makeTrkCorr(bool isEmbedded = true){
     effGraph[c] = new TGraphAsymmErrors();
     effGraph[c]->SetName(Form("effGraph_%d",c));
     effGraph[c]->BayesDivide(genMatched[c],gen[c]);
-    effGraph[c]->Write();
   }
 
   //fake rate
@@ -78,7 +78,6 @@ void makeTrkCorr(bool isEmbedded = true){
     fakeGraph[c] = new TGraphAsymmErrors();
     fakeGraph[c]->SetName(Form("fakeGraph_%d",c));
     fakeGraph[c]->BayesDivide(recoNoFake[c],reco[c]);
-    fakeGraph[c]->Write();  
   }
 
   //secondary
@@ -103,7 +102,6 @@ void makeTrkCorr(bool isEmbedded = true){
     secGraph[c] = new TGraphAsymmErrors();
     secGraph[c]->SetName(Form("secGraph_%d",c));
     secGraph[c]->BayesDivide(recoMatched[c],recoNoFake_sig[c]);
-    secGraph[c]->Write();  
   }
  
   //multiple reco 
@@ -125,6 +123,32 @@ void makeTrkCorr(bool isEmbedded = true){
     }
     multiple[c]->Write();
   }
+
+  TF1 * effFit[6], *fakeFit[6], *secFit[6];
+  for(int c = 0; c<6; c++){
+    std::cout << "Fitting iteration " << c << std::endl;
+    effFit[c] = new TF1(Form("effFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",1,140);
+    effFit[c]->SetParameters(0.6,0.1,0,0,0);
+    effGraph[c]->Fit(Form("effFit_%d",c),"0ERM");
+ 
+    fakeFit[c] = new TF1(Form("fakeFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)",3.2,140);
+    fakeFit[c]->SetParameters(1,0,0);
+    fakeGraph[c]->Fit(Form("fakeFit_%d",c),"0ERM");
+    
+    secFit[c] = new TF1(Form("secFit_%d",c),"[0]",0.5,140);
+    secFit[c]->SetParameter(0,1);
+    secGraph[c]->Fit(Form("secFit_%d",c),"0ERM");
+    
+    effGraph[c]->Write();
+    effFit[c]->Write();
+    fakeGraph[c]->Write(); 
+    fakeFit[c]->Write(); 
+    secGraph[c]->Write();
+    secFit[c]->Write();  
+  }
+ 
+  
+
 }
 
 void makeSpeciesCorr(){
@@ -182,5 +206,4 @@ void makeSpeciesCorr(){
     }
     speciesCorrSyst1D[i]->Write();
   }
-
 }

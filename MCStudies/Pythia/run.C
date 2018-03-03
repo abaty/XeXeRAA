@@ -23,7 +23,7 @@ int centBin(int b){
 }
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
-  float qScaleCutoff = 0.5;
+  float qScaleCutoff = 0.35;
 
   Settings s = Settings();
   EventWeight evtW = EventWeight();
@@ -63,32 +63,28 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   }
 
   //eff and fake plots
-  //static const int ntrkBins2 = 22;
-  //double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.2  , 3.2  , 4.8  , 6.4  , 9.6 , 14.4, 24.0, 35.2, 48.0,73.6,103.6,133.6};
-  static const int ntrkBins2 = 34;
-  double xtrkbins2[ntrkBins2+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6,120,140};
 
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
-  gen2d = new TH2D("gen2d","",ntrkBins2,xtrkbins2,6,0,6);
-  reco2d = new TH2D("reco2d","",ntrkBins2,xtrkbins2,6,0,6);
-  recoNoFake2d = new TH2D("recoNoFake2d","",ntrkBins2,xtrkbins2,6,0,6);
-  recoNoFake2d_sig = new TH2D("recoNoFake2d_sig","",ntrkBins2,xtrkbins2,6,0,6);
-  recoMatched2d = new TH2D("recoMatched2d","",ntrkBins2,xtrkbins2,6,0,6);
-  genMatched2d = new TH2D("genMatched2d","",ntrkBins2,xtrkbins2,6,0,6);
-  genMatchedMult2d = new TH2D("genMatchedMult2d","",ntrkBins2,xtrkbins2,6,0,6);
+  gen2d = new TH2D("gen2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  reco2d = new TH2D("reco2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  recoNoFake2d_sig = new TH2D("recoNoFake2d_sig","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  genMatchedMult2d = new TH2D("genMatchedMult2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
   TH1D *gen[6], *reco[6], *recoNoFake[6], *recoNoFake_sig[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
   for(int c = 0; c<6; c++){
-    gen[c] = new TH1D(Form("gen_%d",c),"",ntrkBins2,xtrkbins2); 
-    reco[c] = new TH1D(Form("reco_%d",c),"",ntrkBins2,xtrkbins2);
-    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",ntrkBins2,xtrkbins2); 
-    recoNoFake_sig[c] = new TH1D(Form("recoNoFake_sig_%d",c),"",ntrkBins2,xtrkbins2); 
-    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",ntrkBins2,xtrkbins2); 
-    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",ntrkBins2,xtrkbins2); 
-    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",ntrkBins2,xtrkbins2); 
+    gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra);
+    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    recoNoFake_sig[c] = new TH1D(Form("recoNoFake_sig_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
   }
   TH2D * qScaleVsPt[6];
   for(int c = 0; c<6; c++){
-    qScaleVsPt[c] = new TH2D(Form("qScaleVsPt_%d",c),"",ntrkBins2,xtrkbins2,30,0,1.5);
+    qScaleVsPt[c] = new TH2D(Form("qScaleVsPt_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra,30,0,1.5);
   }
 
   int nTrk;
@@ -201,7 +197,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
       float w = evtW.getEvtWeight(vz,hiBin);
       //there are basically no events iwth hiBin>186, so remove them to avoid huge weights
-      if(hiBin>186) w=0;
+      if(hiBin>180) continue;
 
       w=w*weight;
       vz_Weighted_h->Fill(vz,w);
@@ -355,7 +351,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(TMath::Abs(pEta[j])>s.etaCut) continue;
 
         //cut to keep weights reasonable
-        if(pPt[j]>qScaleCutoff *pthat) continue;
+        if(pPt[j]>qScaleCutoff*pthat) continue;
 
         gen2d->Fill(pPt[j],centBin(hiBin),w);
         gen[centBin(hiBin)]->Fill(pPt[j],w);

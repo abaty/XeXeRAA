@@ -6,7 +6,7 @@
 #include <cstring>
 #include "TGraphAsymmErrors.h"
 
-void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors ** eff2, TGraphAsymmErrors ** eff3, std::string yTitle, std::string outTitle, bool isZoom = false){
+void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors ** eff2, TGraphAsymmErrors ** eff3, std::string yTitle, std::string outTitle, TF1 ** fit, bool doFit = false ,bool isZoom = false){
 
   gStyle->SetErrorX(0);
   TLegend * l[6];
@@ -17,7 +17,8 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     eff[i]->SetMarkerColor(kBlack);
     eff[i]->SetLineColor(kBlack);
     eff3[i]->GetXaxis()->SetTitle("p_{T}");
-    eff3[i]->GetXaxis()->SetRangeUser(0.5,105);
+    eff3[i]->GetXaxis()->SetRangeUser(0.5,140);
+    if(doFit) eff3[i]->GetXaxis()->SetRangeUser(1,140);
     eff3[i]->GetYaxis()->SetTitle(yTitle.c_str());
     eff3[i]->GetYaxis()->SetTitleOffset(1.3);
     if(strcmp(yTitle.c_str(),"misreconstruction rate")==0) eff3[i]->GetYaxis()->SetTitle("(1-misreconstruction rate)");
@@ -36,7 +37,7 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     if(strcmp(yTitle.c_str(),"secondary rate")==0) eff3[i]->GetYaxis()->SetRangeUser(0.95,1.05);
     if(strcmp(yTitle.c_str(),"multiple reco rate")==0) eff3[i]->GetYaxis()->SetRangeUser(0,0.0001);
     
-    if(isZoom && strcmp(yTitle.c_str(),"efficiency")==0) eff3[i]->GetYaxis()->SetRangeUser(0.5,0.8);
+    if(isZoom && strcmp(yTitle.c_str(),"efficiency")==0) eff3[i]->GetYaxis()->SetRangeUser(0.5,0.9);
     if(isZoom && strcmp(yTitle.c_str(),"misreconstruction rate")==0) eff3[i]->GetYaxis()->SetRangeUser(0.95,1.05);
     if(isZoom && strcmp(yTitle.c_str(),"secondary rate")==0) eff3[i]->GetYaxis()->SetRangeUser(0.97,1.03);
     if(isZoom && strcmp(yTitle.c_str(),"multiple reco rate")==0) eff3[i]->GetYaxis()->SetRangeUser(0,0.0001);
@@ -52,10 +53,18 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     }
    
     eff3[i]->Draw("AP");
-    eff[i]->Draw("P same");
-    eff2[i]->Draw("P same");
+    if(!doFit) eff[i]->Draw("P same");
+    if(!doFit) eff2[i]->Draw("P same");
     eff3[i]->Draw("P same");
-    
+   
+    if(doFit){
+      if(isZoom) gStyle->SetOptFit();
+      else gStyle->SetOptFit(0);
+      fit[i]->SetLineColor(kBlack);
+      fit[i]->SetLineWidth(2);
+      fit[i]->Draw("sames");
+    }
+ 
     if(!isZoom && strcmp(yTitle.c_str(),"misreconstruction rate")==0) l[i] = new TLegend(0.1,0.3,0.7,0.5);
     else l[i] = new TLegend(0.1,0.7,0.7,0.89);
     l[i]->SetBorderSize(0);
@@ -67,19 +76,31 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     if(i==4) l[i]->AddEntry((TObject*)0,"50-70%","");
     if(i==5) l[i]->AddEntry((TObject*)0,"70-100%","");
     l[i]->AddEntry((TObject*)0,"Analysis Cuts","");
-    l[i]->AddEntry(eff[i],"Hydjet MB","p");
-    l[i]->AddEntry(eff2[i],"EPOS MB","p");
+    if(!doFit) l[i]->AddEntry(eff[i],"Hydjet MB","p");
+    if(!doFit) l[i]->AddEntry(eff2[i],"EPOS MB","p");
     l[i]->AddEntry(eff3[i],"Pythia+Hydjet","p");
     l[i]->Draw("same");
   }
   if(isZoom){
-  c1->SaveAs(Form("img/%s_Zoom.png",outTitle.c_str()));
-  c1->SaveAs(Form("img/%s_Zoom.pdf",outTitle.c_str()));
-  c1->SaveAs(Form("img/%s_Zoom.C",outTitle.c_str()));
+    if(doFit){
+      c1->SaveAs(Form("img/%s_Zoom_Fit.png",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Zoom_Fit.pdf",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Zoom_Fit.C",outTitle.c_str()));
+    }else{
+      c1->SaveAs(Form("img/%s_Zoom.png",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Zoom.pdf",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Zoom.C",outTitle.c_str()));
+    }
   }else{
-  c1->SaveAs(Form("img/%s.png",outTitle.c_str()));
-  c1->SaveAs(Form("img/%s.pdf",outTitle.c_str()));
-  c1->SaveAs(Form("img/%s.C",outTitle.c_str()));
+    if(doFit){  
+      c1->SaveAs(Form("img/%s_Fit.png",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Fit.pdf",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s_Fit.C",outTitle.c_str()));
+    }else{
+      c1->SaveAs(Form("img/%s.png",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s.pdf",outTitle.c_str()));
+      c1->SaveAs(Form("img/%s.C",outTitle.c_str()));
+    }
   }
 }
 void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::string yTitle, std::string outTitle){
@@ -157,16 +178,45 @@ void trkCorrPlots(){
     multiple3[c] = (TH1D*)f3->Get(Form("multiple_%d",c));  
   }
 
+  TF1 * effFit[6], *fakeFit[6], *secFit[6];
+  for(c = 0; c<6; c++){
+    effFit[c] = (TF1*)f3->Get(Form("effFit_%d",c));
+    fakeFit[c] = (TF1*)f3->Get(Form("fakeFit_%d",c));
+    secFit[c] = (TF1*)f3->Get(Form("secFit_%d",c));
+  }
+
   TCanvas * c1 = new TCanvas("c1","c1",1000,1300);
   c1->Divide(2,3);
 
-  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency");
-  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake");
-  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary");
-  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency",true);
-  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake",true);
-  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",true);
+  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency", effFit);
+  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake", fakeFit);
+  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",secFit);
+  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency",effFit,false,true);
+  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake",effFit,false,true);
+  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",fakeFit,false,true);
   makeTH1Array(c1, multiple, multiple2, multiple3, "multiple reco rate","multiple");
+  
+  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency",effFit,true,false);
+  makeTGraphArray(c1, efficiency, efficiency2, efficiency3, "efficiency","efficiency",effFit,true,true);
+  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake",fakeFit,true,false);
+  makeTGraphArray(c1, fake, fake2, fake3, "misreconstruction rate","fake",fakeFit,true,true);
+  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",secFit,true,true);
+  makeTGraphArray(c1, secondary, secondary2, secondary3, "secondary rate","secondary",secFit,true,false);
+
+  TCanvas * c2 = new TCanvas("c2","c2",800,700);
+  c2->SetLogx();
+  TH1D * dummy = new TH1D("dummy","dummy",10,0.5,103.6);
+  dummy->GetXaxis()->SetTitle("p_{T} (GeV)");
+  dummy->GetYaxis()->SetTitle("Tracking Efficiency");
+  dummy->Draw();
+  for(int i = 0; i<6; i++){
+    effFit[i]->SetLineColor(i);
+    effFit[i]->Draw("same");
+  }  
+  c2->SaveAs("img/effFitsStacked.png");
+  c2->SaveAs("img/effFitsStacked.pdf");
+  c2->SaveAs("img/effFitsStacked.C");
+
 }
 
 void speciesCorrPlots(){
