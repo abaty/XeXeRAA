@@ -1,6 +1,7 @@
 #ifndef SKIM
 #define SKIM
 #include <iostream>
+#include <string>
 
 class Settings{
   public:
@@ -11,6 +12,10 @@ class Settings{
   float caloMatchStart = 20;
 
   float etaCut = 1.0;
+
+  std::string ppRefFile = "ppRef_March3_Pythia.root";
+  std::string trkCorrFile = "trkCorr_March3_wSpeciesCorr.root";
+  std::string trkResFile = "resolutions_March3.root";
 
 
   static const int ntrkBins = 32;

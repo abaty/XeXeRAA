@@ -83,8 +83,8 @@ double findNcollAverage(int L, int H) {
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
-  TrackingResolution trkReso = TrackingResolution("resolutions_March3.root");
-  TrackingCorrection trkCorr = TrackingCorrection("trkCorr_March3_wSpeciesCorr.root",true,true);
+  TrackingResolution trkReso = TrackingResolution(s.trkResFile);
+  TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
   TFile * output = TFile::Open(Form("output_data_%d.root",jobNumber),"recreate");
@@ -123,7 +123,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   TH1D * scaledPP;
   if(jobNumber==0){
-    TFile * ppFile = TFile::Open("ppRef_March3_Pythia.root","read");
+    TFile * ppFile = TFile::Open(s.ppRefFile.c_str(),"read");
     scaledPP = (TH1D*)ppFile->Get("ppScaled_WithFit");
     scaledPP->SetDirectory(output);
     ppFile->Close();
