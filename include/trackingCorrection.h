@@ -11,6 +11,8 @@ class TrackingCorrection{
     ~TrackingCorrection();
 
     float getTrkCorr(float pt, int cent);
+    float getSpecCorrSyst(float pt, int cent);
+    float getFakeCorr(float pt, int cent);
 
   private:
     bool hasSpeciesCorr;
@@ -19,6 +21,7 @@ class TrackingCorrection{
     TH2D * fake;
     TH2D * sec;
     TH2D * speciesCorr;
+    TH2D * speciesCorrSyst;
 
      int centBin(int b);
 };
@@ -30,6 +33,31 @@ int TrackingCorrection::centBin(int b){
   else if(b<100) return 3;
   else if(b<140) return 4;
   else return 5;
+}
+
+float TrackingCorrection::getSpecCorrSyst(float pt, int cent){
+  if(pt<0.5 || pt> 103.6) return 1;
+  if(cent<0 || cent>199) return 1;
+
+  int bin = centBin(cent);
+  int p = eff->GetXaxis()->FindBin(pt);
+  int c = eff->GetYaxis()->FindBin(bin);
+  if(hasSpeciesCorr){
+    return speciesCorrSyst->GetBinContent(p,c); 
+  }
+  else{
+    return -999;
+  }
+}
+
+float TrackingCorrection::getFakeCorr(float pt, int cent){
+  if(pt<0.5 || pt> 103.6) return 1;
+  if(cent<0 || cent>199) return 1;
+
+  int bin = centBin(cent);
+  int p = eff->GetXaxis()->FindBin(pt);
+  int c = eff->GetYaxis()->FindBin(bin);
+  return fake->GetBinContent(p,c); 
 }
 
 float TrackingCorrection::getTrkCorr(float pt, int cent){
@@ -65,7 +93,10 @@ TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true,
     fake = (TH2D*)corr->Get("fake2d");
     sec = (TH2D*)corr->Get("secondary2d");
   }
-  if(hasSpeciesCorr) speciesCorr = (TH2D*)corr->Get("speciesCorr");
+  if(hasSpeciesCorr){
+    speciesCorr = (TH2D*)corr->Get("speciesCorr");
+    speciesCorrSyst = (TH2D*)corr->Get("speciesCorrSyst");
+  }
 }
 
 TrackingCorrection::~TrackingCorrection(){

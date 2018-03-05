@@ -33,6 +33,9 @@ class Settings{
   bool doRejectPU = false;
 
   TH1D * HI_smeared[nCentBins]; 
+  TH1D * HI_UpSpecCorr[nCentBins]; 
+  TH1D * HI_UpFakeCorr[nCentBins]; 
+
   TH1D * HI[nCentBins]; 
   TH1D * HI_TaaWeighted[nCentBins]; 
   TH1D * HI_NcollWeighted[nCentBins]; 
