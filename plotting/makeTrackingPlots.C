@@ -18,7 +18,7 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   vz->SetMarkerStyle(8);
   vz->GetYaxis()->SetTitleOffset(1.2);
   vz->Draw("");
-  MCvz->Scale(1.0/MCvz->GetEntries());
+  MCvz->Scale(1.0/MCvz->Integral(MCvz->GetBinLowEdge(1),MCvz->GetBinLowEdge(MCvz->GetSize()-1)));
   MCvz->SetMarkerColor(kRed);
   MCvz->SetLineColor(kRed);
   MCvz->SetMarkerStyle(25);
@@ -44,7 +44,7 @@ void makeVzCent(TH1D * vz, TH1D * hiBin,TH1D * MCvz, TH1D * MChiBin, TCanvas * c
   hiBin->GetYaxis()->SetRangeUser(0,0.025);
   hiBin->Draw("");
   MChiBin->Rebin(4);
-  MChiBin->Scale(1.0/MChiBin->GetEntries());
+  MChiBin->Scale(1.0/MCvz->Integral(MChiBin->GetBinLowEdge(1),MChiBin->GetBinLowEdge(MChiBin->GetSize()-1)));
   MChiBin->SetMarkerColor(kRed);
   MChiBin->SetLineColor(kRed);
   MChiBin->SetMarkerStyle(25);
@@ -64,7 +64,7 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   c1->SetLeftMargin(0.2);
   if(doLogy==1) c1->SetLogy();
   h->SetTitle("");
-  h->Scale(1.0/h->GetEntries());
+  h->Scale(1.0/h->Integral(h->GetBinLowEdge(1),h->GetBinLowEdge(h->GetSize()-1)));
   h->GetXaxis()->SetTitle(Xlabel.c_str());
   h->GetYaxis()->SetRangeUser(yMin,yMax);
   h->GetYaxis()->SetTitle("Normalized to unity");
@@ -75,11 +75,11 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   h->GetYaxis()->SetTitleOffset(2);
   h->Draw("");
 
-  mc[0][0]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][0]->Scale(1.0/mc[0][0]->Integral(mc[0][0]->GetBinLowEdge(1),mc[0][0]->GetBinLowEdge(mc[0][0]->GetSize()-1)));
   mc[0][0]->SetLineColor(kBlack);
-  mc[0][1]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][1]->Scale(1.0/mc[0][0]->Integral(mc[0][0]->GetBinLowEdge(1),mc[0][0]->GetBinLowEdge(mc[0][0]->GetSize()-1)));
   mc[0][1]->SetLineColor(kRed);
-  mc[0][2]->Scale(1.0/mc[0][0]->GetEntries());
+  mc[0][2]->Scale(1.0/mc[0][0]->Integral(mc[0][0]->GetBinLowEdge(1),mc[0][0]->GetBinLowEdge(mc[0][0]->GetSize()-1)));
   mc[0][2]->SetLineColor(kBlue);
   mc[0][2]->Draw("same hist");
   mc[0][1]->Draw("same hist");
@@ -151,7 +151,7 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
     l[i-1]->AddEntry((TObject*)0,Form("%d-%d%%",getLowCent(i),getHighCent(i)),"");
     if(doLogy==1) c2->SetLogy();
     h[i]->SetTitle("");
-    h[i]->Scale(1.0/h[i]->GetEntries());
+    h[i]->Scale(1.0/h[i]->Integral(h[i]->GetBinLowEdge(1),h[i]->GetBinLowEdge(h[i]->GetSize()-1)));
     h[i]->GetXaxis()->SetTitle(Xlabel.c_str());
     h[i]->GetYaxis()->SetRangeUser(yMin,yMax);
     h[i]->GetYaxis()->SetTitle("Normalized to unity");
@@ -163,11 +163,11 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
     h[i]->GetYaxis()->SetTitleOffset(2);
     h[i]->Draw(""); 
   
-    mc[i][0]->Scale(1.0/mc[i][0]->GetEntries());
+    mc[i][0]->Scale(1.0/mc[i][0]->Integral(mc[i][0]->GetBinLowEdge(1),mc[i][0]->GetBinLowEdge(mc[i][0]->GetSize()-1)));
     mc[i][0]->SetLineColor(kBlack);
-    mc[i][1]->Scale(1.0/mc[i][0]->GetEntries());
+    mc[i][1]->Scale(1.0/mc[i][0]->Integral(mc[i][0]->GetBinLowEdge(1),mc[i][0]->GetBinLowEdge(mc[i][0]->GetSize()-1)));
     mc[i][1]->SetLineColor(kRed);
-    mc[i][2]->Scale(1.0/mc[i][0]->GetEntries());
+    mc[i][2]->Scale(1.0/mc[i][0]->Integral(mc[i][0]->GetBinLowEdge(1),mc[i][0]->GetBinLowEdge(mc[i][0]->GetSize()-1)));
     mc[i][2]->SetLineColor(kBlue);
     mc[i][2]->Draw("same hist");
     mc[i][1]->Draw("same hist");
@@ -216,11 +216,13 @@ void makeTrackingPlots_Cuts(int cuts = 2){
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
  
-  std::string generator = "MB Hydjet";
+  //std::string generator = "MB Hydjet";
   //std::string generator = "MB EPOS";
+  std::string generator = "Pythia + Hydjet";
  
   TFile * f = TFile::Open("../output_0.root","read");
-  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb26.root","read"); 
+  TFile * mc = TFile::Open("MCTrackingRootFiles/Pythia_March3.root","read"); 
+  //TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb26.root","read"); 
   //TFile * mc = TFile::Open("MCTrackingRootFiles/EPOS_Feb26.root","read"); 
   //etaLT2p5 below 
   //TFile * f = TFile::Open("MCTrackingRootFiles/output_Feb6_etaLT2p5_Data.root","read");

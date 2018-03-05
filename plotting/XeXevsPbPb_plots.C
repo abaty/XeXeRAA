@@ -58,7 +58,10 @@ void XeXevsPbPb_plots(){
   TH1D * PbPb_stat[6];
   TH1D * PbPb_syst[6];
 
-  float TAA[6] = {26.0,20.5,11.5,3.82,0.934,0.152};
+  //NOT TAA but NColl!!!!!
+  float TAA[6] = {1820,1430,805,267,65.4,10.7};
+  float PbPbTAAUncertU[6] = {130,100,55,20,7.0,1.7};
+  float PbPbTAAUncertD[6] = {140,110,58,20,6.6,1.5};
   TFile * f1 = TFile::Open("PbPbRAAs/HEPData-ins1496050-v2-root.root","read"); 
 
   for(int i = 1; i<7; i++){
@@ -178,14 +181,21 @@ void XeXevsPbPb_plots(){
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
-     
-    TAAUncert = 0.05;//placeholder
+
+    TAAUncert = s.Ncolluncert[c];    
+
+    double PbPbU=0;
+    double PbPbD=0;
+    PbPbU = PbPbTAAUncertU[PbPbBin]/TAA[PbPbBin];
+    PbPbD = PbPbTAAUncertD[PbPbBin]/TAA[PbPbBin];
+    double TAAUncertU = TMath::Sqrt(TMath::Power(s.Ncolluncert[c]/100.0,2)+PbPbU*PbPbU);
+    double TAAUncertD = TMath::Sqrt(TMath::Power(s.Ncolluncert[c]/100.0,2)+PbPbD*PbPbD);
+
     bTAA->SetFillColor(kBlue-9);
     bTAA->SetLineWidth(0);
-    bTAA->DrawBox(0.575,1-TAAUncert,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAUncert);
+    bTAA->DrawBox(0.575,1-TAAUncertD,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAUncertU);
     bTAA->DrawBox(0.7,0.675,0.85,0.725);
       
-
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
     line1->SetLineWidth(2);
     line1->SetLineStyle(2);

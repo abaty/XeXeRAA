@@ -188,7 +188,7 @@ void RAA_plots(){
     tex2->DrawLatex(0.9,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.08);
-    tex->DrawLatex(0.8,1.03,"T_{AA} and lumi. uncertainty");
+    tex->DrawLatex(0.8,1.03,"XeXe T_{AA} and pp lumi. uncertainty");
     tex->DrawLatex(0.8,0.93,"|#eta|<1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){

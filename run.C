@@ -68,6 +68,18 @@ double findTaaAverage(int L, int H) {
 
   return 1.0;
 }
+double findNcollAverage(int L, int H) {
+  //v2
+  if(L==0    && H==200 ) return         197;
+  if(L==0    && H==5*2 ) return 	935.9;	
+  if(L==5*2  && H==10*2) return 	727.7;	
+  if(L==0*2  && H==10*2) return 	831.8;	
+  if(L==30*2 && H==50*2) return 	128.3;	
+  if(L==50*2 && H==70*2) return 	33.06;	
+  if(L==70*2 && H==90*2) return 	7.328;	
+  if(L==10*2 && H==30*2) return 	399.3;	
+  return 1.0;
+}
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
@@ -106,6 +118,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     s.HI_smeared[c] = new TH1D(Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_TaaWeighted[c] = new TH1D(Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_TaaWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
+    s.HI_NcollWeighted[c] = new TH1D(Form("HI_NcollWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_NcollWeighted_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
   }
 
   TH1D * scaledPP;
@@ -282,10 +295,13 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   for(int c = 0; c<s.nCentBins; c++)
   {
     double Taa = findTaaAverage(s.lowCentBin[c]*10,s.highCentBin[c]*10);
+    double Ncoll = findNcollAverage(s.lowCentBin[c]*10,s.highCentBin[c]*10);
     for(int i = 1; i<s.HI[c]->GetSize()+1; i++)
     { 
       s.HI_TaaWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa)); 
       s.HI_TaaWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Taa));
+      s.HI_NcollWeighted[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Ncoll)); 
+      s.HI_NcollWeighted[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])*Ncoll));
       s.HI[c]->SetBinContent(i,s.HI[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI_smeared[c]->SetBinContent(i,s.HI_smeared[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI[c]->SetBinError(i,s.HI[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
