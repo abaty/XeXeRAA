@@ -30,12 +30,14 @@ void systematics(){
   TH1D * spec_MCvsDataEff[s.nCentBins]; 
   TH1D * spec_SpecCorr[s.nCentBins]; 
   TH1D * spec_FakeCorr[s.nCentBins]; 
+  TH1D * spec_EffMethod[s.nCentBins]; 
   TH1D * spec_Total[s.nCentBins]; 
   for(int i = 0; i<s.nCentBins; i++){
     spec_reso[i] = new TH1D(Form("spec_reso_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_MCvsDataEff[i] = new TH1D(Form("spec_MCvsDataEff_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_SpecCorr[i] = new TH1D(Form("spec_specCorr_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_FakeCorr[i] = new TH1D(Form("spec_fakeCorr_%d",i),"",s.ntrkBins,s.xtrkbins);
+    spec_EffMethod[i] = new TH1D(Form("spec_effMethod_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_Total[i] = new TH1D(Form("spec_Total_%d",i),"",s.ntrkBins,s.xtrkbins);
   }
    
@@ -51,6 +53,10 @@ void systematics(){
       //fake correction
       spec_FakeCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpFakeCorr[i]->GetBinContent(j)-1));
       total2 += TMath::Power(s.HI_UpFakeCorr[i]->GetBinContent(j)-1,2);
+      
+      //efficiency uncertainty from MC stats
+      spec_EffMethod[i]->SetBinContent(j,0.03);
+      total2 += TMath::Power(0.03,2);
 
       //resolution is a flat 0.5%
       spec_reso[i]->SetBinContent(j,0.005);
