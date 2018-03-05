@@ -52,19 +52,22 @@ void spectra_plots(){
     h[c]->Scale(1.0/nVtx->GetBinContent(nVtx->GetXaxis()->FindBin(c)));
     h[c]->SetDirectory(0);
     h[c]->Print("All");
-    XeXe_totSyst[c] = (TH1D*)h[c]->Clone(Form("spectra_syst_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
+    /*XeXe_totSyst[c] = (TH1D*)h[c]->Clone(Form("spectra_syst_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
     XeXe_totSyst[c]->Reset();
     XeXe_totSyst[c]->SetDirectory(0);
     XeXe_totSyst[c]->SetLineColor(kBlack);
-    XeXe_totSyst[c]->SetLineWidth(2);
+    XeXe_totSyst[c]->SetLineWidth(2);*/
   }
   f->Close();
 
+  TFile * sysFile = TFile::Open("../systematics.root","read");
+
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
-    for(int i = 1; i<XeXe_totSyst[c]->GetSize()-1; i++){
-      XeXe_totSyst[c]->SetBinContent(i,0.08);
-    }
+    XeXe_totSyst[c] = (TH1D*)sysFile->Get(Form("spec_Total_%d",c));
+    XeXe_totSyst[c]->SetDirectory(0);
+    XeXe_totSyst[c]->SetLineColor(kBlack);
+    XeXe_totSyst[c]->SetLineWidth(2);
   }
   
   //pp systematic
@@ -185,15 +188,16 @@ void spectra_plots(){
   ppSpecD2->GetXaxis()->SetTickLength(0.06);
   ppSpecD2->Draw();
 
-  XeXe_totSyst[0]->SetFillColor(kRed-7);
   XeXe_totSyst[0]->Scale(100);
+  XeXe_totSyst[0]->SetFillColor(kRed-7);
   XeXe_totSyst[0]->GetXaxis()->SetRangeUser(0.5,150);
-  XeXe_totSyst[0]->Draw("same");
+  XeXe_totSyst[0]->Print("All");
+  XeXe_totSyst[0]->Draw("same hist");
   XeXe_totSyst[30]->SetFillColor(kBlue);
   XeXe_totSyst[30]->SetFillStyle(3004);
   XeXe_totSyst[30]->Scale(100);
   XeXe_totSyst[30]->GetXaxis()->SetRangeUser(0.5,150);
-  XeXe_totSyst[30]->Draw("same");
+  XeXe_totSyst[30]->Draw("same hist");
   pp_totSyst->SetFillColor(kBlack);
   pp_totSyst->SetFillStyle(3003);
   pp_totSyst->GetXaxis()->SetRangeUser(0.5,150);
