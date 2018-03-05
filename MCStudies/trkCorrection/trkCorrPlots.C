@@ -11,7 +11,7 @@
 void speciesCorrPlots(){
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
-  TFile * f = TFile::Open("trkCorr_March3_wSpeciesCorr.root","read");
+  TFile * f = TFile::Open("trkCorr_March5_wSpeciesCorr.root","read");
   TH1D * speciesCorr[6];
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
@@ -68,8 +68,8 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     eff[i]->SetMarkerColor(kBlack);
     eff[i]->SetLineColor(kBlack);
     eff3[i]->GetXaxis()->SetTitle("p_{T}");
-    eff3[i]->GetXaxis()->SetRangeUser(0.5,140);
-    if(doFit) eff3[i]->GetXaxis()->SetRangeUser(1,140);
+    eff3[i]->GetXaxis()->SetRangeUser(0.5,180);
+    if(doFit) eff3[i]->GetXaxis()->SetRangeUser(1,180);
     eff3[i]->GetYaxis()->SetTitle(yTitle.c_str());
     eff3[i]->GetYaxis()->SetTitleOffset(1.3);
     if(strcmp(yTitle.c_str(),"misreconstruction rate")==0) eff3[i]->GetYaxis()->SetTitle("(1-misreconstruction rate)");
@@ -205,7 +205,7 @@ void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::st
 void trkCorrPlots(){
   TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
   TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
-  TFile * f3 = TFile::Open("trkCorr_Pythia_March1.root","read");
+  TFile * f3 = TFile::Open("trkCorr_Pythia_March5.root","read");
   gStyle->SetOptStat(0);
 
   TGraphAsymmErrors * efficiency[6], *fake[6], *secondary[6];

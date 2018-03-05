@@ -23,7 +23,8 @@ int centBin(int b){
 }
 
 void countTracks(std::vector<std::string> fileList, int jobNumber){
-  float qScaleCutoff = 0.35;
+  float qScaleCutoff = 0.4;
+  float qScaleGap = 30;
 
   Settings s = Settings();
   EventWeight evtW = EventWeight();
@@ -134,6 +135,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   for(unsigned int f = 0; f<fileList.size(); f++){
   //for(unsigned int f = 0; f<10; f++){
     std::cout << "File: " << f << std::endl;
+    std::cout << f << " " << fileList.size() << std::endl;
     TFile * input = TFile::Open(fileList.at(f).c_str(),"read");
     TTree * skim = (TTree*)input->Get("skimanalysis/HltTree");
     TTree * evt = (TTree*)input->Get("hiEvtAnalyzer/HiTree");
@@ -210,7 +212,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkPt[j]<0.5) continue;
        
         //cut to keep weights reasonable
-        if(trkPt[j]>qScaleCutoff*pthat) continue;
+        if(trkPt[j]>qScaleCutoff*pthat && pthat-pPt[j]<qScaleGap) continue;
  
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
         int statusIndex = 0;
@@ -351,7 +353,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(TMath::Abs(pEta[j])>s.etaCut) continue;
 
         //cut to keep weights reasonable
-        if(pPt[j]>qScaleCutoff*pthat) continue;
+        if(pPt[j]>qScaleCutoff*pthat && pthat-pPt[j]<qScaleGap) continue;
 
         gen2d->Fill(pPt[j],centBin(hiBin),w);
         gen[centBin(hiBin)]->Fill(pPt[j],w);

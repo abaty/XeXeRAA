@@ -56,7 +56,7 @@ void systematics(){
       
       //efficiency uncertainty from MC stats
       spec_EffMethod[i]->SetBinContent(j,0.03);
-      total2 += TMath::Power(0.03,2);
+      total2 += TMath::Power(0.04,2);
 
       //resolution is a flat 0.5%
       spec_reso[i]->SetBinContent(j,0.005);
