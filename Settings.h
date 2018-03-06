@@ -19,6 +19,7 @@ class Settings{
   std::string trkCorrFile_noSpec = "trkCorr_Pythia_March5_CutIndex0.root";
   std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_March5_CutIndex1.root";
   std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_March5_CutIndex2.root";
+  std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_March5_CutIndex3.root";
 
 
   static const int ntrkBins = 32;

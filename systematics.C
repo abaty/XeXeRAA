@@ -2,10 +2,45 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TCanvas.h"
+#include "TLegend.h"
 #include "include/trackingCorrection.h"
 #include "include/trackingDataMCDiffUncert.h"
 
+void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
+  TCanvas * c1 = new TCanvas("c1","c1",800,600);
+  TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  c1->SetLogx();
+  gStyle->SetOptStat(0);
+  h1->GetYaxis()->SetRangeUser(0.7,1.3);
+  h1->GetYaxis()->SetTitle("Modified Cuts/Nominal Result");
+  h1->GetXaxis()->SetTitle("p_{T}");
+  h1->SetMarkerStyle(8);
+  h1->SetLineColor(kBlack);
+  h1->SetMarkerColor(kBlack);
+  h2->SetMarkerStyle(24);
+  h2->SetLineColor(kRed);
+  h2->SetMarkerColor(kRed);
+  h3->SetMarkerStyle(25);
+  h3->SetLineColor(kBlue);
+  h3->SetMarkerColor(kBlue);
+  h1->Draw();
+  h2->Draw("same");
+  h3->Draw("same");
+  l->AddEntry(h1,"Selection D","p");
+  l->AddEntry(h2,"Selection E","p");
+  l->AddEntry(h3,"Selection F","p");
+  l->Draw("same");
+  c1->SaveAs(Form("systPlots/CutRatios_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/CutRatios_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/CutRatios_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  delete c1;
+}
+
 void systematics(){
+  TH1::SetDefaultSumw2();
   Settings s = Settings();
   TFile * ppInput = new TFile(s.ppRefFile.c_str(),"read");
   TH1D * ppSyst_NoLumi = (TH1D*)ppInput->Get("ppScaledSyst_NoLumi");
@@ -33,6 +68,7 @@ void systematics(){
     s.HI_NoSpecCut1[c]->SetDirectory(output);
     s.HI_NoSpecCut2[c]->SetDirectory(output);
     s.HI_NoSpecCut3[c]->SetDirectory(output);
+    plotCutRatios(s.HI_NoSpecCut1[c],s.HI_NoSpecCut2[c],s.HI_NoSpecCut3[c],c,s);
   }
   ppSyst_NoLumi->SetDirectory(output);
   //ppSyst_NoLumi->Write();

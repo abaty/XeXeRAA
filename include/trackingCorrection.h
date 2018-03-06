@@ -7,7 +7,7 @@
 class TrackingCorrection{
 
   public:
-    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr, bool doSmoothedfake);
+    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr, bool doSmoothedfake, bool doSmoothedEff);
     ~TrackingCorrection();
 
     float getTrkCorr(float pt, int cent);
