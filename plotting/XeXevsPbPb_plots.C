@@ -58,10 +58,10 @@ void XeXevsPbPb_plots(){
   TH1D * PbPb_stat[6];
   TH1D * PbPb_syst[6];
 
-  //NOT TAA but NColl!!!!!
-  float TAA[6] = {1820,1430,805,267,65.4,10.7};
-  float PbPbTAAUncertU[6] = {130,100,55,20,7.0,1.7};
-  float PbPbTAAUncertD[6] = {140,110,58,20,6.6,1.5};
+  //
+  float TAA[6] = {26.0,20.5,11.5,3.82,0.934,0.152};
+  float PbPbTAAUncertU[6] = {0.5,0.4,0.3,0.21,0.096,0.024};
+  float PbPbTAAUncertD[6] = {0.8,0.6,0.4,0.21,0.089,0.021};
   TFile * f1 = TFile::Open("PbPbRAAs/HEPData-ins1496050-v2-root.root","read"); 
 
   for(int i = 1; i<7; i++){
