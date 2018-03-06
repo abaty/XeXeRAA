@@ -93,10 +93,11 @@ void systematics(){
   for(int i = 0; i<s.nCentBins; i++){
     for(int j = 1; j<s.ntrkBins+1; j++){
       double total2 = 0; 
-      //pp reference without lumi and with pp data/MC Eff difference removed
+      //pp reference without lumi and with 4% pp data/MC Eff difference removed
+      //also removed 1% resolution correction
       //note that the total2 thing is the square of a sqrt
-      RAA_ppRef[i]->SetBinContent(j,TMath::Sqrt(TMath::Power(ppSyst_NoLumi->GetBinContent(j),2)-0.04*0.04));
-      total2 += TMath::Power(ppSyst_NoLumi->GetBinContent(j),2)-0.04*0.04;
+      RAA_ppRef[i]->SetBinContent(j,TMath::Sqrt(TMath::Power(ppSyst_NoLumi->GetBinContent(j),2)-0.04*0.04-0.01*0.01));
+      total2 += TMath::Power(ppSyst_NoLumi->GetBinContent(j),2)-0.04*0.04-0.01*0.01;
 
       //species corr
       RAA_SpecCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpSpecCorr[i]->GetBinContent(j)-1));
