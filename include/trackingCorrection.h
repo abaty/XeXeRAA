@@ -7,7 +7,7 @@
 class TrackingCorrection{
 
   public:
-    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr);
+    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr, bool doSmoothedfake);
     ~TrackingCorrection();
 
     float getTrkCorr(float pt, int cent);
@@ -80,19 +80,21 @@ float TrackingCorrection::getTrkCorr(float pt, int cent){
   return species*(1-f)*(1-s)/(e);
 }
 
-TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true, bool isSpeciesCorr = true){
+TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true, bool isSpeciesCorr = true, bool doSmoothedFake = true){
   hasSpeciesCorr = isSpeciesCorr;
 
   TFile * corr = TFile::Open(file.c_str(),"read");
   if(isSmoothed){
     eff = (TH2D*)corr->Get("efficiency2d_Smoothed");
-    fake = (TH2D*)corr->Get("fake2d_Smoothed");
+    if(doSmoothedFake) fake = (TH2D*)corr->Get("fake2d_Smoothed");
     sec = (TH2D*)corr->Get("secondary2d_Smoothed");
   }else{
     eff = (TH2D*)corr->Get("efficiency2d");
     fake = (TH2D*)corr->Get("fake2d");
     sec = (TH2D*)corr->Get("secondary2d");
   }
+  if(isSmoothed && !doSmoothedFake) fake = (TH2D*)corr->Get("fake2d");
+
   if(hasSpeciesCorr){
     speciesCorr = (TH2D*)corr->Get("speciesCorr");
     speciesCorrSyst = (TH2D*)corr->Get("speciesCorrSyst");
