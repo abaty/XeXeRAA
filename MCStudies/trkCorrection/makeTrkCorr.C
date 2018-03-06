@@ -5,7 +5,7 @@
 #include <iostream>
 #include "TF1.h"
 
-void makeTrkCorr(bool isEmbedded = true){
+void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
@@ -15,30 +15,30 @@ void makeTrkCorr(bool isEmbedded = true){
 
   
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
-  gen2d = (TH2D*)f->Get("gen2d");
-  reco2d = (TH2D*)f->Get("reco2d");
-  recoNoFake2d = (TH2D*)f->Get("recoNoFake2d");
-  if(isEmbedded) recoNoFake2d_sig = (TH2D*)f->Get("recoNoFake2d_sig");
-  else           recoNoFake2d_sig = (TH2D*)f->Get("recoNoFake2d");
-  recoMatched2d = (TH2D*)f->Get("recoMatched2d");
-  genMatched2d = (TH2D*)f->Get("genMatched2d");
-  genMatchedMult2d = (TH2D*)f->Get("genMatchedMult2d");
+  gen2d = (TH2D*)f->Get(Form("gen2d_%d",cutsToUse));
+  reco2d = (TH2D*)f->Get(Form("reco2d_%d",cutsToUse));
+  recoNoFake2d = (TH2D*)f->Get(Form("recoNoFake2d_%d",cutsToUse));
+  if(isEmbedded) recoNoFake2d_sig = (TH2D*)f->Get(Form("recoNoFake2d_sig_%d",cutsToUse));
+  else           recoNoFake2d_sig = (TH2D*)f->Get(Form("recoNoFake2d_%d",cutsToUse));
+  recoMatched2d = (TH2D*)f->Get(Form("recoMatched2d_%d",cutsToUse));
+  genMatched2d = (TH2D*)f->Get(Form("genMatched2d_%d",cutsToUse));
+  genMatchedMult2d = (TH2D*)f->Get(Form("genMatchedMult2d_%d",cutsToUse));
   
   TH1D *gen[6], *reco[6], *recoNoFake[6], * recoNoFake_sig[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
   for(int c = 0; c<6; c++){
-    gen[c] = (TH1D*)f->Get(Form("gen_%d",c));
-    reco[c] = (TH1D*)f->Get(Form("reco_%d",c));
-    recoNoFake[c] = (TH1D*)f->Get(Form("recoNoFake_%d",c));
-    if(isEmbedded) recoNoFake_sig[c] = (TH1D*)f->Get(Form("recoNoFake_sig_%d",c));
-    else           recoNoFake_sig[c] = (TH1D*)f->Get(Form("recoNoFake_%d",c));
-    recoMatched[c] = (TH1D*)f->Get(Form("recoMatched_%d",c));
-    genMatched[c] = (TH1D*)f->Get(Form("genMatched_%d",c));
-    genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d",c));
+    gen[c] = (TH1D*)f->Get(Form("gen_%d_%d",c,cutsToUse));
+    reco[c] = (TH1D*)f->Get(Form("reco_%d_%d",c,cutsToUse));
+    recoNoFake[c] = (TH1D*)f->Get(Form("recoNoFake_%d_%d",c,cutsToUse));
+    if(isEmbedded) recoNoFake_sig[c] = (TH1D*)f->Get(Form("recoNoFake_sig_%d_%d",c,cutsToUse));
+    else           recoNoFake_sig[c] = (TH1D*)f->Get(Form("recoNoFake_%d_%d",c,cutsToUse));
+    recoMatched[c] = (TH1D*)f->Get(Form("recoMatched_%d_%d",c,cutsToUse));
+    genMatched[c] = (TH1D*)f->Get(Form("genMatched_%d_%d",c,cutsToUse));
+    genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d_%d",c,cutsToUse));
   }
 
   //TFile * output = new TFile("trkCorr_Hydjet_Feb26.root","recreate");
  //TFile * output = new TFile("trkCorr_EPOS_Feb26.root","recreate");
- TFile * output = new TFile("trkCorr_Pythia_March5.root","recreate");
+ TFile * output = new TFile(Form("trkCorr_Pythia_March5_CutIndex%d.root",cutsToUse),"recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -182,14 +182,11 @@ void makeTrkCorr(bool isEmbedded = true){
     fake_smooth[c]->Write();
     secondary_smooth[c]->Write();
   }
-
- 
-
 }
 
 void makeSpeciesCorr(){
   //primary correction
-  TFile * f1 = TFile::Open("trkCorr_Pythia_March5.root","read");
+  TFile * f1 = TFile::Open("trkCorr_Pythia_March5_CutIndex0.root","read");
   //secondary correction
   TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
 

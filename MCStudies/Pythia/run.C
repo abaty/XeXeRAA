@@ -65,23 +65,27 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   //eff and fake plots
 
-  TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
-  gen2d = new TH2D("gen2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  reco2d = new TH2D("reco2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  recoNoFake2d_sig = new TH2D("recoNoFake2d_sig","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  genMatchedMult2d = new TH2D("genMatchedMult2d","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
-  TH1D *gen[6], *reco[6], *recoNoFake[6], *recoNoFake_sig[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
-  for(int c = 0; c<6; c++){
-    gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
-    reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra);
-    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
-    recoNoFake_sig[c] = new TH1D(Form("recoNoFake_sig_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
-    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
-    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
-    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+  TH2D *gen2d[3], *reco2d[3], *recoNoFake2d[3], *recoNoFake2d_sig[3], *recoMatched2d[3], *genMatched2d[3], *genMatchedMult2d[3];
+  for(int cut = 2; cut>=0; cut--){
+    gen2d[cut] = new TH2D(Form("gen2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    reco2d[cut] = new TH2D(Form("reco2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    recoNoFake2d[cut] = new TH2D(Form("recoNoFake2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    recoNoFake2d_sig[cut] = new TH2D(Form("recoNoFake2d_sig_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    recoMatched2d[cut] = new TH2D(Form("recoMatched2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    genMatched2d[cut] = new TH2D(Form("genMatched2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+    genMatchedMult2d[cut] = new TH2D(Form("genMatchedMult2d_%d",cut),"",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  }
+  TH1D *gen[6][3], *reco[6][3], *recoNoFake[6][3], *recoNoFake_sig[6][3], *recoMatched[6][3], *genMatched[6][3], *genMatchedMult[6][3];
+  for(int cut = 2; cut>=0; cut--){
+    for(int c = 0; c<6; c++){
+      gen[c][cut] = new TH1D(Form("gen_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+      reco[c][cut] = new TH1D(Form("reco_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra);
+      recoNoFake[c][cut] = new TH1D(Form("recoNoFake_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+      recoNoFake_sig[c][cut] = new TH1D(Form("recoNoFake_sig_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+      recoMatched[c][cut] = new TH1D(Form("recoMatched_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+      genMatched[c][cut] = new TH1D(Form("genMatched_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+      genMatchedMult[c][cut] = new TH1D(Form("genMatchedMult_%d_%d",c,cut),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    }
   }
   TH2D * qScaleVsPt[6];
   for(int c = 0; c<6; c++){
@@ -291,10 +295,27 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           caloMatch[trkBinMap(hiBin,trkPt[j])][0][1]->Fill(Et/trkPt[j],w);
           caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][1]->Fill(Et/trkPt[j],w);
         }
+      
+
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+        
+        reco2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+        reco[centBin(hiBin)][1]->Fill(trkPt[j],w);
+        if(trkStatus[j]!=-999){
+          recoNoFake2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+          recoNoFake[centBin(hiBin)][1]->Fill(trkPt[j],w);
+          if(trkEventId[j]==0){
+            recoNoFake2d_sig[1]->Fill(trkPt[j],centBin(hiBin),w);
+            recoNoFake_sig[centBin(hiBin)][1]->Fill(trkPt[j],w);
+          }
+        }
+        if(trkStatus[j]==1 && trkEventId[j]==0){
+          recoMatched2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+          recoMatched[centBin(hiBin)][1]->Fill(trkPt[j],w);
+        }
 
         if(trkNHit[j]<11) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         eta[0][0][2]->Fill(trkEta[j],w);
         eta[0][statusIndex][2]->Fill(trkEta[j],w);
@@ -331,19 +352,40 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         caloMatch[trkBinMap(hiBin,trkPt[j])][0][2]->Fill(Et/trkPt[j],w);
         caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][2]->Fill(Et/trkPt[j],w);
 
-        reco2d->Fill(trkPt[j],centBin(hiBin),w);
-        reco[centBin(hiBin)]->Fill(trkPt[j],w);
+        reco2d[0]->Fill(trkPt[j],centBin(hiBin),w);
+        reco[centBin(hiBin)][0]->Fill(trkPt[j],w);
         if(trkStatus[j]!=-999){
-          recoNoFake2d->Fill(trkPt[j],centBin(hiBin),w);
-          recoNoFake[centBin(hiBin)]->Fill(trkPt[j],w);
+          recoNoFake2d[0]->Fill(trkPt[j],centBin(hiBin),w);
+          recoNoFake[centBin(hiBin)][0]->Fill(trkPt[j],w);
           if(trkEventId[j]==0){
-            recoNoFake2d_sig->Fill(trkPt[j],centBin(hiBin),w);
-            recoNoFake_sig[centBin(hiBin)]->Fill(trkPt[j],w);
+            recoNoFake2d_sig[0]->Fill(trkPt[j],centBin(hiBin),w);
+            recoNoFake_sig[centBin(hiBin)][0]->Fill(trkPt[j],w);
           }
         }
         if(trkStatus[j]==1 && trkEventId[j]==0){
-          recoMatched2d->Fill(trkPt[j],centBin(hiBin),w);
-          recoMatched[centBin(hiBin)]->Fill(trkPt[j],w);
+          recoMatched2d[0]->Fill(trkPt[j],centBin(hiBin),w);
+          recoMatched[centBin(hiBin)][0]->Fill(trkPt[j],w);
+        }
+        
+
+        if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
+        if(trkPtError[j]/trkPt[j]>0.05) continue;
+        if(trkNHit[j]<13) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.10) continue;
+        
+        reco2d[2]->Fill(trkPt[j],centBin(hiBin),w);
+        reco[centBin(hiBin)][2]->Fill(trkPt[j],w);
+        if(trkStatus[j]!=-999){
+          recoNoFake2d[2]->Fill(trkPt[j],centBin(hiBin),w);
+          recoNoFake[centBin(hiBin)][2]->Fill(trkPt[j],w);
+          if(trkEventId[j]==0){
+            recoNoFake2d_sig[2]->Fill(trkPt[j],centBin(hiBin),w);
+            recoNoFake_sig[centBin(hiBin)][2]->Fill(trkPt[j],w);
+          }
+        }
+        if(trkStatus[j]==1 && trkEventId[j]==0){
+          recoMatched2d[2]->Fill(trkPt[j],centBin(hiBin),w);
+          recoMatched[centBin(hiBin)][2]->Fill(trkPt[j],w);
         }
       }//end of reco tracking stuff
 
@@ -355,8 +397,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         //cut to keep weights reasonable
         if(pPt[j]>qScaleCutoff*pthat && pthat-pPt[j]<qScaleGap) continue;
 
-        gen2d->Fill(pPt[j],centBin(hiBin),w);
-        gen[centBin(hiBin)]->Fill(pPt[j],w);
+        gen2d[0]->Fill(pPt[j],centBin(hiBin),w);
+        gen[centBin(hiBin)][0]->Fill(pPt[j],w);
+        gen2d[1]->Fill(pPt[j],centBin(hiBin),w);
+        gen[centBin(hiBin)][1]->Fill(pPt[j],w);
+        gen2d[2]->Fill(pPt[j],centBin(hiBin),w);
+        gen[centBin(hiBin)][2]->Fill(pPt[j],w);
         qScaleVsPt[centBin(hiBin)]->Fill(pPt[j],pPt[j]/pthat,w);    
     
         if(mtrkPt[j]<=0) continue;//only matched gen particles
@@ -366,19 +412,40 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         
         if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>3 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>3) continue;
         if(mtrkPtError[j]/mtrkPt[j]>0.1) continue;
-        if(mtrkNHit[j]<11) continue;
-        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
+
         float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
         if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
+        
+        genMatched2d[1]->Fill(pPt[j],centBin(hiBin),w);
+        genMatched[centBin(hiBin)][1]->Fill(pPt[j],w);
+        if(pNRec[j]>1){
+          genMatchedMult2d[1]->Fill(pPt[j],centBin(hiBin),w);
+          genMatchedMult[centBin(hiBin)][1]->Fill(pPt[j],w);
+        }
+
+        if(mtrkNHit[j]<11) continue;
+        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
   
         if(pPt[j]>0.5) reso_genCut[dummy->FindBin(pPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
         if(mtrkPt[j]>0.5) reso_recoCut[dummy->FindBin(mtrkPt[j])-1]->Fill(mtrkPt[j]/pPt[j],w);
 
-        genMatched2d->Fill(pPt[j],centBin(hiBin),w);
-        genMatched[centBin(hiBin)]->Fill(pPt[j],w);
+        genMatched2d[0]->Fill(pPt[j],centBin(hiBin),w);
+        genMatched[centBin(hiBin)][0]->Fill(pPt[j],w);
         if(pNRec[j]>1){
-          genMatchedMult2d->Fill(pPt[j],centBin(hiBin),w);
-          genMatchedMult[centBin(hiBin)]->Fill(pPt[j],w);
+          genMatchedMult2d[0]->Fill(pPt[j],centBin(hiBin),w);
+          genMatchedMult[centBin(hiBin)][0]->Fill(pPt[j],w);
+        }
+        
+        if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>2 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>2) continue;
+        if(mtrkPtError[j]/mtrkPt[j]>0.05) continue;
+        if(mtrkNHit[j]<13) continue;
+        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.10) continue;
+        
+        genMatched2d[2]->Fill(pPt[j],centBin(hiBin),w);
+        genMatched[centBin(hiBin)][2]->Fill(pPt[j],w);
+        if(pNRec[j]>1){
+          genMatchedMult2d[2]->Fill(pPt[j],centBin(hiBin),w);
+          genMatchedMult[centBin(hiBin)][2]->Fill(pPt[j],w);
         }
       }//end of gen particle loop
     }

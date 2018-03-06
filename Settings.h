@@ -14,8 +14,11 @@ class Settings{
   float etaCut = 1.0;
 
   std::string ppRefFile = "ppRef_March3_Pythia.root";
-  std::string trkCorrFile = "trkCorr_March5_wSpeciesCorr.root";
   std::string trkResFile = "resolutions_March3.root";
+  std::string trkCorrFile = "trkCorr_March5_wSpeciesCorr.root";
+  std::string trkCorrFile_noSpec = "trkCorr_Pythia_March5_CutIndex0.root";
+  std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_March5_CutIndex1.root";
+  std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_March5_CutIndex2.root";
 
 
   static const int ntrkBins = 32;
@@ -35,6 +38,9 @@ class Settings{
   TH1D * HI_smeared[nCentBins]; 
   TH1D * HI_UpSpecCorr[nCentBins]; 
   TH1D * HI_UpFakeCorr[nCentBins]; 
+  TH1D * HI_NoSpec[nCentBins]; 
+  TH1D * HI_NoSpecCut1[nCentBins]; 
+  TH1D * HI_NoSpecCut2[nCentBins]; 
 
   TH1D * HI[nCentBins]; 
   TH1D * HI_TaaWeighted[nCentBins]; 
