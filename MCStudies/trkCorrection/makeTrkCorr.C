@@ -127,7 +127,7 @@ void makeTrkCorr(bool isEmbedded = true){
   TF1 * effFit[6], *fakeFit[6], *secFit[6];
   for(int c = 0; c<6; c++){
     std::cout << "Fitting iteration " << c << std::endl;
-    effFit[c] = new TF1(Form("effFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",1.0,180);
+    effFit[c] = new TF1(Form("effFit_%d",c),"[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)",1.0,180);
     effFit[c]->SetParameters(0.6,0.1,0,0,0);
     effGraph[c]->Fit(Form("effFit_%d",c),"0ERM");
  
