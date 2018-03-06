@@ -18,9 +18,22 @@ void systematics(){
     s.HI_UpSpecCorr[c]->Divide(s.HI[c]);
     s.HI_UpFakeCorr[c] = (TH1D*)input->Get(Form("HI_UpFakeCorr_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_UpFakeCorr[c]->Divide(s.HI[c]);
+
+    s.HI_NoSpec[c] = (TH1D*)input->Get(Form("HI_NoSpec_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut1[c] = (TH1D*)input->Get(Form("HI_NoSpecCut1_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut1[c]->Divide(s.HI_NoSpec[c]);
+    s.HI_NoSpecCut2[c] = (TH1D*)input->Get(Form("HI_NoSpecCut2_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut2[c]->Divide(s.HI_NoSpec[c]);
+    s.HI_NoSpecCut3[c] = (TH1D*)input->Get(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut3[c]->Divide(s.HI_NoSpec[c]);
   }
 
   TFile * output = new TFile("systematics.root","recreate");
+  for(int c = 0; c<s.nCentBins; c++){
+    s.HI_NoSpecCut1[c]->SetDirectory(output);
+    s.HI_NoSpecCut2[c]->SetDirectory(output);
+    s.HI_NoSpecCut3[c]->SetDirectory(output);
+  }
   ppSyst_NoLumi->SetDirectory(output);
   //ppSyst_NoLumi->Write();
   ppSyst->SetDirectory(output);

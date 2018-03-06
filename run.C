@@ -86,8 +86,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TrackingResolution trkReso = TrackingResolution(s.trkResFile);
   TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true,true);
   TrackingCorrection trkCorr_NoSpec = TrackingCorrection(s.trkCorrFile_noSpec,true,false,true);
-  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,false,false,false);
-  TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,true);
+  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,false,false,false,false);
+  TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,true,true);
+  TrackingCorrection trkCorr_NoSpecCut3 = TrackingCorrection(s.trkCorrFile_noSpecCut3,true,false,false,true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
 
   TFile * output = TFile::Open(Form("output_data_%d.root",jobNumber),"recreate");
@@ -123,6 +124,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     s.HI_NoSpec[c] = new TH1D(Form("HI_NoSpec_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_NoSpecCut1[c] = new TH1D(Form("HI_NoSpecCut1_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_NoSpecCut2[c] = new TH1D(Form("HI_NoSpecCut2_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
+    s.HI_NoSpecCut3[c] = new TH1D(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_smeared[c] = new TH1D(Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
 
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
@@ -280,14 +282,25 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkPtError[j]/trkPt[j]>0.1) continue;
 
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         //lighter cuts
         float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
         for(int c = 0; c<s.nCentBins; c++){
+          if(!(trkPt[j]<5 || (Et>s.caloMatchValue*trkPt[j]))) continue;
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
           float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
           s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
+        }
+
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+        if(trkNHit[j]<9) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.2) continue;
+      
+        float weight_NoSpecCut3 = trkCorr_NoSpecCut3.getTrkCorr(trkPt[j],hiBin)*evtW;
+        for(int c = 0; c<s.nCentBins; c++){
+          if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
+          float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
+          s.HI_NoSpecCut3[c]->Fill(trkPt[j],weight_NoSpecCut3/binCenter);
         }
 
         if(trkNHit[j]<11) continue;
@@ -314,7 +327,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
         if(trkNHit[j]<13) continue;
-        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.10) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.125) continue;
 
         float weight_NoSpecCut2 = trkCorr_NoSpecCut2.getTrkCorr(trkPt[j],hiBin)*evtW;
         for(int c = 0; c<s.nCentBins; c++){
