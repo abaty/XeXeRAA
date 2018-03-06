@@ -113,6 +113,14 @@ void RAA_plots(){
     h[c]->Print("All");
   }
   f->Close();
+  
+  TFile * sysFile = TFile::Open("../systematics.root","read");
+  TH1D * XeXeRAA_totSyst[s.nCentBins];
+  //XeXe systematic
+  for(int c = 0; c<s.nCentBins; c++){
+    XeXeRAA_totSyst[c] = (TH1D*)sysFile->Get(Form("RAA_Total_%d",c));
+    XeXeRAA_totSyst[c]->SetDirectory(0);
+  }
 
   setTDRStyle();
   TLine * line1;
@@ -195,11 +203,8 @@ void RAA_plots(){
       b[i-1]->SetFillColor(kRed-7);
       b[i-1]->SetX1(h[c]->GetXaxis()->GetBinLowEdge(i));
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
-      //b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-s.RAA_totSyst[c]->GetBinContent(i)));
-      //b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+s.RAA_totSyst[c]->GetBinContent(i)));
-      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-0.1));
-      b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.1));
-      
+      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-XeXeRAA_totSyst[c]->GetBinContent(i)));
+      b[i-1]->SetY2((h[c]->GetBinContent(i))*(1+XeXeRAA_totSyst[c]->GetBinContent(i)));
       b[i-1]->Draw("same");
     }
     for(int i = 1; i< (h[0]->GetSize()-1); i++){

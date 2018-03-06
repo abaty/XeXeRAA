@@ -32,7 +32,6 @@ void spectra_plots(){
   Settings s = Settings();
 
   TH1D * h[s.nCentBins];
-  TH1D * XeXe_totSyst[s.nCentBins];
   TH1D * ppSpec;
   TH1D * pp_totSyst;
   TH1D * nVtx;
@@ -61,7 +60,7 @@ void spectra_plots(){
   f->Close();
 
   TFile * sysFile = TFile::Open("../systematics.root","read");
-
+  TH1D * XeXe_totSyst[s.nCentBins];
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
     XeXe_totSyst[c] = (TH1D*)sysFile->Get(Form("spec_Total_%d",c));
