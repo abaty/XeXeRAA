@@ -147,6 +147,17 @@ void spectra_plots(){
   h[25]->SetMarkerStyle(21);
   h[25]->GetXaxis()->SetRangeUser(0.5,150);
   h[25]->Draw("same");
+
+  //zero out two high-pt points with poor errors
+  h[30]->SetBinContent(29,0);
+  h[30]->SetBinContent(30,0);
+  h[30]->SetBinContent(31,0);
+  h[30]->SetBinContent(32,0);
+  h[30]->SetBinError(29,0);
+  h[30]->SetBinError(30,0);
+  h[30]->SetBinError(31,0);
+  h[30]->SetBinError(32,0);
+
   h[30]->SetMarkerColor(kRed);
   h[30]->SetLineColor(kRed);
   h[30]->SetMarkerStyle(34);
@@ -170,7 +181,7 @@ void spectra_plots(){
   pad2->cd();
   pad2->SetLogx();
   TH1D * ppSpecD2 = new TH1D("specDummy2","",3,0.4,150);
-  ppSpecD2->GetYaxis()->SetRangeUser(0.0,19.99);
+  ppSpecD2->GetYaxis()->SetRangeUser(0.0,39.99);
   ppSpecD2->GetYaxis()->SetNdivisions(4,4,0,kTRUE);
   ppSpecD2->GetYaxis()->SetTitleOffset(0.6);
   ppSpecD2->GetYaxis()->SetTitleFont(42);
@@ -197,12 +208,21 @@ void spectra_plots(){
   XeXe_totSyst[30]->Scale(100);
   XeXe_totSyst[30]->GetXaxis()->SetRangeUser(0.5,150);
   XeXe_totSyst[30]->Draw("same hist");
+  XeXe_totSyst[30]->SetBinContent(29,0);  
+  XeXe_totSyst[30]->SetBinContent(30,0);  
+  XeXe_totSyst[30]->SetBinContent(31,0);  
+  XeXe_totSyst[30]->SetBinContent(32,0);  
+  XeXe_totSyst[30]->SetBinError(29,0);  
+  XeXe_totSyst[30]->SetBinError(30,0);  
+  XeXe_totSyst[30]->SetBinError(31,0);  
+  XeXe_totSyst[30]->SetBinError(32,0);  
+
   pp_totSyst->SetFillColor(kBlack);
   pp_totSyst->SetFillStyle(3003);
   pp_totSyst->GetXaxis()->SetRangeUser(0.5,150);
   pp_totSyst->Scale(100);
   pp_totSyst->Draw("same");
-  TLegend * systLeg = new TLegend(0.6,0.6,0.9,0.98);
+  TLegend * systLeg = new TLegend(0.5,0.6,0.8,0.98);
   //systLeg->SetFillStyle(0);
   systLeg->AddEntry(XeXe_totSyst[0],Form("0-5%s","%"),"f");
   systLeg->AddEntry(XeXe_totSyst[30],Form("70-90%s","%"),"f");

@@ -54,6 +54,15 @@ void XeXevsPbPb_plots(){
   }
   f->Close();
 
+  TFile * sysFile = TFile::Open("../systematics.root","read");
+  TH1D * RXP_totSyst[s.nCentBins];
+  //XeXe systematic
+  for(int c = 0; c<s.nCentBins; c++){
+    RXP_totSyst[c] = (TH1D*)sysFile->Get(Form("RXP_Total_%d",c));
+    RXP_totSyst[c]->SetDirectory(0);
+  }
+
+
   TH1D * PbPb[6];
   TH1D * PbPb_stat[6];
   TH1D * PbPb_syst[6];
@@ -177,7 +186,7 @@ void XeXevsPbPb_plots(){
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
-    h[c]->GetYaxis()->SetRangeUser(0.4,2);
+    h[c]->GetYaxis()->SetRangeUser(0,2);
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
@@ -206,15 +215,15 @@ void XeXevsPbPb_plots(){
     tex->SetTextSize(lumiTextSize*0.08);
     tex->DrawLatex(0.9,0.675,"Combined T_{AA} uncertainty");
     tex->DrawLatex(0.7,0.8,"|#eta|<1");
-  
-    for(int i = 1; i< (h[0]->GetSize()-1); i++){
+ 
+    for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
       b[i-1]->SetFillColor(kRed-7);
+      float error = RXP_totSyst[c]->GetBinContent(i);
       b[i-1]->SetX1(h[c]->GetXaxis()->GetBinLowEdge(i));
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
-      //b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-s.RAA_totSyst[c]->GetBinContent(i)));
-      //b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+s.RAA_totSyst[c]->GetBinContent(i)));
-      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-0.03));
-      b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+0.03));
+      b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-error));
+      b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+error));
+      if(c==30 && i>=29) continue;
       b[i-1]->Draw("same");
     }
 
@@ -225,6 +234,18 @@ void XeXevsPbPb_plots(){
     extrapFunc->Draw("same");
     
     h[c]->SetMarkerSize(1.3);
+
+    if(c==30){
+      h[30]->SetBinContent(29,0);  
+      h[30]->SetBinContent(30,0);  
+      h[30]->SetBinContent(31,0);  
+      h[30]->SetBinContent(32,0);  
+      h[30]->SetBinError(29,0);  
+      h[30]->SetBinError(30,0);  
+      h[30]->SetBinError(31,0);  
+      h[30]->SetBinError(32,0);  
+    }
+
     h[c]->Draw("same");
  
     int iPeriod = 0;

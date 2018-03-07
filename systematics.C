@@ -242,7 +242,7 @@ void systematics(){
       total2 += 0.05*0.05;
       
       //Syst from event selections, just take the fit value for now
-      spec_EventSelection[i]->SetBinContent(j,evtSelVar1Fit[i]->Eval(5)-1);
+      spec_EventSelection[i]->SetBinContent(j,TMath::Abs(evtSelVar1Fit[i]->Eval(5)-1));
       total2 += TMath::Power(evtSelVar1Fit[i]->Eval(5)-1,2);
 
       //total
@@ -325,7 +325,7 @@ void systematics(){
       
       //Syst from cut variations
       RXP_PbCutVariation[i]->SetBinContent(j,0.04);
-      total2 += 0.04;
+      total2 += 0.04*0.04;
       
       //Syst from PbPb trigger
       float triggerUncertTemp = TriggerUncert->GetBinContent(TriggerUncert->FindBin(RXP_PbTrigger[i]->GetBinCenter(j)));
@@ -343,7 +343,7 @@ void systematics(){
       total2 += TMath::Power(spec_CutVariation[i]->GetBinContent(j),2);
       
       //Syst from eventSelection
-      RAA_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
+      RXP_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
       total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
       
       //fake correction

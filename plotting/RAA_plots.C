@@ -175,6 +175,17 @@ void RAA_plots(){
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
     h[c]->GetYaxis()->SetRangeUser(0,1.6);
     h[c]->SetMarkerSize(1.3);
+    
+    if(c==30){
+      h[30]->SetBinContent(29,0);  
+      h[30]->SetBinContent(30,0);  
+      h[30]->SetBinContent(31,0);  
+      h[30]->SetBinContent(32,0);  
+      h[30]->SetBinError(29,0);  
+      h[30]->SetBinError(30,0);  
+      h[30]->SetBinError(31,0);  
+      h[30]->SetBinError(32,0);  
+    }
     h[c]->Draw();
 
     
@@ -205,6 +216,7 @@ void RAA_plots(){
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
       b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-XeXeRAA_totSyst[c]->GetBinContent(i)));
       b[i-1]->SetY2((h[c]->GetBinContent(i))*(1+XeXeRAA_totSyst[c]->GetBinContent(i)));
+      if(c==30 && i>=29) continue;
       b[i-1]->Draw("same");
     }
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
