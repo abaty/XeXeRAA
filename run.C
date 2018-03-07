@@ -86,7 +86,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TrackingResolution trkReso = TrackingResolution(s.trkResFile);
   TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true,true);
   TrackingCorrection trkCorr_NoSpec = TrackingCorrection(s.trkCorrFile_noSpec,true,false,true);
-  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,false,false,false,false);
+  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,true,false,false,true);
   TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,true,true);
   TrackingCorrection trkCorr_NoSpecCut3 = TrackingCorrection(s.trkCorrFile_noSpecCut3,true,false,false,true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
@@ -286,15 +286,14 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         //lighter cuts
         float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
         for(int c = 0; c<s.nCentBins; c++){
-          if(!(trkPt[j]<5 || (Et>s.caloMatchValue*trkPt[j]))) continue;
           if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
           float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
           s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
         }
 
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
-        if(trkNHit[j]<9) continue;
-        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.2) continue;
+        if(trkNHit[j]<10) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
       
         float weight_NoSpecCut3 = trkCorr_NoSpecCut3.getTrkCorr(trkPt[j],hiBin)*evtW;
         for(int c = 0; c<s.nCentBins; c++){
@@ -326,8 +325,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
-        if(trkNHit[j]<13) continue;
-        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.125) continue;
+        if(trkNHit[j]<12) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.12) continue;
 
         float weight_NoSpecCut2 = trkCorr_NoSpecCut2.getTrkCorr(trkPt[j],hiBin)*evtW;
         for(int c = 0; c<s.nCentBins; c++){
@@ -366,6 +365,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       
       s.HI_NoSpecCut2[c]->SetBinContent(i,s.HI_NoSpecCut2[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI_NoSpecCut2[c]->SetBinError(i,s.HI_NoSpecCut2[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
+      
+      s.HI_NoSpecCut3[c]->SetBinContent(i,s.HI_NoSpecCut3[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
+      s.HI_NoSpecCut3[c]->SetBinError(i,s.HI_NoSpecCut3[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
       
       s.HI_UpSpecCorr[c]->SetBinContent(i,s.HI_UpSpecCorr[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI_UpSpecCorr[c]->SetBinError(i,s.HI_UpSpecCorr[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));

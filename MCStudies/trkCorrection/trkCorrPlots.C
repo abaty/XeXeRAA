@@ -347,5 +347,8 @@ void trkCorrPlots(int cutIndex = 0){
 
   
   speciesCorrPlots();
+  f1->Close();
+  f2->Close();
+  f3->Close();
 }
 

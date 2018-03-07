@@ -295,9 +295,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           caloMatch[trkBinMap(hiBin,trkPt[j])][0][1]->Fill(Et/trkPt[j],w);
           caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][1]->Fill(Et/trkPt[j],w);
         }
-      
 
-        if(trkPt[j]<5 || (Et>s.caloMatchValue*trkPt[j])){ //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
+        if(trkPtError[j]/trkPt[j]<0.025){
           reco2d[1]->Fill(trkPt[j],centBin(hiBin),w);
           reco[centBin(hiBin)][1]->Fill(trkPt[j],w);
           if(trkStatus[j]!=-999){
@@ -314,9 +314,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           }
         }
         
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
-        if(trkNHit[j]<9) continue;
-        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.2) continue;
+        if(trkNHit[j]<10) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
           
         reco2d[3]->Fill(trkPt[j],centBin(hiBin),w);
         reco[centBin(hiBin)][3]->Fill(trkPt[j],w);
@@ -390,8 +389,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
-        if(trkNHit[j]<13) continue;
-        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.125) continue;
+        if(trkNHit[j]<12) continue;
+        if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.12) continue;
         
         reco2d[2]->Fill(trkPt[j],centBin(hiBin),w);
         reco[centBin(hiBin)][2]->Fill(trkPt[j],w);
@@ -436,8 +435,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(mtrkPtError[j]/mtrkPt[j]>0.1) continue;
 
         float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
-        
-        if(mtrkPt[j]<5 || (Et>s.caloMatchValue*mtrkPt[j])){ //Calo Matchin
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
+        if(mtrkPtError[j]/mtrkPt[j]<0.025){ 
           genMatched2d[1]->Fill(pPt[j],centBin(hiBin),w);
           genMatched[centBin(hiBin)][1]->Fill(pPt[j],w);
           if(pNRec[j]>1){
@@ -445,11 +444,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             genMatchedMult[centBin(hiBin)][1]->Fill(pPt[j],w);
           }
         }
-          
         
-        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
-        if(mtrkNHit[j]<9) continue;
-        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.2) continue;
+        if(mtrkNHit[j]<10) continue;  
+        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.18) continue;
+        
         genMatched2d[3]->Fill(pPt[j],centBin(hiBin),w);
         genMatched[centBin(hiBin)][3]->Fill(pPt[j],w);
         if(pNRec[j]>1){
@@ -457,7 +455,6 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           genMatchedMult[centBin(hiBin)][3]->Fill(pPt[j],w);
         }
 
-        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
         if(mtrkNHit[j]<11) continue;
         if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
   
@@ -471,10 +468,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           genMatchedMult[centBin(hiBin)][0]->Fill(pPt[j],w);
         }
         
-        if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>2.5 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>2.5) continue;
+        if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>2 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>2) continue;
         if(mtrkPtError[j]/mtrkPt[j]>0.05) continue;
-        if(mtrkNHit[j]<13) continue;
-        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.10) continue;
+        if(mtrkNHit[j]<12) continue;
+        if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.12) continue;
         
         genMatched2d[2]->Fill(pPt[j],centBin(hiBin),w);
         genMatched[centBin(hiBin)][2]->Fill(pPt[j],w);

@@ -182,6 +182,8 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     fake_smooth[c]->Write();
     secondary_smooth[c]->Write();
   }
+  f->Close();
+  output->Close();
 }
 
 void makeSpeciesCorr(){

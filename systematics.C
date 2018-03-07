@@ -29,6 +29,7 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   h1->Draw();
   h2->Draw("same");
   h3->Draw("same");
+  l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
   l->AddEntry(h1,"Selection D","p");
   l->AddEntry(h2,"Selection E","p");
   l->AddEntry(h3,"Selection F","p");
@@ -38,6 +39,29 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
   delete c1;
 }
+void plotEvtSelRatios(TH1D * h1, int c, Settings s, TF1 * f ,std::string name,std::string Filename){
+  TCanvas * c1 = new TCanvas("c1","c1",800,600);
+  TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  c1->SetLogx();
+  gStyle->SetOptStat(0);
+  h1->GetYaxis()->SetRangeUser(0,2);
+  h1->GetYaxis()->SetTitle("Modified/Nominal Result");
+  h1->GetXaxis()->SetTitle("p_{T}");
+  h1->SetMarkerStyle(8);
+  h1->SetLineColor(kBlack);
+  h1->SetMarkerColor(kBlack);
+  h1->Draw();
+  l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
+  l->AddEntry((TObject*)0,Form("%s",name.c_str()),"");
+  l->Draw("same");
+  f->Draw("same");
+  c1->SaveAs(Form("systPlots/%s_%d_%d.pdf",Filename.c_str(),5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/%s_%d_%d.png",Filename.c_str(),5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/%s_%d_%d.C",Filename.c_str(),5*s.lowCentBin[c],5*s.highCentBin[c]));
+  delete c1;
+}
 
 void systematics(){
   TH1::SetDefaultSumw2();
@@ -45,8 +69,18 @@ void systematics(){
   TFile * ppInput = new TFile(s.ppRefFile.c_str(),"read");
   TH1D * ppSyst_NoLumi = (TH1D*)ppInput->Get("ppScaledSyst_NoLumi");
   TH1D * ppSyst = (TH1D*)ppInput->Get("ppScaledSyst");
-  
+ 
+  TFile * evtSelFile = new TFile("output_Feb26_100percenteff.root","read");
+  TH1D * evtSelVar1[s.nCentBins];
+  TF1 * evtSelVar1Fit[s.nCentBins];
+  TH1D * nVtx_evtSelVar1 = (TH1D*)evtSelFile->Get("nVtxMoreBin");
+  for(int c = 0; c<s.nCentBins; c++){
+    evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    evtSelVar1[c]->Scale(1.0/nVtx_evtSelVar1->GetBinContent(nVtx_evtSelVar1->GetXaxis()->FindBin(c)));
+  }
+
   TFile * input = new TFile("output_0.root","read");
+  TH1D * nVtx_input = (TH1D*)input->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
     s.HI[c] = (TH1D*)input->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_UpSpecCorr[c] = (TH1D*)input->Get(Form("HI_UpSpecCorr_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
@@ -61,6 +95,14 @@ void systematics(){
     s.HI_NoSpecCut2[c]->Divide(s.HI_NoSpec[c]);
     s.HI_NoSpecCut3[c] = (TH1D*)input->Get(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut3[c]->Divide(s.HI_NoSpec[c]);
+
+    //finish fixing evt sel comparison
+    evtSelVar1Fit[c] = new TF1(Form("evtSelVar1Fit_%d",c),"[0]",0.7,8);
+    evtSelVar1[c]->Scale(nVtx_input->GetBinContent(nVtx_input->GetXaxis()->FindBin(c)));
+    evtSelVar1[c]->Divide(s.HI[c]);
+    evtSelVar1[c]->Fit(Form("evtSelVar1Fit_%d",c),"REM0");
+    evtSelVar1[c]->SetLineColor(kRed);
+    evtSelVar1[c]->SetLineWidth(2);
   }
 
   TFile * output = new TFile("systematics.root","recreate");
@@ -69,6 +111,9 @@ void systematics(){
     s.HI_NoSpecCut2[c]->SetDirectory(output);
     s.HI_NoSpecCut3[c]->SetDirectory(output);
     plotCutRatios(s.HI_NoSpecCut1[c],s.HI_NoSpecCut2[c],s.HI_NoSpecCut3[c],c,s);
+
+    evtSelVar1[c]->SetDirectory(output);
+    plotEvtSelRatios(evtSelVar1[c],c,s,evtSelVar1Fit[c],"100%% Eff Assumption","100PercentEff");
   }
   ppSyst_NoLumi->SetDirectory(output);
   //ppSyst_NoLumi->Write();
@@ -81,6 +126,8 @@ void systematics(){
   TH1D * spec_SpecCorr[s.nCentBins]; 
   TH1D * spec_FakeCorr[s.nCentBins]; 
   TH1D * spec_EffMethod[s.nCentBins]; 
+  TH1D * spec_CutVariation[s.nCentBins]; 
+  TH1D * spec_EventSelection[s.nCentBins];
   TH1D * spec_Total[s.nCentBins]; 
 
   TH1D * RAA_reso[s.nCentBins];
@@ -88,6 +135,8 @@ void systematics(){
   TH1D * RAA_SpecCorr[s.nCentBins];
   TH1D * RAA_FakeCorr[s.nCentBins];  
   TH1D * RAA_EffMethod[s.nCentBins];  
+  TH1D * RAA_CutVariation[s.nCentBins];  
+  TH1D * RAA_EventSelection[s.nCentBins];
   TH1D * RAA_ppRef[s.nCentBins];
   TH1D * RAA_Total[s.nCentBins]; 
 
@@ -97,6 +146,8 @@ void systematics(){
     spec_SpecCorr[i] = new TH1D(Form("spec_specCorr_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_FakeCorr[i] = new TH1D(Form("spec_fakeCorr_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_EffMethod[i] = new TH1D(Form("spec_effMethod_%d",i),"",s.ntrkBins,s.xtrkbins);
+    spec_CutVariation[i] = new TH1D(Form("spec_CutVariation_%d",i),"",s.ntrkBins,s.xtrkbins);
+    spec_EventSelection[i] = new TH1D(Form("spec_EventSelection_%d",i),"",s.ntrkBins,s.xtrkbins);
     spec_Total[i] = new TH1D(Form("spec_Total_%d",i),"",s.ntrkBins,s.xtrkbins);
  
     RAA_reso[i]  = new TH1D(Form("RAA_reso_%d",i),"",s.ntrkBins,s.xtrkbins);
@@ -104,6 +155,8 @@ void systematics(){
     RAA_SpecCorr[i] = new TH1D(Form("RAA_SpecCorr_%d",i),"",s.ntrkBins,s.xtrkbins); 
     RAA_FakeCorr[i]  = new TH1D(Form("RAA_FakeCorr_%d",i),"",s.ntrkBins,s.xtrkbins);
     RAA_EffMethod[i]  = new TH1D(Form("RAA_EffMethod_%d",i),"",s.ntrkBins,s.xtrkbins);
+    RAA_CutVariation[i]  = new TH1D(Form("RAA_CutVariation_%d",i),"",s.ntrkBins,s.xtrkbins);
+    RAA_EventSelection[i] = new TH1D(Form("RAA_EventSelection_%d",i),"",s.ntrkBins,s.xtrkbins);
     RAA_ppRef[i] = new TH1D(Form("RAA_ppRef_%d",i),"",s.ntrkBins,s.xtrkbins);
     RAA_Total[i] = new TH1D(Form("RAA_Total_%d",i),"",s.ntrkBins,s.xtrkbins);
   }
@@ -132,6 +185,14 @@ void systematics(){
       //resolution is a flat 5%
       spec_MCvsDataEff[i]->SetBinContent(j,0.05);
       total2 += 0.05*0.05;
+      
+      //Syst from cut variations
+      spec_CutVariation[i]->SetBinContent(j,0.05);
+      total2 += 0.05*0.05;
+      
+      //Syst from event selections, just take the fit value for now
+      spec_EventSelection[i]->SetBinContent(j,evtSelVarFit1[i]->Eval(5)-1);
+      total2 += TMath::Power(evtSelVarFit1[i]->Eval(5)-1,2);
 
       //total
       spec_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
@@ -167,6 +228,14 @@ void systematics(){
       // MC vs data uncert assumed to cancle at least as well at PbPb 
       RAA_MCvsDataEff[i]->SetBinContent(j,trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]+1));
       total2 += TMath::Power(trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]+1),2);
+      
+      //Syst from cut variations
+      RAA_CutVariation[i]->SetBinContent(j,spec_CutVariation[i]->GetBinContent(j));
+      total2 += TMath::Power(spec_CutVariation[i]->GetBinContent(j),2);
+      
+      //Syst from eventSelection
+      RAA_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
+      total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
 
       //total
       RAA_Total[i]->SetBinContent(j,TMath::Sqrt(total2));

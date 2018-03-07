@@ -182,7 +182,7 @@ void XeXevsPbPb_plots(){
     h[c]->Draw();
 
 
-    TAAUncert = s.Ncolluncert[c];    
+    TAAUncert = s.TAAuncert[c];    
 
     double PbPbU=0;
     double PbPbD=0;
@@ -204,7 +204,7 @@ void XeXevsPbPb_plots(){
     tex2->DrawLatex(0.7,0.55,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.08);
-    tex->DrawLatex(0.9,0.675,"T_{AA} uncertainty");
+    tex->DrawLatex(0.9,0.675,"Combined T_{AA} uncertainty");
     tex->DrawLatex(0.7,0.8,"|#eta|<1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
