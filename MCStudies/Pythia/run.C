@@ -297,7 +297,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         }
 
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
-        if(trkPtError[j]/trkPt[j]<0.025){
+        if(trkPtError[j]/trkPt[j]<0.015){
           reco2d[1]->Fill(trkPt[j],centBin(hiBin),w);
           reco[centBin(hiBin)][1]->Fill(trkPt[j],w);
           if(trkStatus[j]!=-999){
@@ -436,7 +436,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
         float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
         if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
-        if(mtrkPtError[j]/mtrkPt[j]<0.025){ 
+        if(mtrkPtError[j]/mtrkPt[j]<0.015){ 
           genMatched2d[1]->Fill(pPt[j],centBin(hiBin),w);
           genMatched[centBin(hiBin)][1]->Fill(pPt[j],w);
           if(pNRec[j]>1){

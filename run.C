@@ -86,7 +86,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TrackingResolution trkReso = TrackingResolution(s.trkResFile);
   TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true,true);
   TrackingCorrection trkCorr_NoSpec = TrackingCorrection(s.trkCorrFile_noSpec,true,false,true);
-  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,true,false,false,true);
+  TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,false,false,false,false);
   TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,true,true);
   TrackingCorrection trkCorr_NoSpecCut3 = TrackingCorrection(s.trkCorrFile_noSpecCut3,true,false,false,true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
@@ -101,10 +101,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
-  TH1D *nHit[17][3], *chi2[17][3], *DCAz[17][3], *DCAxy[17][3], *ptErr[17][3], *eta[17][3], *phi[17][3], *caloMatch[17][3];
+  TH1D *nHit[17][4], *chi2[17][4], *DCAz[17][4], *DCAxy[17][4], *ptErr[17][4], *eta[17][4], *phi[17][4], *caloMatch[17][4];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
-      for(int c2 = 0; c2<3; c2++){
+      for(int c2 = 0; c2<4; c2++){
         nHit[c][c2] = new TH1D(Form("nHit%d_cut%d",c,c2),Form("nHit%d_cut%d",c,c2),30,0,30);
         chi2[c][c2] = new TH1D(Form("chi2%d_cut%d",c,c2),Form("chi2%d_cut%d",c,c2),50,0,0.3);
         ptErr[c][c2] = new TH1D(Form("ptErr%d_cut%d",c,c2),Form("ptErr%d_cut%d",c,c2),50,0,0.2);
@@ -264,6 +264,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           eta[trkBinMap(hiBin,trkPt[j])][1]->Fill(trkEta[j],evtW);
           if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][1],phi[bin][1],trkPhi[j],DCAz[0][1],DCAz[bin][1],trkDz1[j]/trkDzError1[j],DCAxy[0][1],DCAxy[bin][1],trkDxy1[j]/trkDxyError1[j],nHit[0][1],nHit[bin][1],trkNHit[j],chi2[0][1],chi2[bin][1],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][1],ptErr[bin][1],trkPtError[j]/trkPt[j],caloMatch[0][1],caloMatch[bin][1],Et/trkPt[j],evtW); 
 
+          if(trkPtError[j]/trkPt[j]<0.025){
+            eta[0][3]->Fill(trkEta[j],evtW);
+            eta[trkBinMap(hiBin,trkPt[j])][3]->Fill(trkEta[j],evtW);
+            if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][3],phi[bin][3],trkPhi[j],DCAz[0][3],DCAz[bin][3],trkDz1[j]/trkDzError1[j],DCAxy[0][3],DCAxy[bin][3],trkDxy1[j]/trkDxyError1[j],nHit[0][3],nHit[bin][3],trkNHit[j],chi2[0][3],chi2[bin][3],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][3],ptErr[bin][3],trkPtError[j]/trkPt[j],caloMatch[0][3],caloMatch[bin][3],Et/trkPt[j],evtW); 
+          }
+
           if(trkNHit[j]<11) continue;
           if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
           if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
@@ -285,7 +291,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         //lighter cuts
-        if(trkPtError[j]/trkPt[j]<0.025){
+        if(trkPtError[j]/trkPt[j]<0.015){
         float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
           for(int c = 0; c<s.nCentBins; c++){
             if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
