@@ -7,6 +7,189 @@
 #include "include/trackingCorrection.h"
 #include "include/trackingDataMCDiffUncert.h"
 
+void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, TH1D * h9, TH1D * h10, int c, Settings s){
+  TCanvas * c1 = new TCanvas("c1","",1100,500);
+  c1->Divide(2,1);
+  c1->cd(1);
+  c1->cd(1)->SetLogx();
+  h1->GetXaxis()->SetRangeUser(0.7,120); 
+  h1->GetXaxis()->SetTitle("p_{T}"); 
+  //h1->GetYaxis()->SetRangeUser(0,0.4); 
+  h1->GetYaxis()->SetTitle("Systematic Uncertainty"); 
+  h1->GetYaxis()->SetTitleOffset(1.3); 
+  h1->SetLineColor(kBlack);
+  h1->SetLineWidth(2);
+  h1->Draw("L");
+  h2->SetLineColor(kRed);
+  h2->SetLineWidth(2);
+  h2->Draw("same L");
+  h3->SetLineColor(kBlue);
+  h3->SetLineWidth(2);
+  h3->Draw("same L");
+  h4->SetLineColor(kViolet);
+  h4->SetLineWidth(2);
+  h4->Draw("same L");
+  h5->SetLineColor(kTeal);
+  h5->SetLineWidth(2);
+  h5->SetLineStyle(2);
+  h5->Draw("same L");
+  h6->SetLineColor(kGreen);
+  h6->SetLineWidth(2);
+  h6->Draw("same L");
+  h7->SetLineColor(kGray+2);
+  h7->SetLineWidth(2);
+  h7->Draw("same L");
+  h8->SetLineColor(kOrange);
+  h8->SetLineWidth(2);
+  h8->Draw("same L");
+  h9->SetLineColor(kMagenta-4);
+  h9->SetLineWidth(2);
+  h9->SetLineStyle(2);
+  h9->Draw("same L");
+  h10->SetLineColor(kYellow+1);
+  h10->SetLineWidth(2);
+  h10->Draw("same L");
+  c1->cd(2);
+  TLegend * l = new TLegend(0.1,0.1,0.9,0.9);
+  l->SetBorderSize(0);
+  l->AddEntry((TObject*)0,"R^{Xe}_{Pb} Uncertainties","");
+  l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
+  l->AddEntry(h1,"Total Uncertainty","l");
+  l->AddEntry(h2,"Species Correction","l");
+  l->AddEntry(h3,"Xe Misreconstruction","l");
+  l->AddEntry(h4,"Xe Efficiency Method","l");
+  l->AddEntry(h5,"Xe Track Selection","l");
+  l->AddEntry(h6,"Xe Event Selection","l");
+  l->AddEntry(h7,"Pb Misreconstruction","l");
+  l->AddEntry(h8,"Pb Efficiency Method","l");
+  l->AddEntry(h9,"Pb Track Selection","l");
+  l->AddEntry(h10,"Pb Trigger Combination","l");
+  l->AddEntry((TObject*)0,"Pb uncertainties from HIN-15-015 tables.","");
+  l->Draw("same");
+  c1->SaveAs(Form("systPlots/RXPSystematics_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/RXPSystematics_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/RXPSystematics_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  delete c1;
+  delete l;
+}
+void plotRAA(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, TH1D * h9, int c, Settings s){
+  TCanvas * c1 = new TCanvas("c1","",1100,500);
+  c1->Divide(2,1);
+  c1->cd(1);
+  c1->cd(1)->SetLogx();
+  h1->GetXaxis()->SetRangeUser(0.5,120); 
+  h1->GetXaxis()->SetTitle("p_{T}"); 
+  //h1->GetYaxis()->SetRangeUser(0,0.4); 
+  h1->GetYaxis()->SetTitle("Systematic Uncertainty"); 
+  h1->GetYaxis()->SetTitleOffset(1.3); 
+  h1->SetLineColor(kBlack);
+  h1->SetLineWidth(2);
+  h1->Draw("L");
+  h2->SetLineColor(kRed);
+  h2->SetLineWidth(2);
+  h2->Draw("same L");
+  h3->SetLineColor(kBlue);
+  h3->SetLineWidth(2);
+  h3->Draw("same L");
+  h4->SetLineColor(kViolet);
+  h4->SetLineWidth(2);
+  h4->SetLineStyle(2);
+  h4->Draw("same L");
+  h5->SetLineColor(kTeal);
+  h5->SetLineWidth(2);
+  h5->Draw("same L");
+  h6->SetLineColor(kGreen);
+  h6->SetLineWidth(2);
+  h6->Draw("same L");
+  h7->SetLineColor(kGray);
+  h7->SetLineStyle(2);
+  h7->SetLineWidth(2);
+  h7->Draw("same L");
+  h8->SetLineColor(kOrange);
+  h8->SetLineWidth(2);
+  h8->Draw("same L");
+  h9->SetLineColor(kMagenta-4);
+  h9->SetLineWidth(2);
+  h9->Draw("same L");
+  c1->cd(2);
+  TLegend * l = new TLegend(0.1,0.1,0.9,0.9);
+  l->SetBorderSize(0);
+  l->AddEntry((TObject*)0,"RAA* Uncertainties","");
+  l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
+  l->AddEntry(h1,"Total Uncertainty","l");
+  l->AddEntry(h2,"Species Correction","l");
+  l->AddEntry(h3,"Misreconstruction","l");
+  l->AddEntry(h4,"Efficiency Method","l");
+  l->AddEntry(h5,"Resolution","l");
+  l->AddEntry(h6,"Data vs. MC Efficiency","l");
+  l->AddEntry(h7,"Track Selection","l");
+  l->AddEntry(h8,"Event Selection","l");
+  l->AddEntry(h9,"pp Reference","l");
+  l->AddEntry((TObject*)0,"Lumi. and partially-canceled uncerts removed from pp ref.","");
+  l->Draw("same");
+  c1->SaveAs(Form("systPlots/RAASystematics_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/RAASystematics_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/RAASystematics_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  delete c1;
+  delete l;
+}
+void plotSpec(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, int c, Settings s){
+  TCanvas * c1 = new TCanvas("c1","",1100,500);
+  c1->Divide(2,1);
+  c1->cd(1);
+  c1->cd(1)->SetLogx();
+  h1->GetXaxis()->SetRangeUser(0.5,120); 
+  h1->GetXaxis()->SetTitle("p_{T}"); 
+  //h1->GetYaxis()->SetRangeUser(0,0.4); 
+  h1->GetYaxis()->SetTitle("Systematic Uncertainty"); 
+  h1->GetYaxis()->SetTitleOffset(1.3); 
+  h1->SetLineColor(kBlack);
+  h1->SetLineWidth(2);
+  h1->Draw("L");
+  h2->SetLineColor(kRed);
+  h2->SetLineWidth(2);
+  h2->Draw("same L");
+  h3->SetLineColor(kBlue);
+  h3->SetLineWidth(2);
+  h3->Draw("same L");
+  h4->SetLineColor(kViolet);
+  h4->SetLineWidth(2);
+  h4->SetLineStyle(2);
+  h4->Draw("same L");
+  h5->SetLineColor(kTeal);
+  h5->SetLineWidth(2);
+  h5->Draw("same L");
+  h6->SetLineColor(kGreen);
+  h6->SetLineWidth(2);
+  h6->Draw("same L");
+  h7->SetLineColor(kGray);
+  h7->SetLineStyle(2);
+  h7->SetLineWidth(2);
+  h7->Draw("same L");
+  h8->SetLineColor(kOrange);
+  h8->SetLineWidth(2);
+  h8->Draw("same L");
+  c1->cd(2);
+  TLegend * l = new TLegend(0.1,0.1,0.9,0.9);
+  l->SetBorderSize(0);
+  l->AddEntry((TObject*)0,"XeXe Spectra Uncertainties","");
+  l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
+  l->AddEntry(h1,"Total Uncertainty","l");
+  l->AddEntry(h2,"Species Correction","l");
+  l->AddEntry(h3,"Misreconstruction","l");
+  l->AddEntry(h4,"Efficiency Method","l");
+  l->AddEntry(h5,"Resolution","l");
+  l->AddEntry(h6,"Data vs. MC Efficiency","l");
+  l->AddEntry(h7,"Track Selection","l");
+  l->AddEntry(h8,"Event Selection","l");
+  l->Draw("same");
+  c1->SaveAs(Form("systPlots/SpectraSystematics_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/SpectraSystematics_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  c1->SaveAs(Form("systPlots/SpectraSystematics_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+  delete c1;
+  delete l;
+}
+
 float PbFiniteMCStats(int c, int i){
   if(c==24 || c==25 || c==30){//30-50,50-70,70-90
     if(i>23){
@@ -67,6 +250,7 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
   delete c1;
+  delete l;
 }
 void plotEvtSelRatios(TH1D * h1, int c, Settings s, TF1 * f ,std::string name,std::string Filename){
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
@@ -218,6 +402,7 @@ void systematics(){
     for(int j = 1; j<s.ntrkBins+1; j++){
       double total2 = 0; 
       //species correction
+      if(s.HI[i]->GetBinContent(j)==0) continue;
       spec_SpecCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpSpecCorr[i]->GetBinContent(j)-1));
       total2 += TMath::Power(s.HI_UpSpecCorr[i]->GetBinContent(j)-1,2);
 
@@ -233,7 +418,7 @@ void systematics(){
       spec_reso[i]->SetBinContent(j,0.005);
       total2 += 0.005*0.005;
 
-      //resolution is a flat 5%
+      //data MC Diff is a flat 5%
       spec_MCvsDataEff[i]->SetBinContent(j,0.05);
       total2 += 0.05*0.05;
       
@@ -248,12 +433,14 @@ void systematics(){
       //total
       spec_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
     }
+  plotSpec(spec_Total[i], spec_SpecCorr[i], spec_FakeCorr[i],  spec_EffMethod[i], spec_reso[i], spec_MCvsDataEff[i],  spec_CutVariation[i], spec_EventSelection[i], i, s); 
   }
 
   //RAA
   for(int i = 0; i<s.nCentBins; i++){
     for(int j = 1; j<s.ntrkBins+1; j++){
       double total2 = 0; 
+      if(s.HI[i]->GetBinContent(j)==0) continue;
       //pp reference without lumi and with 4% pp data/MC Eff difference removed
       //also removed 1% resolution correction
       //note that the total2 thing is the square of a sqrt
@@ -277,8 +464,8 @@ void systematics(){
       total2 += TMath::Power(0.005,2);
       
       // MC vs data uncert assumed to cancle at least as well at PbPb 
-      RAA_MCvsDataEff[i]->SetBinContent(j,trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]+1));
-      total2 += TMath::Power(trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]+1),2);
+      RAA_MCvsDataEff[i]->SetBinContent(j,trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]*5+1));
+      total2 += TMath::Power(trackingDataMCDiffUncert(RAA_MCvsDataEff[i]->GetBinCenter(j),s.lowCentBin[i]*5+1),2);
       
       //Syst from cut variations
       RAA_CutVariation[i]->SetBinContent(j,spec_CutVariation[i]->GetBinContent(j));
@@ -291,6 +478,7 @@ void systematics(){
       //total
       RAA_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
     }
+  plotRAA(RAA_Total[i], RAA_SpecCorr[i], RAA_FakeCorr[i],  RAA_EffMethod[i], RAA_reso[i], RAA_MCvsDataEff[i],  RAA_CutVariation[i], RAA_EventSelection[i], RAA_ppRef[i] , i, s); 
   }
 
   //RXePb
@@ -305,6 +493,7 @@ void systematics(){
 
     for(int j = 1; j<s.ntrkBins+1; j++){
       double total2 = 0;
+      if(s.HI[i]->GetBinContent(j)==0) continue;
       float PbPbCorr = TMath::Max(hyperonCorr->GetBinContent(hyperonCorr->FindBin(RXP_SpecCorr[i]->GetBinCenter(j))),0.015);
       //fix high-pt region 
       if(PbPbCorr>0.3) PbPbCorr = 0.015;
@@ -353,6 +542,8 @@ void systematics(){
       //total
       RXP_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
     }
+    plotRXP(RXP_Total[i], RXP_SpecCorr[i], RXP_XeFakeCorr[i],  RXP_XeEffMethod[i], RXP_XeCutVariation[i], RXP_EventSelection[i],  RXP_PbFakeCorr[i], RXP_PbEffMethod[i] , RXP_PbCutVariation[i] , RXP_PbTrigger[i] , i, s); 
+    
     hyperon->Close();
     trigger->Close();
     fakeFile->Close();
