@@ -4,10 +4,12 @@
 #include "TH2D.h"
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "include/isRelevant.h"
 #include "include/trackingCorrection.h"
 #include "include/trackingDataMCDiffUncert.h"
 
 void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, TH1D * h9, TH1D * h10, int c, Settings s){
+  if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","",1100,500);
   c1->Divide(2,1);
   c1->cd(1);
@@ -73,6 +75,7 @@ void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   delete l;
 }
 void plotRAA(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, TH1D * h9, int c, Settings s){
+  if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","",1100,500);
   c1->Divide(2,1);
   c1->cd(1);
@@ -134,6 +137,7 @@ void plotRAA(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   delete l;
 }
 void plotSpec(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, int c, Settings s){
+  if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","",1100,500);
   c1->Divide(2,1);
   c1->cd(1);
@@ -220,6 +224,7 @@ float PbFiniteMCStats(int c, int i){
 }
 
 void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
+  if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
   l->SetBorderSize(0);
@@ -253,6 +258,7 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   delete l;
 }
 void plotEvtSelRatios(TH1D * h1, int c, Settings s, TF1 * f ,std::string name,std::string Filename){
+  if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
   l->SetBorderSize(0);
