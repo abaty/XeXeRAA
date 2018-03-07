@@ -282,16 +282,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkPtError[j]/trkPt[j]>0.1) continue;
 
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         //lighter cuts
+        if(trkPtError[j]/trkPt[j]<0.025){
         float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
-        for(int c = 0; c<s.nCentBins; c++){
-          if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
-          float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
-          s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
+          for(int c = 0; c<s.nCentBins; c++){
+            if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
+            float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
+            s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
+          }
         }
 
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<10) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
       
