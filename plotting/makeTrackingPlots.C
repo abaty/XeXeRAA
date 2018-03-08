@@ -75,11 +75,12 @@ void makeTrkDistInclusive(TH1D * h, TH1D * mc[17][3],TCanvas * c1, std::string X
   h->GetYaxis()->SetTitleOffset(2);
   h->Draw("");
 
-  mc[0][0]->Scale(1.0/mc[0][0]->Integral(0,mc[0][0]->GetSize()-1));
+  float tempScale = mc[0][0]->Integral(0,mc[0][0]->GetSize()-1);
+  mc[0][0]->Scale(1.0/tempScale);
   mc[0][0]->SetLineColor(kBlack);
-  mc[0][1]->Scale(1.0/mc[0][0]->Integral(0,mc[0][0]->GetSize()-1));
+  mc[0][1]->Scale(1.0/tempScale);
   mc[0][1]->SetLineColor(kRed);
-  mc[0][2]->Scale(1.0/mc[0][0]->Integral(0,mc[0][0]->GetSize()-1));
+  mc[0][2]->Scale(1.0/tempScale);
   mc[0][2]->SetLineColor(kBlue);
   mc[0][2]->Draw("same hist");
   mc[0][1]->Draw("same hist");
@@ -162,12 +163,13 @@ void makeTrkDistArray(TH1D ** h,TH1D * mc[17][3], TCanvas * c2, std::string Xlab
     //h[i]->SetMarkerStyle(8);
     h[i]->GetYaxis()->SetTitleOffset(2);
     h[i]->Draw(""); 
-  
-    mc[i][0]->Scale(1.0/mc[i][0]->Integral(0,mc[i][0]->GetSize()-1));
+
+    float tempScale = mc[i][0]->Integral(0,mc[i][0]->GetSize()-1);  
+    mc[i][0]->Scale(1.0/tempScale);
     mc[i][0]->SetLineColor(kBlack);
-    mc[i][1]->Scale(1.0/mc[i][0]->Integral(0,mc[i][0]->GetSize()-1));
+    mc[i][1]->Scale(1.0/tempScale);
     mc[i][1]->SetLineColor(kRed);
-    mc[i][2]->Scale(1.0/mc[i][0]->Integral(0,mc[i][0]->GetSize()-1));
+    mc[i][2]->Scale(1.0/tempScale);
     mc[i][2]->SetLineColor(kBlue);
     mc[i][2]->Draw("same hist");
     mc[i][1]->Draw("same hist");
@@ -216,13 +218,13 @@ void makeTrackingPlots_Cuts(int cuts = 2){
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
  
-  //std::string generator = "MB Hydjet";
+  std::string generator = "MB Hydjet";
   //std::string generator = "MB EPOS";
-  std::string generator = "Pythia + Hydjet";
+  //std::string generator = "Pythia + Hydjet";
  
   TFile * f = TFile::Open("../output_0.root","read");
-  TFile * mc = TFile::Open("MCTrackingRootFiles/Pythia_March3.root","read"); 
-  //TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_Feb26.root","read"); 
+  //TFile * mc = TFile::Open("MCTrackingRootFiles/Pythia_March3.root","read"); 
+  TFile * mc = TFile::Open("MCTrackingRootFiles/Hydjet_March7.root","read"); 
   //TFile * mc = TFile::Open("MCTrackingRootFiles/EPOS_Feb26.root","read"); 
   //etaLT2p5 below 
   //TFile * f = TFile::Open("MCTrackingRootFiles/output_Feb6_etaLT2p5_Data.root","read");
@@ -239,6 +241,7 @@ void makeTrackingPlots_Cuts(int cuts = 2){
     eta[c] = (TH1D*)f->Get(Form("eta%d_cut%d",c,cuts));
     phi[c] = (TH1D*)f->Get(Form("phi%d_cut%d",c,cuts));
     caloMatch[c] = (TH1D*)f->Get(Form("caloMatch%d_cut%d",c,cuts));
+    
     for(int c2 = 0; c2<3; c2++){
       MCnHit[c][c2] = (TH1D*)mc->Get(Form("nHit%d_%d_cut%d",c,c2,cuts));
       MCchi2[c][c2] = (TH1D*)mc->Get(Form("chi2%d_%d_cut%d",c,c2,cuts));
@@ -349,5 +352,6 @@ void makeTrackingPlots(){
   makeTrackingPlots_Cuts(0);
   makeTrackingPlots_Cuts(1);
   makeTrackingPlots_Cuts(2);
+//  makeTrackingPlots_Cuts(3);
   resolutionSyst();
 }

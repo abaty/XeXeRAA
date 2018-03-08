@@ -226,30 +226,36 @@ float PbFiniteMCStats(int c, int i){
 void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
-  TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
+  TLegend * l = new TLegend(0.3,0.1,0.8,0.35);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   c1->SetLogx();
   gStyle->SetOptStat(0);
-  h1->GetYaxis()->SetRangeUser(0.7,1.3);
-  h1->GetYaxis()->SetTitle("Modified Cuts/Nominal Result");
-  h1->GetXaxis()->SetTitle("p_{T}");
-  h1->SetMarkerStyle(8);
-  h1->SetLineColor(kBlack);
-  h1->SetMarkerColor(kBlack);
+  //h1->SetTitle("");
+  //h1->GetYaxis()->SetRangeUser(0.7,1.3);
+  //h1->GetYaxis()->SetTitle("Modified Cuts/Nominal Result");
+  //h1->GetXaxis()->SetTitle("p_{T}");
+  //h1->SetMarkerStyle(8);
+  //h1->SetLineColor(kBlack);
+  //h1->SetMarkerColor(kBlack);
+  h2->SetTitle("");
+  h2->GetYaxis()->SetRangeUser(0.7,1.3);
+  h2->GetYaxis()->SetTitle("Modified Cuts/Nominal Result");
+  h2->GetXaxis()->SetTitle("p_{T}");
   h2->SetMarkerStyle(24);
   h2->SetLineColor(kRed);
   h2->SetMarkerColor(kRed);
   h3->SetMarkerStyle(25);
   h3->SetLineColor(kBlue);
   h3->SetMarkerColor(kBlue);
-  h1->Draw();
+  //h1->Draw();
   h2->Draw("same");
+  h2->Draw();
   h3->Draw("same");
   l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
-  l->AddEntry(h1,"Selection D","p");
-  l->AddEntry(h2,"Selection E","p");
-  l->AddEntry(h3,"Selection F","p");
+  l->AddEntry(h2,"Selection D","p");
+  l->AddEntry(h3,"Selection E","p");
+  //l->AddEntry(h1,"Selection F","p");
   l->Draw("same");
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
@@ -429,8 +435,9 @@ void systematics(){
       total2 += 0.05*0.05;
       
       //Syst from cut variations
-      spec_CutVariation[i]->SetBinContent(j,0.05);
-      total2 += 0.05*0.05;
+      float tempSyst = (spec_CutVariation[i]->GetBinLowEdge(j)<20) ? 0.06 : 0.03;
+      spec_CutVariation[i]->SetBinContent(j,tempSyst);
+      total2 += TMath::Power(tempSyst,2);
       
       //Syst from event selections, just take the fit value for now
       spec_EventSelection[i]->SetBinContent(j,TMath::Abs(evtSelVar1Fit[i]->Eval(5)-1));
