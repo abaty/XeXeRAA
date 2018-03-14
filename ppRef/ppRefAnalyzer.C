@@ -378,7 +378,13 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia->GetYaxis()->SetTitle("Extrapolation Factor");
   extrapFactorPythia->GetXaxis()->SetTitle("p_{T} (GeV)");
   extrapFactorPythia->GetXaxis()->CenterTitle();
-  extrapFactorPythia->GetYaxis()->SetTitleOffset(1.2);
+  extrapFactorPythia->GetYaxis()->SetTitleOffset(1.1);
+  extrapFactorPythia->GetYaxis()->SetTitleSize(0.07);
+  extrapFactorPythia->GetYaxis()->SetLabelSize(0.05);
+  extrapFactorPythia->GetXaxis()->SetTitleOffset(0.8);
+  extrapFactorPythia->GetXaxis()->SetLabelOffset(-0.015);
+  extrapFactorPythia->GetXaxis()->SetTitleSize(0.0675);
+  extrapFactorPythia->GetXaxis()->SetLabelSize(0.05);
   extrapFactorPythia->SetLineColor(kRed);
   extrapFactorPythia->SetLineWidth(2);
   extrapFactorPythia->SetMarkerColor(kRed);
@@ -392,7 +398,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorHerw->Draw("same");
   //TH1D * extrapFactorPythiaClone = (TH1D*)extrapFactorPythia->Clone("extraFactorPythiaClone");
   //extrapFactorPythiaClone->Draw("same");
-  specLeg2->SetX1NDC(0.3); 
+  specLeg2->SetX1NDC(0.2); 
   specLeg2->SetX2NDC(0.7); 
   specLeg2->SetY1NDC(0.55); 
   specLeg2->SetY2NDC(0.75); 
@@ -403,7 +409,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   int iPeriod = 0;
   lumi_sqrtS = "";
   writeExtraText = true;  
-  extraText  = "Preliminary";
+  extraText  = "Simulation Preliminary";
   //extraText  = "Unpublished";
   CMS_lumi( c3, iPeriod, 11 );
 

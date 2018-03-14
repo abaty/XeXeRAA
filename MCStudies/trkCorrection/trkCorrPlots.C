@@ -299,6 +299,9 @@ void trkCorrPlots(int cutIndex = 0){
   dummy->GetYaxis()->CenterTitle();
   dummy->GetYaxis()->SetRangeUser(0,1);
   dummy->GetYaxis()->SetTitleOffset(1.2);
+  dummy->GetXaxis()->SetTitleOffset(0.9);
+  dummy->GetXaxis()->SetLabelOffset(-0.01);
+  dummy->GetXaxis()->SetLabelSize(0.048);
   dummy->Draw();
   TH1D * efficiencySmooth[6];
   for(int i = 0; i<6; i++){
@@ -314,8 +317,8 @@ void trkCorrPlots(int cutIndex = 0){
     efficiencySmooth[i]->SetMarkerStyle(1);
     efficiencySmooth[i]->Draw("same C");
   } 
-  TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.45);
-  trkEffLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
+  TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.55);
+  trkEffLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   trkEffLeg->AddEntry((TObject*)0,"Pythia 8 + Hydjet",""); 
   trkEffLeg->AddEntry(efficiencySmooth[0],"0-5%","l"); 
   trkEffLeg->AddEntry(efficiencySmooth[1],"5-10%","l"); 
@@ -331,7 +334,7 @@ void trkCorrPlots(int cutIndex = 0){
   int iPeriod = 0;
   lumi_sqrtS = "";
   writeExtraText = true;  
-  extraText  = "Preliminary";
+  extraText  = "Simulation Preliminary";
   //extraText  = "Unpublished";
   CMS_lumi( c2, iPeriod, 11 );
 
