@@ -208,7 +208,7 @@ void RAA_plots(){
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.08);
     tex->DrawLatex(0.8,1.03,"XeXe T_{AA} and pp lumi. uncertainty");
-    tex->DrawLatex(0.8,0.93,"|#eta|<1");
+    tex->DrawLatex(0.8,0.93,"|#eta| < 1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);

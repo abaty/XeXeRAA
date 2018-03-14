@@ -167,7 +167,7 @@ void spectra_plots(){
 
   TLegend * specLeg = new TLegend(0.25,0.1,0.55,0.5);
   //specLeg->SetFillStyle(0);
-  specLeg->AddEntry((TObject*)0,"|#eta|<1",""); 
+  specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   specLeg->AddEntry(h[0],Form("0-5%s (x10)","%"),"p");  
   specLeg->AddEntry(h[1],Form("5-10%s (x3)","%"),"p");  
   specLeg->AddEntry(h[23],Form("10-30%s","%"),"p");  

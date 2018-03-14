@@ -1,5 +1,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TCanvas.h"
+#include "TLegend.h"
 #include "TFile.h"
 #include "TGraphAsymmErrors.h"
 #include <iostream>
@@ -186,20 +188,25 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   output->Close();
 }
 
-void makeSpeciesCorr(){
+void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   //primary correction
   TFile * f1 = TFile::Open("trkCorr_Pythia_March5_CutIndex0.root","read");
   //secondary correction
   TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
 
+  TFile * f3;
+  if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
+
   TH2D * eff, *fake, *sec, *multiple;
-  TH2D * eff2;
+  TH2D * eff2, *fake2, *eff3, *fake3;
   TH1D * eff1d;
 
   eff = (TH2D*)f1->Get("efficiency2d_Smoothed");
   eff2 = (TH2D*)f2->Get("efficiency2d");
+  if(makeTotalCorrectionPlots) eff3 = (TH2D*)f3->Get("efficiency2d");
   fake = (TH2D*)f1->Get("fake2d_Smoothed");
-  fake2 = (TH2D*)f1->Get("fake2d");
+  fake2 = (TH2D*)f2->Get("fake2d");
+  if(makeTotalCorrectionPlots) fake3 = (TH2D*)f3->Get("fake2d");
   sec = (TH2D*)f1->Get("secondary2d_Smoothed");
   multiple = (TH2D*)f1->Get("multiple2d");
   
@@ -261,5 +268,71 @@ void makeSpeciesCorr(){
 
   for(int i = 0; i<6; i++){
     speciesCorrSyst1D[i]->Write();
+  }
+
+  TH1D * totalCorrection[3][6];
+  if(makeTotalCorrectionPlots){
+    for(int c = 0; c<6; c++){
+      totalCorrection[0][c] = (TH1D*)eff1d->Clone(Form("TotalCorrection_Pythia_%d",c));
+      totalCorrection[0][c]->Reset();
+      totalCorrection[1][c] = (TH1D*)eff1d->Clone(Form("TotalCorrection_EPOS_%d",c));
+      totalCorrection[1][c]->Reset();
+      totalCorrection[2][c] = (TH1D*)eff1d->Clone(Form("TotalCorrection_Hydjet_%d",c));
+      totalCorrection[2][c]->Reset();
+      for(int i = 1; i< eff1d->GetSize()-1; i++){
+        if(eff1d->GetBinCenter(i)>20) continue;
+        totalCorrection[0][c]->SetBinContent(i,(1-fake->GetBinContent(i,c+1))/eff->GetBinContent(i,c+1));
+        float err2 = TMath::Power(eff->GetBinError(i,c+1)/eff->GetBinContent(i,c+1),2)+TMath::Power(fake->GetBinError(i,c+1)/(1-fake->GetBinContent(i,c+1)),2);
+        totalCorrection[0][c]->SetBinError(i,TMath::Sqrt(err2));
+        totalCorrection[1][c]->SetBinContent(i,(1-fake2->GetBinContent(i,c+1))/eff2->GetBinContent(i,c+1));
+        err2 = TMath::Power(eff2->GetBinError(i,c+1)/eff2->GetBinContent(i,c+1),2)+TMath::Power(fake2->GetBinError(i,c+1)/(1-fake2->GetBinContent(i,c+1)),2);
+        totalCorrection[1][c]->SetBinError(i,TMath::Sqrt(err2));
+        totalCorrection[2][c]->SetBinContent(i,(1-fake3->GetBinContent(i,c+1))/eff3->GetBinContent(i,c+1));
+        err2 = TMath::Power(eff3->GetBinError(i,c+1)/eff3->GetBinContent(i,c+1),2)+TMath::Power(fake3->GetBinError(i,c+1)/(1-fake3->GetBinContent(i,c+1)),2);
+        totalCorrection[2][c]->SetBinError(i,TMath::Sqrt(err2));
+      }
+ 
+      gStyle->SetOptStat(0);
+      gStyle->SetErrorX(0);
+      TCanvas * c1 = new TCanvas("c1","",800,600);
+      c1->SetLogx();
+      totalCorrection[0][c]->GetXaxis()->SetTitle("p_{T}");
+      totalCorrection[0][c]->GetXaxis()->SetRangeUser(0.5,20);
+      totalCorrection[0][c]->GetYaxis()->SetTitle("Total Tracking Correction");
+      totalCorrection[0][c]->GetYaxis()->SetRangeUser(1,6);
+      totalCorrection[0][c]->SetLineColor(kRed);  
+      totalCorrection[0][c]->SetMarkerColor(kRed);  
+      totalCorrection[0][c]->SetMarkerStyle(28);  
+      totalCorrection[1][c]->SetLineColor(kBlue);  
+      totalCorrection[1][c]->SetMarkerColor(kBlue);  
+      totalCorrection[1][c]->SetMarkerStyle(24);  
+      totalCorrection[2][c]->SetLineColor(kBlack);  
+      totalCorrection[2][c]->SetMarkerColor(kBlack);  
+      totalCorrection[2][c]->SetMarkerStyle(8); 
+      totalCorrection[0][c]->Draw("p"); 
+      totalCorrection[1][c]->Draw("p same"); 
+      totalCorrection[2][c]->Draw("p same"); 
+
+      TLegend * l = new TLegend(0.3,0.4,0.7,0.7);
+      l->SetBorderSize(0);
+      l->AddEntry(totalCorrection[0][c],"Pythia 8 + Hydjet","p");
+      l->AddEntry(totalCorrection[1][c],"MB EPOS","p");
+      l->AddEntry(totalCorrection[2][c],"MB Hydjet","p");
+      int a, b;
+      if(c==0) a=0; b=5;
+      if(c==1) a=5; b=10;
+      if(c==2) a=10; b=30;
+      if(c==3) a=30; b=50;
+      if(c==4) a=50; b=70;
+      if(c==5) a=70; b=100;
+      l->AddEntry((TObject*)0,Form("%d-%d %%",a,b),"");
+      l->Draw("same");
+
+      c1->SaveAs(Form("img/TotalCorrection_%d.pdf",c));
+      c1->SaveAs(Form("img/TotalCorrection_%d.png",c));
+      c1->SaveAs(Form("img/TotalCorrection_%d.C",c));
+
+      delete c1;
+    }
   }
 }

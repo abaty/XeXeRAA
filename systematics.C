@@ -253,8 +253,8 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
   h2->Draw();
   h3->Draw("same");
   l->AddEntry((TObject*)0,Form("%d-%d %%",5*s.lowCentBin[c],5*s.highCentBin[c]),"");
-  l->AddEntry(h2,"Selection D","p");
-  l->AddEntry(h3,"Selection E","p");
+  l->AddEntry(h2,"Selection E","p");
+  l->AddEntry(h3,"Selection D","p");
   //l->AddEntry(h1,"Selection F","p");
   l->Draw("same");
   c1->SaveAs(Form("systPlots/CutRatios_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
