@@ -167,12 +167,16 @@ void RAA_plots(){
     h[c]->SetMarkerStyle(8);
     h[c]->GetXaxis()->SetTitle("p_{T} (GeV)");
     h[c]->GetXaxis()->CenterTitle();
-    h[c]->GetYaxis()->SetTitle("R_{AA}*, R_{AA}");
-    h[c]->GetYaxis()->SetTitleOffset(1.2);
-    h[c]->GetXaxis()->SetTitleOffset(1.2);
+    h[c]->GetYaxis()->SetTitle("R*_{AA}, R_{AA}");
+    h[c]->GetXaxis()->SetTitleSize(0.06);
+    h[c]->GetYaxis()->SetTitleSize(0.06);
+    h[c]->GetYaxis()->SetTitleOffset(1.0);
+    h[c]->GetXaxis()->SetTitleOffset(0.87);
+    h[c]->GetYaxis()->SetLabelSize(0.055);
+    h[c]->GetXaxis()->SetLabelSize(0.055);
+    h[c]->GetXaxis()->SetLabelOffset(-0.017);
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
-    h[c]->GetXaxis()->SetLabelOffset(-0.005);
     h[c]->GetYaxis()->SetRangeUser(0,1.6);
     h[c]->SetMarkerSize(1.3);
     
@@ -204,11 +208,12 @@ void RAA_plots(){
     line1->SetLineStyle(2);
     line1->Draw("same");
   
+    tex2->SetTextSize(lumiTextSize*0.15);
     tex2->DrawLatex(0.9,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
-    tex->SetTextSize(lumiTextSize*0.08);
-    tex->DrawLatex(0.8,1.03,"XeXe T_{AA} and pp lumi. uncertainty");
-    tex->DrawLatex(0.8,0.93,"|#eta| < 1");
+    tex->SetTextSize(lumiTextSize*0.095);
+    tex->DrawLatex(0.8,1.04,"XeXe T_{AA} and pp lumi. uncertainty");
+    tex->DrawLatex(0.8,0.92,"|#eta| < 1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);
@@ -243,7 +248,7 @@ void RAA_plots(){
       }
     }
 
-    TLegend * leg = new TLegend(0.5,0.7,0.85,0.9);
+    TLegend * leg = new TLegend(0.4,0.7,0.95,0.9);
     leg->SetFillStyle(0);
     //31 is 0-10%, removed for now
     if(!(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30 && c!=20)){

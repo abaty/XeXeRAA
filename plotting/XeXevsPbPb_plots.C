@@ -187,6 +187,15 @@ void XeXevsPbPb_plots(){
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetXaxis()->SetLabelOffset(-0.005);
     h[c]->GetYaxis()->SetRangeUser(0,2);
+
+    h[c]->GetXaxis()->SetTitleSize(0.06);
+    h[c]->GetYaxis()->SetTitleSize(0.06);
+    h[c]->GetYaxis()->SetTitleOffset(1.0);
+    h[c]->GetXaxis()->SetTitleOffset(0.87);
+    h[c]->GetYaxis()->SetLabelSize(0.055);
+    h[c]->GetXaxis()->SetLabelSize(0.055);
+    h[c]->GetXaxis()->SetLabelOffset(-0.017);
+
     h[c]->SetMarkerSize(1.3);
     h[c]->Draw();
 
@@ -203,18 +212,19 @@ void XeXevsPbPb_plots(){
     bTAA->SetFillColor(kBlue-9);
     bTAA->SetLineWidth(0);
     bTAA->DrawBox(0.575,1-TAAUncertD,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAUncertU);
-    bTAA->DrawBox(0.7,0.675,0.85,0.725);
+    bTAA->DrawBox(0.7,0.375,0.85,0.45);
       
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
     line1->SetLineWidth(2);
     line1->SetLineStyle(2);
     line1->Draw("same");
   
-    tex2->DrawLatex(0.7,0.55,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
+    tex2->SetTextSize(lumiTextSize*0.15);
+    tex2->DrawLatex(0.7,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
-    tex->SetTextSize(lumiTextSize*0.08);
-    tex->DrawLatex(0.9,0.675,"Combined T_{AA} uncertainty");
-    tex->DrawLatex(0.7,0.8,"|#eta| < 1");
+    tex->SetTextSize(lumiTextSize*0.095);
+    tex->DrawLatex(0.9,0.375,"Combined T_{AA} uncertainty");
+    tex->DrawLatex(0.7,0.5,"|#eta| < 1");
  
     for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
       b[i-1]->SetFillColor(kRed-7);
