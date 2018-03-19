@@ -319,7 +319,7 @@ void trkCorrPlots(int cutIndex = 0){
   } 
   TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.55);
   trkEffLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
-  trkEffLeg->AddEntry((TObject*)0,"Pythia 8 + Hydjet",""); 
+  trkEffLeg->AddEntry((TObject*)0,"PYTHIA 8 + HYDJET",""); 
   trkEffLeg->AddEntry(efficiencySmooth[0],"0-5%","l"); 
   trkEffLeg->AddEntry(efficiencySmooth[1],"5-10%","l"); 
   trkEffLeg->AddEntry(efficiencySmooth[2],"10-30%","l"); 

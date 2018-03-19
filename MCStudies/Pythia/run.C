@@ -57,10 +57,10 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D *reso_reco[s.ntrkBins], *reso_gen[s.ntrkBins], *reso_recoCut[s.ntrkBins], *reso_genCut[s.ntrkBins];
   TH1D * dummy = new TH1D("dummy","",s.ntrkBins,s.xtrkbins);
   for(int c = 0; c<s.ntrkBins; c++){
-    reso_reco[c] = new TH1D(Form("reso_reco_%d",c),"",30,0.9,1.1);
-    reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",30,0.9,1.1);
-    reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",30,0.9,1.1);
-    reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",30,0.9,1.1);
+    reso_reco[c] = new TH1D(Form("reso_reco_%d",c),"",51,0.9,1.1);
+    reso_gen[c] = new TH1D(Form("reso_gen_%d",c),"",51,0.9,1.1);
+    reso_recoCut[c] = new TH1D(Form("reso_recoCut_%d",c),"",51,0.9,1.1);
+    reso_genCut[c] = new TH1D(Form("reso_genCut_%d",c),"",51,0.9,1.1);
   }
 
   //eff and fake plots
@@ -296,24 +296,26 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           caloMatch[trkBinMap(hiBin,trkPt[j])][statusIndex][1]->Fill(Et/trkPt[j],w);
         }
 
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
         if(trkPtError[j]/trkPt[j]<0.015){
-          reco2d[1]->Fill(trkPt[j],centBin(hiBin),w);
-          reco[centBin(hiBin)][1]->Fill(trkPt[j],w);
-          if(trkStatus[j]!=-999){
-            recoNoFake2d[1]->Fill(trkPt[j],centBin(hiBin),w);
-            recoNoFake[centBin(hiBin)][1]->Fill(trkPt[j],w);
-            if(trkEventId[j]==0){
-              recoNoFake2d_sig[1]->Fill(trkPt[j],centBin(hiBin),w);
-              recoNoFake_sig[centBin(hiBin)][1]->Fill(trkPt[j],w);
+          if((trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))){ //Calo Matchin
+            reco2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+            reco[centBin(hiBin)][1]->Fill(trkPt[j],w);
+            if(trkStatus[j]!=-999){
+              recoNoFake2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+              recoNoFake[centBin(hiBin)][1]->Fill(trkPt[j],w);
+              if(trkEventId[j]==0){
+                recoNoFake2d_sig[1]->Fill(trkPt[j],centBin(hiBin),w);
+                recoNoFake_sig[centBin(hiBin)][1]->Fill(trkPt[j],w);
+              }
             }
-          }
-          if(trkStatus[j]==1 && trkEventId[j]==0){
-            recoMatched2d[1]->Fill(trkPt[j],centBin(hiBin),w);
-            recoMatched[centBin(hiBin)][1]->Fill(trkPt[j],w);
+            if(trkStatus[j]==1 && trkEventId[j]==0){
+              recoMatched2d[1]->Fill(trkPt[j],centBin(hiBin),w);
+              recoMatched[centBin(hiBin)][1]->Fill(trkPt[j],w);
+            }
           }
         }
         
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<10) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
           
@@ -387,6 +389,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         }
         
 
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*trkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
         if(trkNHit[j]<12) continue;
@@ -435,16 +438,18 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(mtrkPtError[j]/mtrkPt[j]>0.1) continue;
 
         float Et = (mtrkPfHcal[j]+mtrkPfEcal[j])/TMath::CosH(pEta[j]);
-        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
-        if(mtrkPtError[j]/mtrkPt[j]<0.015){ 
-          genMatched2d[1]->Fill(pPt[j],centBin(hiBin),w);
-          genMatched[centBin(hiBin)][1]->Fill(pPt[j],w);
-          if(pNRec[j]>1){
-            genMatchedMult2d[1]->Fill(pPt[j],centBin(hiBin),w);
-            genMatchedMult[centBin(hiBin)][1]->Fill(pPt[j],w);
+        if(mtrkPtError[j]/mtrkPt[j]<0.015){
+          if((mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))){ //Calo Matchin
+            genMatched2d[1]->Fill(pPt[j],centBin(hiBin),w);
+            genMatched[centBin(hiBin)][1]->Fill(pPt[j],w);
+            if(pNRec[j]>1){
+              genMatchedMult2d[1]->Fill(pPt[j],centBin(hiBin),w);
+              genMatchedMult[centBin(hiBin)][1]->Fill(pPt[j],w);
+            }
           }
         }
         
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*mtrkPt[j]))) continue; //Calo Matchin
         if(mtrkNHit[j]<10) continue;  
         if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.18) continue;
         
@@ -455,6 +460,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           genMatchedMult[centBin(hiBin)][3]->Fill(pPt[j],w);
         }
 
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*mtrkPt[j]))) continue; //Calo Matchin
         if(mtrkNHit[j]<11) continue;
         if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.15) continue;
   
@@ -468,6 +474,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           genMatchedMult[centBin(hiBin)][0]->Fill(pPt[j],w);
         }
         
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*mtrkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>2 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>2) continue;
         if(mtrkPtError[j]/mtrkPt[j]>0.05) continue;
         if(mtrkNHit[j]<12) continue;

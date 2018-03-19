@@ -290,6 +290,8 @@ void plotEvtSelRatios(TH1D * h1, int c, Settings s, TF1 * f ,std::string name,st
 
 void systematics(){
   TH1::SetDefaultSumw2();
+  gStyle->SetPadTickX(1);
+  gStyle->SetPadTickY(1);
   Settings s = Settings();
   TFile * ppInput = new TFile(s.ppRefFile.c_str(),"read");
   TH1D * ppSyst_NoLumi = (TH1D*)ppInput->Get("ppScaledSyst_NoLumi");

@@ -292,14 +292,17 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
  
         //lighter cuts
         if(trkPtError[j]/trkPt[j]<0.015){
-        float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
-          for(int c = 0; c<s.nCentBins; c++){
-            if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
-            float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
-            s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
+          if((trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))){ //Calo Matchin
+          float weight_NoSpecCut1 = trkCorr_NoSpecCut1.getTrkCorr(trkPt[j],hiBin)*evtW;
+            for(int c = 0; c<s.nCentBins; c++){
+              if(hiBin/10<s.lowCentBin[c] || hiBin/10>=s.highCentBin[c]) continue;
+              float binCenter = s.HI[0]->GetXaxis()->GetBinCenter(s.HI[0]->GetXaxis()->FindBin(trkPt[j]));
+              s.HI_NoSpecCut1[c]->Fill(trkPt[j],weight_NoSpecCut1/binCenter);
+            }
           }
         }
 
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<10) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
       
@@ -310,6 +313,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           s.HI_NoSpecCut3[c]->Fill(trkPt[j],weight_NoSpecCut3/binCenter);
         }
 
+        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<11) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.15) continue;
 
@@ -331,6 +335,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           s.HI_smeared[c]->Fill(smearPt,smearWeight/binCenter);
         }//cent bin loop
 
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*trkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
         if(trkNHit[j]<12) continue;

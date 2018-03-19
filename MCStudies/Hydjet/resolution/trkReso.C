@@ -21,7 +21,7 @@ void fillResoPoint(TH1D * r, int bin, std::string name){
   f1->SetParameter(2,0.02);
 
   TCanvas * c = new TCanvas("c","c",400,400);
-  h->Draw("h");
+  h->Draw("p");
   h->Fit("f1","EMR");
 
   std::cout << f1->GetParameter(1) << " " << f1->GetParameter(2) << std::endl;

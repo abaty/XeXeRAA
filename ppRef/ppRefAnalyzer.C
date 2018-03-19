@@ -296,9 +296,9 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorHerw->SetTitle("");
 
   TLegend * specLeg2 = new TLegend(0.2,0.7,0.4,0.85);
-  specLeg2->AddEntry(extrapFactorPythia,"Pythia 8","pl");
+  specLeg2->AddEntry(extrapFactorPythia,"PYTHIA 8","pl");
   specLeg2->AddEntry(extrapFactorEPOS,"EPOS LHC","pl");
-  specLeg2->AddEntry(extrapFactorHerw,"Herwig++","pl");
+  specLeg2->AddEntry(extrapFactorHerw,"HERWIG++","pl");
   
   TF1 * extrapFuncLogistic = new TF1("extrapLogistic","[0]+[3]*TMath::Log(x)+[1]*((TMath::Log(x)-[2])/TMath::Power(1+TMath::Power(TMath::Log(x)-[2],2),0.5))",0.5,103.6);
   extrapFuncLogistic->SetParameter(0,1.1);
@@ -307,6 +307,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncLogistic->SetParameter(3,0);
   extrapFuncLogistic->SetLineColor(kCyan+1);
   extrapFactorPythia->Fit(extrapFuncLogistic,"EMR");
+  std::cout << extrapFuncLogistic->GetChisquare()/(float)extrapFuncLogistic->GetNDF() << std::endl;
   extrapFuncLogistic->Write();  
   
   TF1 * extrapFuncLogistic2 = new TF1("extrapLogistic2","[0]+[4]*TMath::Log(x)+[1]*TMath::Log(x)*TMath::Log(x)+[2]*TMath::TanH(TMath::Log(x)-[3])",0.5,103.6);
@@ -316,6 +317,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncLogistic2->SetParameter(2,1);
   extrapFuncLogistic2->SetLineColor(kBlue);
   extrapFactorPythia->Fit(extrapFuncLogistic2,"EMR");
+  std::cout << extrapFuncLogistic2->GetChisquare()/(float)extrapFuncLogistic2->GetNDF() << std::endl;
   extrapFuncLogistic2->Write();  
  
   TF1 * extrapFuncPoly3 = new TF1("extrapFuncPoly3","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)",0.5,103.6);
@@ -325,6 +327,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncPoly3->SetParameter(3,0);
   extrapFuncPoly3->SetLineColor(kGreen);
   extrapFactorPythia->Fit(extrapFuncPoly3,"EMR");
+  std::cout << extrapFuncPoly3->GetChisquare()/(float)extrapFuncPoly3->GetNDF() << std::endl;
   extrapFuncPoly3->Write();
   
   TF1 * extrapFuncPoly5 = new TF1("extrapFuncPoly5","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)+[5]*TMath::Power(TMath::Log(x),5)",0.5,103.6);
@@ -334,6 +337,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncPoly5->SetParameter(3,0);
   extrapFuncPoly5->SetLineColor(kGreen+2);
   extrapFactorPythia->Fit(extrapFuncPoly5,"EMR");
+  std::cout << extrapFuncPoly5->GetChisquare()/(float)extrapFuncPoly5->GetNDF() << std::endl;
   extrapFuncPoly5->Write();
 
   TF1 * extrapFuncPoly4 = new TF1("extrapFuncPoly4","[0]+[1]*TMath::Log(x)+[2]*TMath::Power(TMath::Log(x),2)+[3]*TMath::Power(TMath::Log(x),3)+[4]*TMath::Power(TMath::Log(x),4)",0.5,103.6);
@@ -344,6 +348,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFuncPoly4->SetParameter(4,0);
   extrapFuncPoly4->SetLineColor(kBlack);
   extrapFactorPythia->Fit(extrapFuncPoly4,"EMR");
+  std::cout << extrapFuncPoly4->GetChisquare()/(float)extrapFuncPoly4->GetNDF() << std::endl;
   extrapFuncPoly4->Write();  
   
   extrapFuncPoly4->Draw("same");
@@ -352,7 +357,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorHerw->Draw("same");
   extrapFactorPythia->SetLineWidth(2);
   extrapFactorPythia->Draw("same");
-  specLeg2->AddEntry(extrapFuncPoly4,"Fit to Pythia 8","l");
+  specLeg2->AddEntry(extrapFuncPoly4,"Fit to PYTHIA 8","l");
   specLeg2->Draw("same"); 
 
   c3->SaveAs("img/extrapolationFactorPythia8.png");
