@@ -207,28 +207,38 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_March20.root","read");
 
   TH2D * eff, *fake, *sec, *multiple;
+  TH2D * effUnsmooth, *fakeUnsmooth, *secUnsmooth;
   TH2D * eff2, *fake2, *eff3, *fake3;
   TH1D * eff1d;
 
   eff = (TH2D*)f1->Get("efficiency2d_Smoothed");
+  effUnsmooth = (TH2D*)f1->Get("efficiency2d");
   eff2 = (TH2D*)f2->Get("efficiency2d");
   if(makeTotalCorrectionPlots) eff3 = (TH2D*)f3->Get("efficiency2d");
   fake = (TH2D*)f1->Get("fake2d_Smoothed");
+  fakeUnsmooth = (TH2D*)f1->Get("fake2d");
   fake2 = (TH2D*)f2->Get("fake2d");
   if(makeTotalCorrectionPlots) fake3 = (TH2D*)f3->Get("fake2d");
   sec = (TH2D*)f1->Get("secondary2d_Smoothed");
+  secUnsmooth = (TH2D*)f1->Get("secondary2d");
   multiple = (TH2D*)f1->Get("multiple2d");
   
   eff1d = (TH1D*)f2->Get("efficiency_0");
 
   TFile * output = TFile::Open("trkCorr_March20_wSpeciesCorr.root","recreate");
   eff->SetDirectory(output);
+  effUnsmooth->SetDirectory(output);
   fake->SetDirectory(output);
+  fakeUnsmooth->SetDirectory(output);
   sec->SetDirectory(output);
+  secUnsmooth->SetDirectory(output);
   multiple->SetDirectory(output);
   eff->Write();
+  effUnsmooth->Write();
   fake->Write();
+  fakeUnsmooth->Write();
   sec->Write();
+  secUnsmooth->Write();
   multiple->Write();
 
   TH2D * speciesCorr = (TH2D*)eff2->Clone("speciesCorr");
