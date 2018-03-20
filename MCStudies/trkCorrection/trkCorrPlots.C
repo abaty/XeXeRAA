@@ -11,13 +11,13 @@
 void speciesCorrPlots(){
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
-  TFile * f = TFile::Open("trkCorr_March5_wSpeciesCorr.root","read");
+  TFile * f = TFile::Open("trkCorr_March20_wSpeciesCorr.root","read");
   TH1D * speciesCorr[6];
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
   for(int i = 0; i<6; i++){
     speciesCorr[i] = (TH1D*)f->Get(Form("speciesCorrSyst1D_ForPlots_%d",i));
-    speciesCorr[i]->GetXaxis()->SetRangeUser(0.5,14);
+    speciesCorr[i]->GetXaxis()->SetRangeUser(0.5,11);
     speciesCorr[i]->SetMarkerStyle(8);
     speciesCorr[i]->SetMarkerColor(kBlack);
     speciesCorr[i]->SetLineColor(kBlack);
@@ -44,8 +44,8 @@ void speciesCorrPlots(){
       if(speciesCorr[i]->GetBinContent(j)<0 && speciesCorr[i]->GetBinCenter(j)>3){
         line1->SetX1(speciesCorr[i]->GetBinCenter(j)-0.3);
         line1->SetX2(speciesCorr[i]->GetBinCenter(j)-0.3);
-        line1->SetY1(-0.07);
-        line1->SetY2(0.07);
+        line1->SetY1(-0.04);
+        line1->SetY2(0.04);
         break;
       }
     }
@@ -235,9 +235,9 @@ void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::st
 
 
 void trkCorrPlots(int cutIndex = 0){
-  TFile * f1 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
-  TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
-  TFile * f3 = TFile::Open(Form("trkCorr_Pythia_March5_CutIndex%d.root",cutIndex),"read");
+  TFile * f1 = TFile::Open("trkCorr_Hydjet_March20.root","read");
+  TFile * f2 = TFile::Open("trkCorr_EPOS_March20.root","read");
+  TFile * f3 = TFile::Open(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutIndex),"read");
   gStyle->SetOptStat(0);
 
   TGraphAsymmErrors * efficiency[6], *fake[6], *secondary[6];
@@ -292,7 +292,7 @@ void trkCorrPlots(int cutIndex = 0){
   c2->SetLogx();
   c2->SetTickx(1);
   c2->SetTicky(1);
-  TH1D * dummy = new TH1D("dummy","",10,0.5,103.6);
+  TH1D * dummy = new TH1D("dummy","",10,0.5,127);
   dummy->GetXaxis()->SetTitle("p_{T} (GeV)");
   dummy->GetXaxis()->CenterTitle();
   dummy->GetYaxis()->SetTitle("XeXe Tracking Efficiency");
@@ -315,6 +315,7 @@ void trkCorrPlots(int cutIndex = 0){
     if(i==1 || i==3 || i==5) efficiencySmooth[i]->SetLineStyle(3);
     efficiencySmooth[i]->SetLineWidth(2);
     efficiencySmooth[i]->SetMarkerStyle(1);
+    gStyle->SetErrorX(0);
     efficiencySmooth[i]->Draw("same C");
   } 
   TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.55);

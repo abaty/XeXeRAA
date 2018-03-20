@@ -84,12 +84,13 @@ double findNcollAverage(int L, int H) {
 void countTracks(std::vector<std::string> fileList, int jobNumber){
   Settings s = Settings();
   TrackingResolution trkReso = TrackingResolution(s.trkResFile);
-  TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true,true);
-  TrackingCorrection trkCorr_NoSpec = TrackingCorrection(s.trkCorrFile_noSpec,true,false,true);
+  TrackingCorrection trkCorr = TrackingCorrection(s.trkCorrFile,true,true,false);
+  TrackingCorrection trkCorr_NoSpec = TrackingCorrection(s.trkCorrFile_noSpec,true,false,false);
   TrackingCorrection trkCorr_NoSpecCut1 = TrackingCorrection(s.trkCorrFile_noSpecCut1,false,false,false,false);
-  TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,true,true);
+  TrackingCorrection trkCorr_NoSpecCut2 = TrackingCorrection(s.trkCorrFile_noSpecCut2,true,false,false,true);
   TrackingCorrection trkCorr_NoSpecCut3 = TrackingCorrection(s.trkCorrFile_noSpecCut3,true,false,false,true);
   TF1 * evtSelEff = new TF1("evtSelEff","0.5*(1+TMath::Erf((x-13.439)/(TMath::Sqrt(x)*0.811)))",0,100000);
+
 
   TFile * output = TFile::Open(Form("output_data_%d.root",jobNumber),"recreate");
   TH1D * evtCount = new TH1D("evtCount","evtCount",10,0,10);

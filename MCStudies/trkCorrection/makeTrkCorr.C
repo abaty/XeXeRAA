@@ -11,8 +11,8 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  //TFile * f = new TFile("../Hydjet/output_Feb26.root","read");
-  //TFile * f = new TFile("../EPOS/output_0_Feb26.root","read");
+  //TFile * f = new TFile("../Hydjet/output_March20.root","read");
+  //TFile * f = new TFile("../EPOS/output_March20.root","read");
   TFile * f = new TFile("../Pythia/output_0.root","read");
 
   
@@ -38,9 +38,9 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d_%d",c,cutsToUse));
   }
 
-  //TFile * output = new TFile("trkCorr_Hydjet_Feb26.root","recreate");
- //TFile * output = new TFile("trkCorr_EPOS_Feb26.root","recreate");
- TFile * output = new TFile(Form("trkCorr_Pythia_March5_CutIndex%d.root",cutsToUse),"recreate");
+  //TFile * output = new TFile("trkCorr_Hydjet_March20.root","recreate");
+  //TFile * output = new TFile("trkCorr_EPOS_March20.root","recreate");
+  TFile * output = new TFile(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutsToUse),"recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -146,7 +146,7 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     fakeGraph[c]->Write(); 
     fakeFit[c]->Write(); 
     secGraph[c]->Write();
-    secFit[c]->Write();  
+    secFit[c]->Write(); 
   }
  
   TH2D * efficiency2d_Smoothed = (TH2D*)efficiency2d->Clone("efficiency2d_Smoothed");
@@ -157,16 +157,25 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     efficiency_smooth[c] = (TH1D*)efficiency[c]->Clone(Form("efficiency_smooth_%d",c));
     fake_smooth[c] = (TH1D*)fake[c]->Clone(Form("fake_smooth_%d",c));
     secondary_smooth[c] = (TH1D*)secondary[c]->Clone(Form("secondary_smooth_%d",c));
+
+    //smooth efficiency plots
+    efficiency_smooth[c]->Smooth(3);
   }
   for(int i = 0; i<efficiency2d_Smoothed->GetXaxis()->GetNbins(); i++){
     for(int j = 0; j<6; j++){
       float pt = efficiency2d_Smoothed->GetXaxis()->GetBinCenter(i+1);
       secondary2d_Smoothed->SetBinContent(i+1,j+1,1-secFit[j]->Eval(pt));
       secondary_smooth[j]->SetBinContent(i+1,1-secFit[j]->Eval(pt));
-      if(pt>1.0){
+      /*if(pt>1.0){
         efficiency2d_Smoothed->SetBinContent(i+1,j+1,effFit[j]->Eval(pt));
         efficiency_smooth[j]->SetBinContent(i+1,effFit[j]->Eval(pt));
-      }  
+      }*/
+      //overwrite unsmoothed ones
+      if(pt<=1.0){
+        efficiency2d_Smoothed->SetBinContent(i+1,j+1,efficiency[j]->GetBinContent(i+1));
+        efficiency_smooth[j]->SetBinContent(i+1,efficiency[j]->GetBinContent(i+1));
+      }
+     
       if(pt>3.2){
         fake2d_Smoothed->SetBinContent(i+1,j+1,1-fakeFit[j]->Eval(pt));
         fake_smooth[j]->SetBinContent(i+1,1-fakeFit[j]->Eval(pt));
@@ -190,12 +199,12 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
 
 void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   //primary correction
-  TFile * f1 = TFile::Open("trkCorr_Pythia_March5_CutIndex0.root","read");
+  TFile * f1 = TFile::Open("trkCorr_Pythia_March20_CutIndex0.root","read");
   //secondary correction
-  TFile * f2 = TFile::Open("trkCorr_EPOS_Feb26.root","read");
+  TFile * f2 = TFile::Open("trkCorr_EPOS_March20.root","read");
 
   TFile * f3;
-  if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_Feb26.root","read");
+  if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_March20.root","read");
 
   TH2D * eff, *fake, *sec, *multiple;
   TH2D * eff2, *fake2, *eff3, *fake3;
@@ -210,9 +219,9 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   sec = (TH2D*)f1->Get("secondary2d_Smoothed");
   multiple = (TH2D*)f1->Get("multiple2d");
   
-  eff1d = (TH1D*)f1->Get("efficiency_0");
+  eff1d = (TH1D*)f2->Get("efficiency_0");
 
-  TFile * output = TFile::Open("trkCorr_March5_wSpeciesCorr.root","recreate");
+  TFile * output = TFile::Open("trkCorr_March20_wSpeciesCorr.root","recreate");
   eff->SetDirectory(output);
   fake->SetDirectory(output);
   sec->SetDirectory(output);
@@ -222,8 +231,8 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   sec->Write();
   multiple->Write();
 
-  TH2D * speciesCorr = (TH2D*)eff->Clone("speciesCorr");
-  TH2D * speciesCorrSyst = (TH2D*)eff->Clone("speciesCorrSyst");
+  TH2D * speciesCorr = (TH2D*)eff2->Clone("speciesCorr");
+  TH2D * speciesCorrSyst = (TH2D*)eff2->Clone("speciesCorrSyst");
 
   TH1D * speciesCorrSyst1D[6];
   for(int i = 0; i<6; i++){
@@ -233,6 +242,8 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
 
   for(int i = 1; i<speciesCorr->GetXaxis()->GetNbins()+1;i++){
     for(int j = 1; j<speciesCorr->GetYaxis()->GetNbins()+1;j++){
+      int pythiaBinX = eff->GetXaxis()->FindBin(speciesCorr->GetXaxis()->GetBinCenter(i)); 
+      int pythiaBinY = eff->GetYaxis()->FindBin(speciesCorr->GetYaxis()->GetBinCenter(j)); 
       float e1 = eff->GetBinContent(i,j);
       float e2 = eff2->GetBinContent(i,j);
       e1 = e1/(1-fake->GetBinContent(i,j));

@@ -61,20 +61,20 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
   //eff and fake plots
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
-  gen2d = new TH2D("gen2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  reco2d = new TH2D("reco2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  recoNoFake2d = new TH2D("recoNoFake2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  recoMatched2d = new TH2D("recoMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  genMatched2d = new TH2D("genMatched2d","",s.ntrkBins,s.xtrkbins,6,0,6);
-  genMatchedMult2d = new TH2D("genMatchedMult2d","",s.ntrkBins,s.xtrkbins,6,0,6);
+  gen2d = new TH2D("gen2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  reco2d = new TH2D("reco2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  recoNoFake2d = new TH2D("recoNoFake2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  recoMatched2d = new TH2D("recoMatched2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  genMatched2d = new TH2D("genMatched2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
+  genMatchedMult2d = new TH2D("genMatchedMult2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
   TH1D *gen[6], *reco[6], *recoNoFake[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
   for(int c = 0; c<6; c++){
-    gen[c] = new TH1D(Form("gen_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    reco[c] = new TH1D(Form("reco_%d",c),"",s.ntrkBins,s.xtrkbins);
-    recoNoFake[c] = new TH1D(Form("recoNoFake_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    recoMatched[c] = new TH1D(Form("recoMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    genMatched[c] = new TH1D(Form("genMatched_%d",c),"",s.ntrkBins,s.xtrkbins); 
-    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d",c),"",s.ntrkBins,s.xtrkbins); 
+    gen[c] = new TH1D(Form("gen_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    reco[c] = new TH1D(Form("reco_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra);
+    recoNoFake[c] = new TH1D(Form("recoNoFake_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    recoMatched[c] = new TH1D(Form("recoMatched_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    genMatched[c] = new TH1D(Form("genMatched_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
   }
 
   int nTrk;

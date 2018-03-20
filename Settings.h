@@ -15,17 +15,17 @@ class Settings{
 
   std::string ppRefFile = "ppRef_March3_Pythia.root";
   std::string trkResFile = "resolutions_March3.root";
-  std::string trkCorrFile = "trkCorr_March5_wSpeciesCorr.root";
-  std::string trkCorrFile_noSpec = "trkCorr_Pythia_March5_CutIndex0.root";
-  std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_March5_CutIndex1.root";
-  std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_March5_CutIndex2.root";
-  std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_March5_CutIndex3.root";
+  std::string trkCorrFile = "trkCorr_March20_wSpeciesCorr.root";
+  std::string trkCorrFile_noSpec = "trkCorr_Pythia_March20_CutIndex0.root";
+  std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_March20_CutIndex1.root";
+  std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_March20_CutIndex2.root";
+  std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_March20_CutIndex3.root";
 
 
   static const int ntrkBins = 32;
   double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
-  static const int ntrkBins_extra = 21;
-  double xtrkbins_extra[ntrkBins_extra+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 ,  1.8 , 2.2 , 3.2 , 4.8 , 6.4 ,  9.6 , 14.4, 24.0, 35.2, 48.0,73.6,103.6,150};
+  static const int ntrkBins_extra = 19;
+  double xtrkbins_extra[ntrkBins_extra+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 2.0 , 2.4  , 4.0 , 5.6  , 7.2 , 12.0, 24.0, 41.6,103.6,150};
 
   static const int nCentBins = 33;
   int lowCentBin[nCentBins] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,0,6,10,2,6,10,14,16,0,0,14,0,10};

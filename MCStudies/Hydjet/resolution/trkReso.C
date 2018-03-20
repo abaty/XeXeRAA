@@ -16,13 +16,22 @@ void fillResoPoint(TH1D * r, int bin, std::string name){
   TH1D * h = (TH1D*)f->Get(Form("%s_%d",name.c_str(),bin));
 
   TF1 *f1 = new TF1("f1","gaus",0.97,1.03);
-  f1->SetParameter(0,h->GetEntries()/10.0);
+  //TF1 *f1 = new TF1("f1","[0]*TMath::Exp(-TMath::Power((x-[1]),2)/(2*[2]*[2]))+[3]*TMath::Exp(-TMath::Power((x-[1]),2)/(2*[4]*[4]))",0.97,1.03);
+  f1->SetParameter(0,h->GetEntries()/20.0);
   f1->SetParameter(1,1);
-  f1->SetParameter(2,0.02);
+  f1->SetParameter(2,0.01);
+  //f1->SetParameter(3,h->GetEntries()/20.0);
+  //f1->SetParameter(4,0.005);
+  f1->SetParLimits(0,0,9999999);
+  f1->SetParLimits(1,0.99,1.01);
+  f1->SetParLimits(2,0.009,0.02);
+  //f1->SetParLimits(3,0,9999999);
+  //f1->SetParLimits(4,0.005,0.009);
 
+  gStyle->SetOptFit(1);
   TCanvas * c = new TCanvas("c","c",400,400);
   h->Draw("p");
-  h->Fit("f1","EMR");
+  h->Fit("f1","IEMR");
 
   std::cout << f1->GetParameter(1) << " " << f1->GetParameter(2) << std::endl;
   std::cout << f1->GetParError(1) << " " << f1->GetParError(2) << std::endl;
