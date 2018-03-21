@@ -78,6 +78,16 @@ void RAA_plots(){
   gStyle->SetPadTickX(1);
  
   Settings s = Settings();
+  TGraphAsymmErrors * sumNcoll[s.ntrkBins];
+  TGraphAsymmErrors * sumNpart[s.ntrkBins];
+  TGraphAsymmErrors * sumNcollPb[s.ntrkBins];
+  TGraphAsymmErrors * sumNpartPb[s.ntrkBins];
+  for(int i = 0; i<s.ntrkBins; i++){
+    sumNcoll[i] = new TGraphAsymmErrors(6);
+    sumNpart[i] = new TGraphAsymmErrors(6);
+    sumNcollPb[i] = new TGraphAsymmErrors(6);
+    sumNpartPb[i] = new TGraphAsymmErrors(6);
+  }
 
   //loading 5.02 TeV PbPb
   TFile * f1 = TFile::Open("PbPbRAAs/HEPData-ins1496050-v2-root.root","read"); 
@@ -96,6 +106,11 @@ void RAA_plots(){
     PbPb_systLumi[i] = (TH1D*) f1->Get(Form("Table %d/Hist1D_y1_e4",i+8));
     for(int j = 1; j<PbPb[i]->GetSize(); j++){
       PbPb[i]->SetBinError(j,PbPb_stat[i]->GetBinContent(j));
+      if(i>5) continue;
+      sumNcollPb[j+1]->SetPoint(i,s.PbPbNcoll[i],PbPb[i]->GetBinContent(j));
+      sumNcollPb[j+1]->SetPointError(i,s.PbPbNcollErrD[i],s.PbPbNcollErrU[i],PbPb[i]->GetBinError(i),PbPb[i]->GetBinError(i));
+      sumNpartPb[j+1]->SetPoint(i,s.PbPbNpart[i],PbPb[i]->GetBinContent(j));
+      sumNpartPb[j+1]->SetPointError(i,s.PbPbNcollErrD[i],s.PbPbNcollErrU[i],PbPb[i]->GetBinError(i),PbPb[i]->GetBinError(i));
     }
   }//done loading PbPb
 
@@ -111,6 +126,18 @@ void RAA_plots(){
     h[c]->Scale(1.0/nVtx->GetBinContent(nVtx->GetXaxis()->FindBin(c)));
     h[c]->SetDirectory(0);
     h[c]->Print("All");
+    
+    //filling Graph
+    if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30) continue;
+    int cc = c;
+    if(c==23) cc=2;
+    if(c==24) cc=3;
+    if(c==25) cc=4;
+    if(c==30) cc=5;
+    for(int i = 1; i<h[c]->GetSize()-1; i++){
+      sumNcoll[i-1]->SetPoint(cc,s.XeXeNcoll[cc],h[c]->GetBinContent(i));
+      sumNpart[i-1]->SetPoint(cc,s.XeXeNpart[cc],h[c]->GetBinContent(i));
+    }
   }
   f->Close();
   
@@ -223,6 +250,18 @@ void RAA_plots(){
       b[i-1]->SetY2((h[c]->GetBinContent(i))*(1+XeXeRAA_totSyst[c]->GetBinContent(i)));
       if(c==30 && i>=29) continue;
       b[i-1]->Draw("same");
+      
+      if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30) continue;
+      int cc = c;
+      if(c==23) cc=2;
+      if(c==24) cc=3;
+      if(c==25) cc=4;
+      if(c==30) cc=5;
+      float err2 = TMath::Power(XeXeRAA_totSyst[c]->GetBinContent(i),2)+TMath::Power(TAAUncert,2)+TMath::Power(lumiUncert,2)+TMath::Power(h[c]->GetBinError(i)/h[c]->GetBinContent(i),2);
+      float err = TMath::Sqrt(err2)*h[c]->GetBinContent(i);
+      sumNcoll[i-1]->SetPointError(cc,s.XeXeNcollErr[cc],s.XeXeNcollErr[cc],err,err);
+      sumNpart[i-1]->SetPointError(cc,s.XeXeNpartErr[cc],s.XeXeNpartErr[cc],err,err);
+
     }
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       //PbPb syst error boxes    
@@ -301,5 +340,26 @@ void RAA_plots(){
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
     }
   }
+  sumNcoll[15]->Print("All");
+  sumNcoll[15]->Print("All");
+  TCanvas * c5 = new TCanvas("c5","c5",650,600);
+  sumNcoll[15]->SetFillColor(kRed-7);
+  sumNcoll[15]->GetYaxis()->SetRangeUser(0,1);
+  sumNcoll[15]->GetYaxis()->CenterTitle();
+  sumNcoll[15]->GetYaxis()->SetTitle("R*_{AA},R_{AA}");
+  sumNcoll[15]->GetXaxis()->SetTitle("#LTN_{coll}#GT");
+  sumNcoll[15]->GetXaxis()->CenterTitle();
+  sumNcoll[15]->SetLineWidth(2);
+  sumNcoll[15]->SetMarkerStyle(8);
+  sumNcoll[15]->SetMarkerSize(1.3);
+  sumNcoll[15]->Draw("A2P");
+  sumNcoll[15]->Draw("PX same");
+  lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
+  CMS_lumi( c5, 0, 11 );
+  c5->SaveAs("img/Summary_NColl.png");
+  c5->SaveAs("img/Summary_NColl.pdf");
+  c5->SaveAs("img/Summary_NColl.C");
+  sumNpart[15]->Print("All");
+  sumNpart[15]->Print("All");
 }
 
