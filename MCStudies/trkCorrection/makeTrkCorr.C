@@ -47,6 +47,8 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   efficiency2d->Divide(gen2d);  
   efficiency2d->Write();
 
+  TH2D * efficiency2d_statErr = (TH2D*)genMatched2d->Clone("efficiency2d_statErr");  
+
   TH1D * efficiency[6];
   TGraphAsymmErrors * effGraph[6];
   for(int c = 0; c<6; c++){
@@ -56,7 +58,14 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     effGraph[c] = new TGraphAsymmErrors();
     effGraph[c]->SetName(Form("effGraph_%d",c));
     effGraph[c]->BayesDivide(genMatched[c],gen[c]);
+    for(int i = 1; i<efficiency[c]->GetSize()-1; i++){
+      float y = efficiency[c]->GetBinContent(i);
+      float error = TMath::Max(TMath::Abs(effGraph[c]->GetErrorYhigh(i-1)/y),TMath::Abs(effGraph[c]->GetErrorYlow(i-1)/y));
+      efficiency2d_statErr->SetBinContent(i,c+1,error);
+      efficiency2d_statErr->SetBinError(i,c+1,0);
+    }
   }
+  efficiency2d_statErr->Write();
 
   //fake rate
   TH2D * fake2d = (TH2D*)recoNoFake2d->Clone("fake2d");  
@@ -211,6 +220,8 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   TH2D * eff2, *fake2, *eff3, *fake3;
   TH1D * eff1d;
 
+  TH2D * effStat;
+
   eff = (TH2D*)f1->Get("efficiency2d_Smoothed");
   effUnsmooth = (TH2D*)f1->Get("efficiency2d");
   eff2 = (TH2D*)f2->Get("efficiency2d");
@@ -224,6 +235,8 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   multiple = (TH2D*)f1->Get("multiple2d");
   
   eff1d = (TH1D*)f2->Get("efficiency_0");
+
+  effStat = (TH2D*)f1->Get("efficiency2d_statErr");
 
   TFile * output = TFile::Open("trkCorr_March20_wSpeciesCorr.root","recreate");
   eff->SetDirectory(output);
@@ -240,6 +253,9 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   sec->Write();
   secUnsmooth->Write();
   multiple->Write();
+
+  effStat->SetDirectory(output);
+  effStat->Write();
 
   TH2D * speciesCorr = (TH2D*)eff2->Clone("speciesCorr");
   TH2D * speciesCorrSyst = (TH2D*)eff2->Clone("speciesCorrSyst");

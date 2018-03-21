@@ -126,6 +126,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     s.HI_NoSpecCut1[c] = new TH1D(Form("HI_NoSpecCut1_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_NoSpecCut2[c] = new TH1D(Form("HI_NoSpecCut2_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_NoSpecCut3[c] = new TH1D(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
+    s.HI_NoSpec_EffUp1Sig[c] = new TH1D(Form("HI_NoSpec_EffUp1Sig_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_NoSpec_EffUp1Sig_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
     s.HI_smeared[c] = new TH1D(Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HIsmeared_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
 
     s.HI[c] = new TH1D(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]),s.ntrkBins,s.xtrkbins);
@@ -265,7 +266,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           eta[trkBinMap(hiBin,trkPt[j])][1]->Fill(trkEta[j],evtW);
           if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][1],phi[bin][1],trkPhi[j],DCAz[0][1],DCAz[bin][1],trkDz1[j]/trkDzError1[j],DCAxy[0][1],DCAxy[bin][1],trkDxy1[j]/trkDxyError1[j],nHit[0][1],nHit[bin][1],trkNHit[j],chi2[0][1],chi2[bin][1],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][1],ptErr[bin][1],trkPtError[j]/trkPt[j],caloMatch[0][1],caloMatch[bin][1],Et/trkPt[j],evtW); 
 
-          if(trkPtError[j]/trkPt[j]<0.025){
+          if(trkPtError[j]/trkPt[j]<0.015){
             eta[0][3]->Fill(trkEta[j],evtW);
             eta[trkBinMap(hiBin,trkPt[j])][3]->Fill(trkEta[j],evtW);
             if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][3],phi[bin][3],trkPhi[j],DCAz[0][3],DCAz[bin][3],trkDz1[j]/trkDzError1[j],DCAxy[0][3],DCAxy[bin][3],trkDxy1[j]/trkDxyError1[j],nHit[0][3],nHit[bin][3],trkNHit[j],chi2[0][3],chi2[bin][3],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][3],ptErr[bin][3],trkPtError[j]/trkPt[j],caloMatch[0][3],caloMatch[bin][3],Et/trkPt[j],evtW); 
@@ -289,7 +290,6 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(trkPtError[j]/trkPt[j]>0.1) continue;
 
         float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
-        if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         //lighter cuts
         if(trkPtError[j]/trkPt[j]<0.015){
@@ -320,6 +320,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
         float weight = trkCorr.getTrkCorr(trkPt[j],hiBin)*evtW;
         float weight_NoSpec = trkCorr_NoSpec.getTrkCorr(trkPt[j],hiBin)*evtW;
+        float weight_NoSpec_EffUp1Sig = trkCorr_NoSpec.getTrkCorr(trkPt[j],hiBin)*(1+trkCorr_NoSpec.getEffStatErr(trkPt[j],hiBin))*evtW;
         float smearPt = trkReso.getSmearing(trkPt[j]);
         float smearWeight = trkCorr.getTrkCorr(smearPt,hiBin)*evtW;
 
@@ -332,7 +333,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           
           s.HI_UpSpecCorr[c]->Fill(trkPt[j],(1.0/(1+trkCorr.getSpecCorrSyst(trkPt[j],hiBin)))*weight/binCenter);
           s.HI_UpFakeCorr[c]->Fill(trkPt[j],(1.0/(1-trkCorr.getFakeCorr(trkPt[j],hiBin)))*weight/binCenter);
-          
+ 
+          s.HI_NoSpec_EffUp1Sig[c]->Fill(trkPt[j],weight_NoSpec_EffUp1Sig/binCenter);   
+      
           s.HI_smeared[c]->Fill(smearPt,smearWeight/binCenter);
         }//cent bin loop
 
@@ -382,6 +385,9 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       
       s.HI_NoSpecCut3[c]->SetBinContent(i,s.HI_NoSpecCut3[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI_NoSpecCut3[c]->SetBinError(i,s.HI_NoSpecCut3[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
+      
+      s.HI_NoSpec_EffUp1Sig[c]->SetBinContent(i,s.HI_NoSpec_EffUp1Sig[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
+      s.HI_NoSpec_EffUp1Sig[c]->SetBinError(i,s.HI_NoSpec_EffUp1Sig[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));
       
       s.HI_UpSpecCorr[c]->SetBinContent(i,s.HI_UpSpecCorr[c]->GetBinContent(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1]))); 
       s.HI_UpSpecCorr[c]->SetBinError(i,s.HI_UpSpecCorr[c]->GetBinError(i)/(2*s.etaCut*2*TMath::Pi()*(s.xtrkbins[i]-s.xtrkbins[i-1])));

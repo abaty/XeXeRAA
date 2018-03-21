@@ -43,6 +43,7 @@ class Settings{
   TH1D * HI_NoSpecCut1[nCentBins]; 
   TH1D * HI_NoSpecCut2[nCentBins]; 
   TH1D * HI_NoSpecCut3[nCentBins]; 
+  TH1D * HI_NoSpec_EffUp1Sig[nCentBins]; 
 
   TH1D * HI[nCentBins]; 
   TH1D * HI_TaaWeighted[nCentBins]; 

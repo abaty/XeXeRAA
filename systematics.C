@@ -323,6 +323,8 @@ void systematics(){
     s.HI_NoSpecCut2[c]->Divide(s.HI_NoSpec[c]);
     s.HI_NoSpecCut3[c] = (TH1D*)input->Get(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut3[c]->Divide(s.HI_NoSpec[c]);
+    s.HI_NoSpec_EffUp1Sig[c] = (TH1D*)input->Get(Form("HI_NoSpec_EffUp1Sig_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpec_EffUp1Sig[c]->Divide(s.HI_NoSpec[c]);
 
     //finish fixing evt sel comparison
     evtSelVar1Fit[c] = new TF1(Form("evtSelVar1Fit_%d",c),"[0]",0.7,8);
@@ -425,8 +427,9 @@ void systematics(){
       total2 += TMath::Power(s.HI_UpFakeCorr[i]->GetBinContent(j)-1,2);
       
       //efficiency uncertainty from MC stats
-      spec_EffMethod[i]->SetBinContent(j,0.04);
-      total2 += TMath::Power(0.04,2);
+      float effStat = s.HI_NoSpec_EffUp1Sig[i]->GetBinContent(j)-1;
+      spec_EffMethod[i]->SetBinContent(j,effStat);
+      total2 += TMath::Power(effStat,2);
 
       //resolution is a flat 0.5%
       spec_reso[i]->SetBinContent(j,0.005);

@@ -7,12 +7,13 @@
 class TrackingCorrection{
 
   public:
-    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr, bool doSmoothedfake, bool doSmoothedEff);
+    TrackingCorrection(std::string file, bool isSmoothed, bool isSpeciesCorr, bool doSmoothedfake, bool doSmoothedEff, bool getStatErr);
     ~TrackingCorrection();
 
     float getTrkCorr(float pt, int cent);
     float getSpecCorrSyst(float pt, int cent);
     float getFakeCorr(float pt, int cent);
+    float getEffStatErr(float pt, int cent);
 
   private:
     bool hasSpeciesCorr;
@@ -22,6 +23,7 @@ class TrackingCorrection{
     TH2D * sec;
     TH2D * speciesCorr;
     TH2D * speciesCorrSyst;
+    TH2D * effStatErr;
 
      int centBin(int b);
 };
@@ -60,6 +62,16 @@ float TrackingCorrection::getFakeCorr(float pt, int cent){
   return fake->GetBinContent(p,c); 
 }
 
+float TrackingCorrection::getEffStatErr(float pt, int cent){
+  if(pt<0.5 || pt> 103.6) return 1;
+  if(cent<0 || cent>199) return 1;
+
+  int bin = centBin(cent);
+  int p = eff->GetXaxis()->FindBin(pt);
+  int c = eff->GetYaxis()->FindBin(bin);
+  return effStatErr->GetBinContent(p,c); 
+}
+
 float TrackingCorrection::getTrkCorr(float pt, int cent){
   if(pt<0.5 || pt> 103.6) return 1;
   if(cent<0 || cent>199) return 1;
@@ -80,7 +92,7 @@ float TrackingCorrection::getTrkCorr(float pt, int cent){
   return species*(1-f)*(1-s)/(e);
 }
 
-TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true, bool isSpeciesCorr = true, bool doSmoothedFake = true, bool doSmoothedEff = true){
+TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true, bool isSpeciesCorr = true, bool doSmoothedFake = true, bool doSmoothedEff = true, bool getStatErr = true){
   hasSpeciesCorr = isSpeciesCorr;
 
   TFile * corr = TFile::Open(file.c_str(),"read");
@@ -100,6 +112,11 @@ TrackingCorrection::TrackingCorrection(std::string file, bool isSmoothed = true,
     speciesCorr = (TH2D*)corr->Get("speciesCorr");
     speciesCorrSyst = (TH2D*)corr->Get("speciesCorrSyst");
   }
+
+  if(getStatErr){
+    effStatErr = (TH2D*)corr->Get("efficiency2d_statErr");
+  }
+
 }
 
 TrackingCorrection::~TrackingCorrection(){
