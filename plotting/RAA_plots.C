@@ -78,15 +78,19 @@ void RAA_plots(){
   gStyle->SetPadTickX(1);
  
   Settings s = Settings();
-  TGraphAsymmErrors * sumNcoll[s.ntrkBins];
-  TGraphAsymmErrors * sumNpart[s.ntrkBins];
-  TGraphAsymmErrors * sumNcollPb[s.ntrkBins];
-  TGraphAsymmErrors * sumNpartPb[s.ntrkBins];
+  TGraphAsymmErrors * sumNcoll[2][s.ntrkBins];
+  TGraphAsymmErrors * sumNpart[2][s.ntrkBins];
+  TGraphAsymmErrors * sumNcollPb[2][s.ntrkBins];
+  TGraphAsymmErrors * sumNpartPb[2][s.ntrkBins];
   for(int i = 0; i<s.ntrkBins; i++){
-    sumNcoll[i] = new TGraphAsymmErrors(6);
-    sumNpart[i] = new TGraphAsymmErrors(6);
-    sumNcollPb[i] = new TGraphAsymmErrors(6);
-    sumNpartPb[i] = new TGraphAsymmErrors(6);
+    sumNcoll[0][i] = new TGraphAsymmErrors(6);
+    sumNpart[0][i] = new TGraphAsymmErrors(6);
+    sumNcollPb[0][i] = new TGraphAsymmErrors(6);
+    sumNpartPb[0][i] = new TGraphAsymmErrors(6);
+    sumNcoll[1][i] = new TGraphAsymmErrors(6);
+    sumNpart[1][i] = new TGraphAsymmErrors(6);
+    sumNcollPb[1][i] = new TGraphAsymmErrors(6);
+    sumNpartPb[1][i] = new TGraphAsymmErrors(6);
   }
 
   //loading 5.02 TeV PbPb
@@ -107,10 +111,18 @@ void RAA_plots(){
     for(int j = 1; j<PbPb[i]->GetSize(); j++){
       PbPb[i]->SetBinError(j,PbPb_stat[i]->GetBinContent(j));
       if(i>5) continue;
-      sumNcollPb[j+1]->SetPoint(i,s.PbPbNcoll[i],PbPb[i]->GetBinContent(j));
-      sumNcollPb[j+1]->SetPointError(i,s.PbPbNcollErrD[i],s.PbPbNcollErrU[i],PbPb[i]->GetBinError(i),PbPb[i]->GetBinError(i));
-      sumNpartPb[j+1]->SetPoint(i,s.PbPbNpart[i],PbPb[i]->GetBinContent(j));
-      sumNpartPb[j+1]->SetPointError(i,s.PbPbNcollErrD[i],s.PbPbNcollErrU[i],PbPb[i]->GetBinError(i),PbPb[i]->GetBinError(i));
+      float err2U = TMath::Power(PbPb_systLumi[i]->GetBinContent(j),2)+TMath::Power(PbPb_syst[i]->GetBinContent(j),2)+TMath::Power(PbPb_systTAAU[i]->GetBinContent(j),2);
+      float err2D = TMath::Power(PbPb_systLumi[i]->GetBinContent(j),2)+TMath::Power(PbPb_syst[i]->GetBinContent(j),2)+TMath::Power(PbPb_systTAAD[i]->GetBinContent(j),2);
+
+      if(j>s.ntrkBins-3) continue;
+      sumNcollPb[0][j+1]->SetPoint(i,s.PbPbNcoll[i],PbPb[i]->GetBinContent(j));
+      sumNcollPb[0][j+1]->SetPointError(i,s.PbPbNcollErrD[i],s.PbPbNcollErrU[i],TMath::Sqrt(err2D),TMath::Sqrt(err2U));
+      sumNpartPb[0][j+1]->SetPoint(i,s.PbPbNpart[i],PbPb[i]->GetBinContent(j));
+      sumNpartPb[0][j+1]->SetPointError(i,s.PbPbNpartErrD[i],s.PbPbNpartErrU[i],TMath::Sqrt(err2D),TMath::Sqrt(err2U));
+      sumNcollPb[1][j+1]->SetPoint(i,s.PbPbNcoll[i],PbPb[i]->GetBinContent(j));
+      sumNcollPb[1][j+1]->SetPointError(i,0,0,PbPb_stat[i]->GetBinContent(j),PbPb_stat[i]->GetBinContent(j));
+      sumNpartPb[1][j+1]->SetPoint(i,s.PbPbNpart[i],PbPb[i]->GetBinContent(j));
+      sumNpartPb[1][j+1]->SetPointError(i,0,0,PbPb_stat[i]->GetBinContent(j),PbPb_stat[i]->GetBinContent(j));
     }
   }//done loading PbPb
 
@@ -135,8 +147,10 @@ void RAA_plots(){
     if(c==25) cc=4;
     if(c==30) cc=5;
     for(int i = 1; i<h[c]->GetSize()-1; i++){
-      sumNcoll[i-1]->SetPoint(cc,s.XeXeNcoll[cc],h[c]->GetBinContent(i));
-      sumNpart[i-1]->SetPoint(cc,s.XeXeNpart[cc],h[c]->GetBinContent(i));
+      sumNcoll[0][i-1]->SetPoint(cc,s.XeXeNcoll[cc],h[c]->GetBinContent(i));
+      sumNpart[0][i-1]->SetPoint(cc,s.XeXeNpart[cc],h[c]->GetBinContent(i));
+      sumNcoll[1][i-1]->SetPoint(cc,s.XeXeNcoll[cc],h[c]->GetBinContent(i));
+      sumNpart[1][i-1]->SetPoint(cc,s.XeXeNpart[cc],h[c]->GetBinContent(i));
     }
   }
   f->Close();
@@ -257,10 +271,12 @@ void RAA_plots(){
       if(c==24) cc=3;
       if(c==25) cc=4;
       if(c==30) cc=5;
-      float err2 = TMath::Power(XeXeRAA_totSyst[c]->GetBinContent(i),2)+TMath::Power(TAAUncert,2)+TMath::Power(lumiUncert,2)+TMath::Power(h[c]->GetBinError(i)/h[c]->GetBinContent(i),2);
+      float err2 = TMath::Power(XeXeRAA_totSyst[c]->GetBinContent(i),2)+TMath::Power(TAAUncert,2)+TMath::Power(lumiUncert,2);
       float err = TMath::Sqrt(err2)*h[c]->GetBinContent(i);
-      sumNcoll[i-1]->SetPointError(cc,s.XeXeNcollErr[cc],s.XeXeNcollErr[cc],err,err);
-      sumNpart[i-1]->SetPointError(cc,s.XeXeNpartErr[cc],s.XeXeNpartErr[cc],err,err);
+      sumNcoll[0][i-1]->SetPointError(cc,s.XeXeNcollErr[cc],s.XeXeNcollErr[cc],err,err);
+      sumNpart[0][i-1]->SetPointError(cc,s.XeXeNpartErr[cc],s.XeXeNpartErr[cc],err,err);
+      sumNcoll[1][i-1]->SetPointError(cc,0,0,h[c]->GetBinError(i),h[c]->GetBinError(i));
+      sumNpart[1][i-1]->SetPointError(cc,0,0,h[c]->GetBinError(i),h[c]->GetBinError(i));
 
     }
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
@@ -340,26 +356,120 @@ void RAA_plots(){
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
     }
   }
-  sumNcoll[15]->Print("All");
-  sumNcoll[15]->Print("All");
-  TCanvas * c5 = new TCanvas("c5","c5",650,600);
-  sumNcoll[15]->SetFillColor(kRed-7);
-  sumNcoll[15]->GetYaxis()->SetRangeUser(0,1);
-  sumNcoll[15]->GetYaxis()->CenterTitle();
-  sumNcoll[15]->GetYaxis()->SetTitle("R*_{AA},R_{AA}");
-  sumNcoll[15]->GetXaxis()->SetTitle("#LTN_{coll}#GT");
-  sumNcoll[15]->GetXaxis()->CenterTitle();
-  sumNcoll[15]->SetLineWidth(2);
-  sumNcoll[15]->SetMarkerStyle(8);
-  sumNcoll[15]->SetMarkerSize(1.3);
-  sumNcoll[15]->Draw("A2P");
-  sumNcoll[15]->Draw("PX same");
-  lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-  CMS_lumi( c5, 0, 11 );
-  c5->SaveAs("img/Summary_NColl.png");
-  c5->SaveAs("img/Summary_NColl.pdf");
-  c5->SaveAs("img/Summary_NColl.C");
-  sumNpart[15]->Print("All");
-  sumNpart[15]->Print("All");
+
+  for(int i = 2; i<s.ntrkBins; i++){ 
+    TCanvas * c5 = new TCanvas("c5","c5",650,600);
+    sumNcoll[0][i]->SetFillColor(kRed-7);
+    sumNcoll[0][i]->SetLineWidth(1);
+    sumNcoll[0][i]->SetMarkerStyle(8);
+    sumNcoll[0][i]->SetMarkerSize(1.3);
+
+    sumNcoll[1][i]->SetLineWidth(1);
+    sumNcoll[1][i]->SetMarkerStyle(8);
+    sumNcoll[1][i]->SetMarkerSize(1.3);
+
+    sumNcollPb[0][i]->GetYaxis()->SetRangeUser(0,1.2);
+    sumNcollPb[0][i]->GetXaxis()->SetRangeUser(-500,2100);
+    sumNcollPb[0][i]->GetYaxis()->CenterTitle();
+    sumNcollPb[0][i]->GetYaxis()->SetTitle("R*_{AA}, R_{AA}");
+    sumNcollPb[0][i]->GetXaxis()->SetTitle("#LTN_{coll}#GT");
+    sumNcollPb[0][i]->GetXaxis()->CenterTitle();
+    sumNcollPb[0][i]->GetXaxis()->SetNdivisions(505);
+    sumNcollPb[0][i]->SetLineColor(kBlue);
+    sumNcollPb[0][i]->SetFillColor(kBlue);
+    sumNcollPb[0][i]->SetFillStyle(0);
+    sumNcollPb[0][i]->SetLineWidth(1);
+    sumNcollPb[0][i]->SetFillStyle(0);
+    sumNcollPb[0][i]->SetMarkerStyle(24);
+    sumNcollPb[0][i]->SetMarkerColor(kBlue);
+    sumNcollPb[0][i]->SetMarkerSize(1.3);
+    sumNcollPb[1][i]->SetLineWidth(1);
+    sumNcollPb[1][i]->SetLineColor(kBlue);
+    sumNcollPb[1][i]->SetMarkerColor(kBlue);
+    sumNcollPb[1][i]->SetMarkerStyle(24);
+    sumNcollPb[1][i]->SetMarkerSize(1.3);
+
+    sumNcollPb[0][i]->Draw("A2");
+    sumNcoll[0][i]->Draw("same 2");
+    sumNcollPb[0][i]->Draw("same 2");
+    sumNcoll[1][i]->Draw("same PZ");
+    sumNcollPb[1][i]->Draw("same PZ");
+
+    gStyle->SetLegendBorderSize(0);
+    TLegend * leg5 = new TLegend(0.4,0.6,0.9,0.9);
+    leg5->SetTextSize(0.05);
+    leg5->AddEntry(sumNcoll[0][i],"5.44 TeV XeXe R*_{AA}","pf");
+    leg5->AddEntry(sumNcollPb[0][i],"5.02 TeV PbPb R_{AA}","pf");
+    leg5->AddEntry((TObject*)0,"|#eta| < 1","");
+    leg5->AddEntry((TObject*)0,Form("%.1f #leq p_{T} < %.1f GeV",h[0]->GetXaxis()->GetBinLowEdge(i+1),h[0]->GetXaxis()->GetBinLowEdge(i+2)),"");
+    leg5->SetFillStyle(0);
+    leg5->Draw("same");
+
+    lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
+    CMS_lumi( c5, 0, 11 );
+    c5->SaveAs(Form("img/Summary_NColl_%d.png",i));
+    c5->SaveAs(Form("img/Summary_NColl_%d.pdf",i));
+    c5->SaveAs(Form("img/Summary_NColl_%d.C",i));
+    //sumNpart[15]->Print("All");
+    //sumNpart[15]->Print("All");
+    delete c5;
+  }
+  for(int i = 2; i<s.ntrkBins; i++){ 
+    TCanvas * c5 = new TCanvas("c5","c5",650,600);
+    sumNpart[0][i]->SetFillColor(kRed-7);
+    sumNpart[0][i]->SetLineWidth(1);
+    sumNpart[0][i]->SetMarkerStyle(8);
+    sumNpart[0][i]->SetMarkerSize(1.3);
+
+    sumNpart[1][i]->SetLineWidth(1);
+    sumNpart[1][i]->SetMarkerStyle(8);
+    sumNpart[1][i]->SetMarkerSize(1.3);
+
+    sumNpartPb[0][i]->GetYaxis()->SetRangeUser(0,1.2);
+    sumNpartPb[0][i]->GetXaxis()->SetRangeUser(-500,2100);
+    sumNpartPb[0][i]->GetYaxis()->CenterTitle();
+    sumNpartPb[0][i]->GetYaxis()->SetTitle("R*_{AA}, R_{AA}");
+    sumNpartPb[0][i]->GetXaxis()->SetTitle("#LTN_{part}#GT");
+    sumNpartPb[0][i]->GetXaxis()->CenterTitle();
+    sumNpartPb[0][i]->GetXaxis()->SetNdivisions(505);
+    sumNpartPb[0][i]->SetLineColor(kBlue);
+    sumNpartPb[0][i]->SetFillColor(kBlue);
+    sumNpartPb[0][i]->SetFillStyle(0);
+    sumNpartPb[0][i]->SetLineWidth(1);
+    sumNpartPb[0][i]->SetFillStyle(0);
+    sumNpartPb[0][i]->SetMarkerStyle(24);
+    sumNpartPb[0][i]->SetMarkerColor(kBlue);
+    sumNpartPb[0][i]->SetMarkerSize(1.3);
+    sumNpartPb[1][i]->SetLineWidth(1);
+    sumNpartPb[1][i]->SetLineColor(kBlue);
+    sumNpartPb[1][i]->SetMarkerColor(kBlue);
+    sumNpartPb[1][i]->SetMarkerStyle(24);
+    sumNpartPb[1][i]->SetMarkerSize(1.3);
+
+    sumNpartPb[0][i]->Draw("A2");
+    sumNpart[0][i]->Draw("same 2");
+    sumNpartPb[0][i]->Draw("same 2");
+    sumNpart[1][i]->Draw("same PZ");
+    sumNpartPb[1][i]->Draw("same PZ");
+
+    gStyle->SetLegendBorderSize(0);
+    TLegend * leg5 = new TLegend(0.4,0.6,0.9,0.9);
+    leg5->SetTextSize(0.05);
+    leg5->AddEntry(sumNpart[0][i],"5.44 TeV XeXe R*_{AA}","pf");
+    leg5->AddEntry(sumNpartPb[0][i],"5.02 TeV PbPb R_{AA}","pf");
+    leg5->AddEntry((TObject*)0,"|#eta| < 1","");
+    leg5->AddEntry((TObject*)0,Form("%.1f #leq p_{T} < %.1f GeV",h[0]->GetXaxis()->GetBinLowEdge(i+1),h[0]->GetXaxis()->GetBinLowEdge(i+2)),"");
+    leg5->SetFillStyle(0);
+    leg5->Draw("same");
+
+    lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
+    CMS_lumi( c5, 0, 11 );
+    c5->SaveAs(Form("img/Summary_NPart_%d.png",i));
+    c5->SaveAs(Form("img/Summary_NPart_%d.pdf",i));
+    c5->SaveAs(Form("img/Summary_NPart_%d.C",i));
+    //sumNpart[15]->Print("All");
+    //sumNpart[15]->Print("All");
+    delete c5;
+  }
 }
 
