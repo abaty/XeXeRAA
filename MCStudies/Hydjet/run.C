@@ -12,6 +12,19 @@
 #include "evtWeights/evtWeights.h"
 #include "TMath.h"
 
+bool isPrimary(float p){
+  p = TMath::Abs(p);
+  if(TMath::Abs(p-221)<0.1) return true;
+  if(TMath::Abs(p-223)<0.1) return true;
+  if(TMath::Abs(p-333)<0.1) return true;
+  if(TMath::Abs(p-113)<0.1) return true;
+  if(TMath::Abs(p-213)<0.1) return true;
+  if(TMath::Abs(p-313)<0.1) return true;
+  if(TMath::Abs(p-323)<0.1) return true;
+  if(TMath::Abs(p-331)<0.1) return true;
+  return false;
+}
+
 int centBin(int b){
   if(b<10) return 0;
   else if(b<20) return 1;
@@ -68,6 +81,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   genMatched2d = new TH2D("genMatched2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
   genMatchedMult2d = new TH2D("genMatchedMult2d_0","",s.ntrkBins_extra,s.xtrkbins_extra,6,0,6);
   TH1D *gen[6], *reco[6], *recoNoFake[6], *recoMatched[6], *genMatched[6], *genMatchedMult[6];
+  TH1D *secondaryMoms[6], *genPartComp[6];
   for(int c = 0; c<6; c++){
     gen[c] = new TH1D(Form("gen_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
     reco[c] = new TH1D(Form("reco_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra);
@@ -75,6 +89,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     recoMatched[c] = new TH1D(Form("recoMatched_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
     genMatched[c] = new TH1D(Form("genMatched_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
     genMatchedMult[c] = new TH1D(Form("genMatchedMult_%d_0",c),"",s.ntrkBins_extra,s.xtrkbins_extra); 
+    secondaryMoms[c] = new TH1D(Form("secondaryMoms_%d",c),"",3500,0,3500);
+    genPartComp[c] = new TH1D(Form("genPartComp_%d",c),"",3500,0,3500);
   }
 
   int nTrk;
@@ -83,6 +99,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   int vtx;
   int beam;
   int hfCoinc;
+  float trkMPId[50000];
   float trkPt[50000];
   float trkPtError[50000];
   float trkEta[50000];
@@ -102,6 +119,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   //gen
   int nParticle;
   float pPt[100000];
+  int pPId[100000];
   float pEta[100000];
   float mtrkPt[100000];
   float mtrkPtError[100000];
@@ -117,6 +135,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   float mtrkPfEcal[100000];
   float mtrkPfHcal[100000];
   int pNRec[100000];
+  int pStatus[100000];
 
   for(unsigned int f = 0; f<fileList.size(); f++){
   //for(unsigned int f = 0; f<10; f++){
@@ -146,6 +165,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("trkNlayer",&trkNlayer);
     trk->SetBranchAddress("trkNdof",&trkNdof);
     trk->SetBranchAddress("trkNHit",&trkNHit);
+    trk->SetBranchAddress("trkMPId",&trkMPId);
+    trk->SetBranchAddress("pPId",&pPId);
     trk->SetBranchAddress("trkStatus",&trkStatus);
     trk->SetBranchAddress("pfEcal",pfEcal);
     trk->SetBranchAddress("pfHcal",pfHcal);
@@ -167,6 +188,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("mtrkPfEcal",mtrkPfEcal);
     trk->SetBranchAddress("mtrkPfHcal",mtrkPfHcal);
     trk->SetBranchAddress("pNRec",pNRec);
+    trk->SetBranchAddress("pStatus",pStatus);
  
     for(int i = 0; i<trk->GetEntries(); i++){
       if(i%100==0) std::cout << i << "/" << trk->GetEntries() << std::endl;
@@ -350,17 +372,21 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           recoNoFake2d->Fill(trkPt[j],centBin(hiBin),w);
           recoNoFake[centBin(hiBin)]->Fill(trkPt[j],w);
         }
-        if(trkStatus[j]==1){
+        if(trkStatus[j]==1 || isPrimary(trkMPId[j])){
           recoMatched2d->Fill(trkPt[j],centBin(hiBin),w);
           recoMatched[centBin(hiBin)]->Fill(trkPt[j],w);
         }
+        secondaryMoms[centBin(hiBin)]->Fill((trkMPId[j]==-999 ? 0 : TMath::Abs(trkMPId[j])),w);
       }//end of reco tracking stuff
 
       //gen particle loop
       for(int j = 0; j<nParticle; j++){
         if(TMath::Abs(pEta[j])>s.etaCut) continue;
+        if(pStatus[j]==2) continue;
         gen2d->Fill(pPt[j],centBin(hiBin),w);
         gen[centBin(hiBin)]->Fill(pPt[j],w);
+
+        genPartComp[centBin(hiBin)]->Fill(TMath::Abs(pPId[j]),w);
         
         if(mtrkPt[j]<=0) continue;//only matched gen particles
         if(!mhighPurity[j]) continue;
