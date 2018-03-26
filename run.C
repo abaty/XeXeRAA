@@ -104,7 +104,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
   TH1D *nHit[17][4], *chi2[17][4], *DCAz[17][4], *DCAxy[17][4], *ptErr[17][4], *eta[17][4], *phi[17][4], *caloMatch[17][4];
-  TH1D * dz_expanded[s.ntrkBins][6], * d0_expanded[s.ntrkBins][6];
+  TH1D * dz_expanded[s.ntrkBins][8], * d0_expanded[s.ntrkBins][8];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
       for(int c2 = 0; c2<4; c2++){
@@ -119,7 +119,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       }
     }
     for(int c = 0; c<s.ntrkBins; c++){
-      for(int i = 0; i<6; i++){
+      for(int i = 0; i<8; i++){
         dz_expanded[c][i] = new TH1D(Form("dz_expanded_%d_%d",i,c),";#delta z",150,-30,30);
         d0_expanded[c][i] = new TH1D(Form("d0_expanded_%d_%d",i,c),";#delta z",150,-30,30);
       }
@@ -272,8 +272,16 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             if(hiBin>=60 && hiBin<100) centBin=3;
             if(hiBin>=100 && hiBin<140) centBin=4;
             if(hiBin>=140 && hiBin<200) centBin=5;
-            if(TMath::Abs(trkDxy1[j]/trkDxyError1[j])<3) dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDz1[j]/trkDzError1[j],evtW);
-            if(TMath::Abs(trkDz1[j]/trkDzError1[j])<3) d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+            if(TMath::Abs(trkDxy1[j]/trkDxyError1[j])<3){
+              dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDz1[j]/trkDzError1[j],evtW);
+              if(centBin<2) dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][6]->Fill(trkDz1[j]/trkDzError1[j],evtW);
+              dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDz1[j]/trkDzError1[j],evtW);
+            }
+            if(TMath::Abs(trkDz1[j]/trkDzError1[j])<3){
+              d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+              if(centBin<2) d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][6]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+              d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+            }
           }
   
           eta[0][0]->Fill(trkEta[j],evtW);

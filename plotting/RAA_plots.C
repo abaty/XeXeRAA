@@ -157,10 +157,13 @@ void RAA_plots(){
   
   TFile * sysFile = TFile::Open("../systematics.root","read");
   TH1D * XeXeRAA_totSyst[s.nCentBins];
+  TH1D * evtSelSyst[s.nCentBins];
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
     XeXeRAA_totSyst[c] = (TH1D*)sysFile->Get(Form("RAA_Total_%d",c));
     XeXeRAA_totSyst[c]->SetDirectory(0);
+    evtSelSyst[c] = (TH1D*)sysFile->Get(Form("RAA_EventSelection_%d",c));
+    evtSelSyst[c]->SetDirectory(0);
   }
 
   setTDRStyle();
@@ -234,14 +237,16 @@ void RAA_plots(){
     h[c]->Draw();
 
     
+    float lumiUncert = 0.023;//2.3% for pp lumi
     float TAAUncert = s.TAAuncert[c]/100.0;
-    float lumiUncert = 0.023;//12% for pp lumi
+    float evtSel = evtSelSyst[c]->GetBinContent(2);
+    float totUncert = TMath::Power(lumiUncert*lumiUncert+TAAUncert*TAAUncert+evtSel*evtSel,0.5);
     bLumi->SetFillColor(kGray);
-    bTAA->SetFillColor(kBlue-9);
+    bTAA->SetFillColor(kRed+1);
     bLumi->SetLineWidth(0);
     bTAA->SetLineWidth(0);
-    bTAA->DrawBox(0.55,1-TAAUncert,TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.775)-TMath::Log10(0.55))/2.0),1+TAAUncert);
-    bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.775)-TMath::Log10(0.55))/2.0),1-lumiUncert,0.775,1+lumiUncert);
+    bTAA->DrawBox(0.55,1-totUncert,TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.75)-TMath::Log10(0.55))/2.0),1+totUncert);
+    //bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.75)-TMath::Log10(0.55))/2.0),1-lumiUncert,0.75,1+lumiUncert);
       
 
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
@@ -253,8 +258,9 @@ void RAA_plots(){
     tex2->DrawLatex(0.9,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.095);
-    tex->DrawLatex(0.8,1.04,"XeXe T_{AA} and pp lumi. uncertainty");
-    tex->DrawLatex(0.8,0.92,"|#eta| < 1");
+    //tex->DrawLatex(0.8,1.04,"XeXe T_{AA} and pp lumi. uncertainty");
+    tex->DrawLatex(0.7,1.04,"Normalization uncertainty");
+    tex->DrawLatex(0.7,0.92,"|#eta| < 1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);
@@ -271,7 +277,7 @@ void RAA_plots(){
       if(c==24) cc=3;
       if(c==25) cc=4;
       if(c==30) cc=5;
-      float err2 = TMath::Power(XeXeRAA_totSyst[c]->GetBinContent(i),2)+TMath::Power(TAAUncert,2)+TMath::Power(lumiUncert,2);
+      float err2 = TMath::Power(XeXeRAA_totSyst[c]->GetBinContent(i),2)+TMath::Power(totUncert,2);
       float err = TMath::Sqrt(err2)*h[c]->GetBinContent(i);
       sumNcoll[0][i-1]->SetPointError(cc,s.XeXeNcollErr[cc],s.XeXeNcollErr[cc],err,err);
       sumNpart[0][i-1]->SetPointError(cc,s.XeXeNpartErr[cc],s.XeXeNpartErr[cc],err,err);

@@ -38,7 +38,7 @@ void spectra_plots(){
   TFile * fpp = TFile::Open(Form("../%s",s.ppRefFile.c_str()),"read");
   ppSpec = (TH1D*)fpp->Get("ppScaled_WithFit");
   ppSpec->SetDirectory(0);
-  pp_totSyst = (TH1D*)fpp->Get("ppScaledSyst");
+  pp_totSyst = (TH1D*)fpp->Get("ppScaledSyst_NoLumi");
   pp_totSyst->SetLineColor(kBlack);
   pp_totSyst->SetLineWidth(2);
   pp_totSyst->SetFillStyle(3003);
@@ -61,12 +61,15 @@ void spectra_plots(){
 
   TFile * sysFile = TFile::Open("../systematics.root","read");
   TH1D * XeXe_totSyst[s.nCentBins];
+  TH1D * evtSelSyst[s.nCentBins];
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
     XeXe_totSyst[c] = (TH1D*)sysFile->Get(Form("spec_Total_%d",c));
     XeXe_totSyst[c]->SetDirectory(0);
     XeXe_totSyst[c]->SetLineColor(kBlack);
     XeXe_totSyst[c]->SetLineWidth(2);
+    evtSelSyst[c] = (TH1D*)sysFile->Get(Form("spec_EventSelection_%d",c));
+    evtSelSyst[c]->SetDirectory(0);
   }
   
   //pp systematic
@@ -115,7 +118,7 @@ void spectra_plots(){
   ppSpecD->GetYaxis()->CenterTitle();
   ppSpecD->GetYaxis()->SetLabelOffset(0.002);
   ppSpecD->GetYaxis()->SetRangeUser(1.1e-13,1e4);
-  ppSpecD->GetXaxis()->SetRangeUser(0.4,150);
+  ppSpecD->GetXaxis()->SetRangeUser(0.4,350);
   ppSpecD->Draw();
 
   ppSpec->SetMarkerStyle(5);
@@ -165,7 +168,7 @@ void spectra_plots(){
   h[30]->Draw("same");
 
 
-  TLegend * specLeg = new TLegend(0.25,0.1,0.55,0.5);
+  TLegend * specLeg = new TLegend(0.2,0.05,0.55,0.5);
   //specLeg->SetFillStyle(0);
   specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   specLeg->AddEntry(h[0],Form("0-5%s (x10)","%"),"p");  
@@ -181,7 +184,7 @@ void spectra_plots(){
   pad2->cd();
   pad2->SetLogx();
   TH1D * ppSpecD2 = new TH1D("specDummy2","",3,0.4,150);
-  ppSpecD2->GetYaxis()->SetRangeUser(0.0,39.99);
+  ppSpecD2->GetYaxis()->SetRangeUser(0.0,29.999);
   ppSpecD2->GetYaxis()->SetNdivisions(4,4,0,kTRUE);
   ppSpecD2->GetYaxis()->SetTitleOffset(0.6);
   ppSpecD2->GetYaxis()->SetTitleFont(42);
@@ -189,7 +192,7 @@ void spectra_plots(){
   ppSpecD2->GetYaxis()->SetLabelSize(0.095);
   ppSpecD2->GetXaxis()->SetTitleFont(42);
   ppSpecD2->GetYaxis()->SetTitle(Form("Syst. uncert. (%s)","%"));
-  ppSpecD2->GetXaxis()->SetRangeUser(0.4,150);
+  ppSpecD2->GetXaxis()->SetRangeUser(0.4,350);
   ppSpecD2->GetXaxis()->SetTitle("p_{T} (GeV)");
   ppSpecD2->GetXaxis()->SetTitleSize(0.1);
   ppSpecD2->GetXaxis()->SetLabelSize(0.1);
@@ -222,11 +225,39 @@ void spectra_plots(){
   pp_totSyst->GetXaxis()->SetRangeUser(0.5,150);
   pp_totSyst->Scale(100);
   pp_totSyst->Draw("same");
-  TLegend * systLeg = new TLegend(0.5,0.6,0.8,0.98);
-  //systLeg->SetFillStyle(0);
+
+  //normalization
+  TH1D * ppNorm = new TH1D("ppNorm","",2,110,140);
+  ppNorm->SetBinContent(1,2.3);
+  ppNorm->SetBinContent(2,0);
+  ppNorm->SetFillColor(kBlack);
+  ppNorm->SetFillStyle(3003);
+  ppNorm->SetLineWidth(2);
+  ppNorm->Draw("same hist");
+  TH1D * centNorm = new TH1D("centNorm","",2,125,165);
+  centNorm->SetBinContent(1,evtSelSyst[0]->GetBinContent(2)*100);
+  centNorm->SetBinContent(2,0);
+  centNorm->SetFillColor(kRed-7);
+  centNorm->SetLineWidth(2);
+  centNorm->Draw("same hist");
+  TH1D * periNorm = new TH1D("periNorm","",2,145,195);
+  periNorm->SetBinContent(1,evtSelSyst[30]->GetBinContent(2)*100);
+  periNorm->SetBinContent(2,0);
+  periNorm->SetFillColor(kBlue);
+  periNorm->SetLineWidth(2);
+  periNorm->SetFillStyle(3004);
+  periNorm->Draw("same hist");
+  TLatex * lat = new TLatex();
+  lat->SetTextSize(0.06);
+  lat->DrawLatex(54,15,"Normalization");
+  lat->DrawLatex(55,12,"uncertainties");
+
+  TLegend * systLeg = new TLegend(0.2,0.75,0.85,0.93);
+  systLeg->SetNColumns(3);
+  systLeg->SetFillStyle(0);
+  systLeg->AddEntry(pp_totSyst,"Extrapolated pp","f");
   systLeg->AddEntry(XeXe_totSyst[0],Form("0-5%s","%"),"f");
   systLeg->AddEntry(XeXe_totSyst[30],Form("70-90%s","%"),"f");
-  systLeg->AddEntry(pp_totSyst,"Extrapolated pp","f");
   systLeg->SetFillStyle(0);
   gStyle->SetPadTickY(1);
   systLeg->SetLineColor(kBlack);

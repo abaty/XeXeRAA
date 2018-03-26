@@ -63,7 +63,7 @@ void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   h5->Draw("same L");
   h6->SetLineColor(kGreen);
   h6->SetLineWidth(2);
-  h6->Draw("same L");
+  //h6->Draw("same L");
   h7->SetLineColor(kGray+2);
   h7->SetLineWidth(2);
   h7->Draw("same L");
@@ -87,7 +87,7 @@ void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   l->AddEntry(h3,"Xe Misreconstruction","l");
   l->AddEntry(h4,"Xe Efficiency Method","l");
   l->AddEntry(h5,"Xe Track Selection","l");
-  l->AddEntry(h6,"Xe Event Selection","l");
+  //l->AddEntry(h6,"Xe Event Selection","l");
   l->AddEntry(h7,"Pb Misreconstruction","l");
   l->AddEntry(h8,"Pb Efficiency Method","l");
   l->AddEntry(h9,"Pb Track Selection","l");
@@ -136,7 +136,7 @@ void plotRAA(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   h7->Draw("same L");
   h8->SetLineColor(kOrange);
   h8->SetLineWidth(2);
-  h8->Draw("same L");
+  //h8->Draw("same L");
   h9->SetLineColor(kMagenta-4);
   h9->SetLineWidth(2);
   h9->Draw("same L");
@@ -152,7 +152,7 @@ void plotRAA(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, T
   l->AddEntry(h5,"Resolution","l");
   l->AddEntry(h6,"Data vs. MC Efficiency","l");
   l->AddEntry(h7,"Track Selection","l");
-  l->AddEntry(h8,"Event Selection","l");
+  //l->AddEntry(h8,"Event Selection","l");
   l->AddEntry(h9,"pp Reference","l");
   l->AddEntry((TObject*)0,"Lumi. and partially-canceled uncerts removed from pp ref.","");
   l->Draw("same");
@@ -198,7 +198,7 @@ void plotSpec(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, 
   h7->Draw("same L");
   h8->SetLineColor(kOrange);
   h8->SetLineWidth(2);
-  h8->Draw("same L");
+  //h8->Draw("same L");
   c1->cd(2);
   TLegend * l = new TLegend(0.1,0.1,0.9,0.9);
   l->SetBorderSize(0);
@@ -211,7 +211,7 @@ void plotSpec(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, 
   l->AddEntry(h5,"Resolution","l");
   l->AddEntry(h6,"Data vs. MC Efficiency","l");
   l->AddEntry(h7,"Track Selection","l");
-  l->AddEntry(h8,"Event Selection","l");
+  //l->AddEntry(h8,"Event Selection","l");
   l->Draw("same");
   c1->SaveAs(Form("systPlots/SpectraSystematics_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
   c1->SaveAs(Form("systPlots/SpectraSystematics_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
@@ -330,6 +330,12 @@ void systematics(){
   for(int c = 0; c<s.nCentBins; c++){
     evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     evtSelVar1[c]->Scale(1.0/nVtx_evtSelVar1->GetBinContent(nVtx_evtSelVar1->GetXaxis()->FindBin(c)));
+  }
+
+  TFile * fakeSyst = new TFile("fakeRateSyst/fakeSyst.root","read");
+  TH1D * fakeSyst_h[8];
+  for(int i = 0; i<8; i++){
+    fakeSyst_h[i] = (TH1D*)fakeSyst->Get(Form("uncert_%d",i));
   }
 
   TFile * input = new TFile("output_0.root","read");
@@ -459,9 +465,21 @@ void systematics(){
       spec_SpecCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpSpecCorr[i]->GetBinContent(j)-1));
       total2 += TMath::Power(s.HI_UpSpecCorr[i]->GetBinContent(j)-1,2);
 
-      //fake correction
+      //fake correction - use fake value for high pt, use calculated uncert at low pt
       spec_FakeCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpFakeCorr[i]->GetBinContent(j)-1));
-      total2 += TMath::Power(s.HI_UpFakeCorr[i]->GetBinContent(j)-1,2);
+      if(spec_FakeCorr[i]->GetBinCenter(j) < 4){
+        if(i==0 || i==1 || i== 23 || i==24 || i==25 || i==30 || i==20 || i==31){
+          int cc = i;
+          if(i==23) cc=2;
+          if(i==24) cc=3;
+          if(i==25) cc=4;
+          if(i==30) cc=5;
+          if(i==31) cc=6;
+          if(i==20) cc=7;
+          spec_FakeCorr[i]->SetBinContent(j,fakeSyst_h[cc]->GetBinContent(j));
+        }
+      }
+      total2 += TMath::Power(spec_FakeCorr[i]->GetBinContent(j),2);
       
       //efficiency uncertainty from MC stats
       float effStat = s.HI_NoSpec_EffUp1Sig[i]->GetBinContent(j)-1;
@@ -483,7 +501,8 @@ void systematics(){
       
       //Syst from event selections, just take the fit value for now
       spec_EventSelection[i]->SetBinContent(j,TMath::Abs(evtSelVar1Fit[i]->Eval(5)-1));
-      total2 += TMath::Power(evtSelVar1Fit[i]->Eval(5)-1,2);
+      //don't include evt selection uncert in total
+      //total2 += TMath::Power(evtSelVar1Fit[i]->Eval(5)-1,2);
 
       //total
       spec_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
@@ -528,7 +547,8 @@ void systematics(){
       
       //Syst from eventSelection
       RAA_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
-      total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
+      //don't include event selection uncer in total
+      //total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
 
       //total
       RAA_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
@@ -588,7 +608,8 @@ void systematics(){
       
       //Syst from eventSelection
       RXP_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
-      total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
+      //don't include uncert in total
+      //total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
       
       //fake correction
       RXP_XeFakeCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpFakeCorr[i]->GetBinContent(j)-1));

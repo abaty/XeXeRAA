@@ -56,12 +56,14 @@ void XeXevsPbPb_plots(){
 
   TFile * sysFile = TFile::Open("../systematics.root","read");
   TH1D * RXP_totSyst[s.nCentBins];
+  TH1D * evtSelSyst[s.nCentBins];
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
     RXP_totSyst[c] = (TH1D*)sysFile->Get(Form("RXP_Total_%d",c));
     RXP_totSyst[c]->SetDirectory(0);
+    evtSelSyst[c] = (TH1D*)sysFile->Get(Form("RXP_EventSelection_%d",c));
+    evtSelSyst[c]->SetDirectory(0);
   }
-
 
   TH1D * PbPb[6];
   TH1D * PbPb_stat[6];
@@ -206,13 +208,14 @@ void XeXevsPbPb_plots(){
     double PbPbD=0;
     PbPbU = PbPbTAAUncertU[PbPbBin]/TAA[PbPbBin];
     PbPbD = PbPbTAAUncertD[PbPbBin]/TAA[PbPbBin];
-    double TAAUncertU = TMath::Sqrt(TMath::Power(s.Ncolluncert[c]/100.0,2)+PbPbU*PbPbU);
-    double TAAUncertD = TMath::Sqrt(TMath::Power(s.Ncolluncert[c]/100.0,2)+PbPbD*PbPbD);
+    double evtSel = evtSelSyst[c]->GetBinContent(2);
+    double TAAUncertU = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbU*PbPbU+evtSel*evtSel);
+    double TAAUncertD = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbD*PbPbD+evtSel*evtSel);
 
-    bTAA->SetFillColor(kBlue-9);
+    bTAA->SetFillColor(kRed+1);
     bTAA->SetLineWidth(0);
     bTAA->DrawBox(0.575,1-TAAUncertD,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAUncertU);
-    bTAA->DrawBox(0.7,0.375,0.85,0.45);
+    bTAA->DrawBox(0.7,0.475,0.85,0.55);
       
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
     line1->SetLineWidth(2);
@@ -223,8 +226,11 @@ void XeXevsPbPb_plots(){
     tex2->DrawLatex(0.7,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.095);
-    tex->DrawLatex(0.9,0.375,"Combined T_{AA} uncertainty");
-    tex->DrawLatex(0.7,0.5,"|#eta| < 1");
+    tex->DrawLatex(0.9,0.47,"Normalization uncertainty");
+    tex->DrawLatex(0.9,0.35,"Expectation from #sqrt{s_{NN}} difference ");
+    bTAA->SetFillColor(kBlue);
+    bTAA->DrawBox(0.7,0.395,0.85,0.405);
+    tex->DrawLatex(0.7,0.6,"|#eta| < 1");
  
     for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
       b[i-1]->SetFillColor(kRed-7);
@@ -237,7 +243,7 @@ void XeXevsPbPb_plots(){
       b[i-1]->Draw("same");
     }
 
-    extrapFunc->SetLineStyle(10); 
+    extrapFunc->SetLineStyle(1); 
     extrapFunc->SetLineWidth(2); 
     extrapFunc->SetLineColor(kBlue); 
     extrapFunc->SetRange(0.65,103.6); 
