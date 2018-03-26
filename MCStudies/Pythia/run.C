@@ -13,6 +13,19 @@
 #include "TMath.h"
 #include "TEfficiency.h"
 
+bool isPrimary(float p){
+  p = TMath::Abs(p);
+  if(TMath::Abs(p-221)<0.1) return true;
+  if(TMath::Abs(p-223)<0.1) return true;
+  if(TMath::Abs(p-333)<0.1) return true;
+  if(TMath::Abs(p-113)<0.1) return true;
+  if(TMath::Abs(p-213)<0.1) return true;
+  if(TMath::Abs(p-313)<0.1) return true;
+  if(TMath::Abs(p-323)<0.1) return true;
+  if(TMath::Abs(p-331)<0.1) return true;
+  return false;
+}
+
 int centBin(int b){
   if(b<10) return 0;
   else if(b<20) return 1;
@@ -101,6 +114,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   float pthat;
   int hfCoinc;
   float trkPt[50000];
+  float trkMPId[50000];
   float trkPtError[50000];
   float trkEta[50000];
   float trkPhi[50000];
@@ -120,6 +134,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   int nParticle;
   float pPt[100000];
   float pEta[100000];
+  int pStatus[100000];
   float mtrkPt[100000];
   float mtrkPtError[100000];
   bool mhighPurity[100000];
@@ -156,6 +171,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("nTrk",&nTrk);
     trk->SetBranchAddress("trkPt",trkPt);
     trk->SetBranchAddress("trkPhi",trkPhi);
+    trk->SetBranchAddress("trkMPId",trkMPId);
     trk->SetBranchAddress("trkEta",trkEta);
     trk->SetBranchAddress("highPurity",&highPurity);
     trk->SetBranchAddress("trkPtError",trkPtError);
@@ -175,6 +191,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     trk->SetBranchAddress("nParticle",&nParticle);   
     trk->SetBranchAddress("pPt",pPt);   
     trk->SetBranchAddress("pEta",pEta);   
+    trk->SetBranchAddress("pStatus",pStatus);
     trk->SetBranchAddress("mtrkPt",mtrkPt);
     trk->SetBranchAddress("mtrkPtError",mtrkPtError);
     trk->SetBranchAddress("mhighPurity",mhighPurity);
@@ -308,14 +325,14 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
                 recoNoFake_sig[centBin(hiBin)][1]->Fill(trkPt[j],w);
               }
             }
-            if(trkStatus[j]==1 && trkEventId[j]==0){
+            if(((trkStatus[j]==-99 && isPrimary(trkMPId[j])) || trkStatus[j]==1) && trkEventId[j]==0){
               recoMatched2d[1]->Fill(trkPt[j],centBin(hiBin),w);
               recoMatched[centBin(hiBin)][1]->Fill(trkPt[j],w);
             }
           }
         }
         
-        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*trkPt[j]))) continue; //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.1)*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<10) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
           
@@ -329,7 +346,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             recoNoFake_sig[centBin(hiBin)][3]->Fill(trkPt[j],w);
           }
         }
-        if(trkStatus[j]==1 && trkEventId[j]==0){
+        if(((trkStatus[j]==-99 && isPrimary(trkMPId[j])) || trkStatus[j]==1) && trkEventId[j]==0){
           recoMatched2d[3]->Fill(trkPt[j],centBin(hiBin),w);
           recoMatched[centBin(hiBin)][3]->Fill(trkPt[j],w);
         }
@@ -383,13 +400,13 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             recoNoFake_sig[centBin(hiBin)][0]->Fill(trkPt[j],w);
           }
         }
-        if(trkStatus[j]==1 && trkEventId[j]==0){
+        if(((trkStatus[j]==-99 && isPrimary(trkMPId[j])) || trkStatus[j]==1) && trkEventId[j]==0){
           recoMatched2d[0]->Fill(trkPt[j],centBin(hiBin),w);
           recoMatched[centBin(hiBin)][0]->Fill(trkPt[j],w);
         }
         
 
-        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*trkPt[j]))) continue; //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.1)*trkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
         if(trkNHit[j]<12) continue;
@@ -405,7 +422,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             recoNoFake_sig[centBin(hiBin)][2]->Fill(trkPt[j],w);
           }
         }
-        if(trkStatus[j]==1 && trkEventId[j]==0){
+        if(((trkStatus[j]==-99 && isPrimary(trkMPId[j])) || trkStatus[j]==1) && trkEventId[j]==0){
           recoMatched2d[2]->Fill(trkPt[j],centBin(hiBin),w);
           recoMatched[centBin(hiBin)][2]->Fill(trkPt[j],w);
         }
@@ -418,6 +435,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
         //cut to keep weights reasonable
         if(pPt[j]>qScaleCutoff*pthat && pthat-pPt[j]<qScaleGap) continue;
+        if(pStatus[j]>1) continue;
 
         gen2d[0]->Fill(pPt[j],centBin(hiBin),w);
         gen[centBin(hiBin)][0]->Fill(pPt[j],w);
@@ -449,7 +467,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           }
         }
         
-        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*mtrkPt[j]))) continue; //Calo Matchin
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.1)*mtrkPt[j]))) continue; //Calo Matchin
         if(mtrkNHit[j]<10) continue;  
         if(mtrkChi2[j]/(float)mtrkNdof[j]/(float)mtrkNlayer[j]>0.18) continue;
         
@@ -474,7 +492,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           genMatchedMult[centBin(hiBin)][0]->Fill(pPt[j],w);
         }
         
-        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*mtrkPt[j]))) continue; //Calo Matchin
+        if(!(mtrkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.1)*mtrkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(mtrkDz1[j]/mtrkDzError1[j])>2 || TMath::Abs(mtrkDxy1[j]/mtrkDxyError1[j])>2) continue;
         if(mtrkPtError[j]/mtrkPt[j]>0.05) continue;
         if(mtrkNHit[j]<12) continue;

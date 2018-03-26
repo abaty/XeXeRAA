@@ -18,53 +18,54 @@
 double findTaaAverage(int L, int H) {
   //v2
   if(L==0    && H==200 ) return         2.88;
-  if(L==0    && H==5*2 ) return 	13.7;	
+  if(L==0    && H==5*2 ) return 	13.5;	
   if(L==5*2  && H==10*2) return 	10.6;	
-  if(L==10*2 && H==15*2) return 	8.28;	
+  if(L==10*2 && H==15*2) return 	8.24;	
   if(L==15*2 && H==20*2) return 	6.41;	
-  if(L==20*2 && H==25*2) return 	4.92;	
-  if(L==25*2 && H==30*2) return 	3.75;	
-  if(L==35*2 && H==40*2) return 	2.08;	
-  if(L==40*2 && H==45*2) return 	1.52;	
-  if(L==45*2 && H==50*2) return 	1.09;	
-  if(L==50*2 && H==55*2) return 	0.772;	
-  if(L==55*2 && H==60*2) return 	0.539;	
-  if(L==60*2 && H==65*2) return 	0.37;	
-  if(L==65*2 && H==70*2) return 	0.252;	
-  if(L==70*2 && H==75*2) return 	0.172;	
-  if(L==75*2 && H==80*2) return 	0.118;	
-  if(L==80*2 && H==85*2) return 	0.0816;	
-  if(L==85*2 && H==90*2) return 	0.0573;	
-  if(L==90*2 && H==95*2) return 	0.0409;	
-  if(L==95*2 && H==100*2) return 	0.0273;	
-  if(L==0*2  && H==10*2) return 	12.2;	
-  if(L==10*2 && H==20*2) return 	7.34;	
-  if(L==20*2 && H==30*2) return 	4.33;	
-  if(L==30*2 && H==40*2) return 	2.45;	
-  if(L==40*2 && H==50*2) return 	1.3;	
-  if(L==50*2 && H==60*2) return 	0.656;	
-  if(L==60*2 && H==70*2) return 	0.311;	
-  if(L==70*2 && H==80*2) return 	0.145;	
-  if(L==80*2 && H==90*2) return 	0.0694;	
-  if(L==90*2 && H==100*2) return 	0.0341;	
-  if(L==0*2  && H==20*2) return 	9.75;	
-  if(L==20*2 && H==40*2) return 	3.39;	
-  if(L==40*2 && H==60*2) return 	0.98;	
-  if(L==60*2 && H==80*2) return 	0.228;	
-  if(L==80*2 && H==100*2) return 	0.0518;	
-  if(L==0*2  && H==50*2) return 	5.52;	
-  if(L==50*2 && H==100*2) return 	0.243;	
-  if(L==0*2  && H==30*2) return 	7.95;	
-  if(L==30*2 && H==50*2) return 	1.88;	
-  if(L==50*2 && H==70*2) return 	0.483;	
-  if(L==70*2 && H==90*2) return 	0.107;	
-  if(L==70*2 && H==100*2) return 	0.0828;	
+  if(L==20*2 && H==25*2) return 	4.93;	
+  if(L==25*2 && H==30*2) return 	3.77;	
+  if(L==30*2 && H==35*2) return 	2.85;	
+  if(L==35*2 && H==40*2) return 	2.13;	
+  if(L==40*2 && H==45*2) return 	1.57;	
+  if(L==45*2 && H==50*2) return 	1.14;	
+  if(L==50*2 && H==55*2) return 	0.807;	
+  if(L==55*2 && H==60*2) return 	0.561;	
+  if(L==60*2 && H==65*2) return 	0.386;	
+  if(L==65*2 && H==70*2) return 	0.258;	
+  if(L==70*2 && H==75*2) return 	0.17;	
+  if(L==75*2 && H==80*2) return 	0.11;	
+  if(L==80*2 && H==85*2) return 	0.0726;	
+  if(L==85*2 && H==90*2) return 	0.0476;	
+  if(L==90*2 && H==95*2) return 	0.0258;	
+  if(L==95*2 && H==100*2) return 	0.0235;	
+  if(L==0*2  && H==10*2) return 	12;	
+  if(L==10*2 && H==20*2) return 	7.33;	
+  if(L==20*2 && H==30*2) return 	4.35;	
+  if(L==30*2 && H==40*2) return 	2.49;	
+  if(L==40*2 && H==50*2) return 	1.36;	
+  if(L==50*2 && H==60*2) return 	0.684;	
+  if(L==60*2 && H==70*2) return 	0.322;	
+  if(L==70*2 && H==80*2) return 	0.14;	
+  if(L==80*2 && H==90*2) return 	0.0601;	
+  if(L==90*2 && H==100*2) return 	0.0247;	
+  if(L==0*2  && H==20*2) return 	9.68;	
+  if(L==20*2 && H==40*2) return 	3.42;	
+  if(L==40*2 && H==60*2) return 	1.02;	
+  if(L==60*2 && H==80*2) return 	0.231;	
+  if(L==80*2 && H==100*2) return 	0.0424;	
+  if(L==0*2  && H==50*2) return 	5.51;	
+  if(L==50*2 && H==100*2) return 	0.246;	
+  if(L==0*2  && H==30*2) return 	7.9;	
+  if(L==30*2 && H==50*2) return 	1.92;	
+  if(L==50*2 && H==70*2) return 	0.503;	
+  if(L==70*2 && H==90*2) return 	0.1;	
+  if(L==70*2 && H==100*2) return 	0.0749;	
   if(L==10*2 && H==30*2) return 	5.84;	
-  if(L==30*2 && H==100*2) return 	0.709;	
-  if(L==50*2 && H==80*2) return 	0.37;	
-  if(L==40*2 && H==100*2) return 	0.42;	
-  if(L==50*2 && H==90*2) return 	0.295;	
-  if(L==50*2 && H==80*2) return 	0.37;	
+  if(L==30*2 && H==100*2) return 	0.726;	
+  if(L==50*2 && H==80*2) return 	0.382;	
+  if(L==40*2 && H==100*2) return 	0.431;	
+  if(L==50*2 && H==90*2) return 	0.301;	
+  if(L==50*2 && H==80*2) return 	0.382;	
 
   return 1.0;
 }
@@ -103,6 +104,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
   TH1D *nHit[17][4], *chi2[17][4], *DCAz[17][4], *DCAxy[17][4], *ptErr[17][4], *eta[17][4], *phi[17][4], *caloMatch[17][4];
+  TH1D * dz_expanded[s.ntrkBins][6], * d0_expanded[s.ntrkBins][6];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
       for(int c2 = 0; c2<4; c2++){
@@ -114,6 +116,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         eta[c][c2] = new TH1D(Form("eta%d_cut%d",c,c2),Form("eta%d_cut%d",c,c2),50,-3,3);
         phi[c][c2] = new TH1D(Form("phi%d_cut%d",c,c2),Form("phi%d_cut%d",c,c2),50,-TMath::Pi(),TMath::Pi());
         caloMatch[c][c2] = new TH1D(Form("caloMatch%d_cut%d",c,c2),Form("caloMatch%d_cut%d",c,c2),50,0,2);
+      }
+    }
+    for(int c = 0; c<s.ntrkBins; c++){
+      for(int i = 0; i<6; i++){
+        dz_expanded[c][i] = new TH1D(Form("dz_expanded_%d_%d",i,c),";#delta z",150,-30,30);
+        d0_expanded[c][i] = new TH1D(Form("d0_expanded_%d_%d",i,c),";#delta z",150,-30,30);
       }
     }
   }
@@ -252,9 +260,22 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         for(int j = 0; j<nTrk; j++){
           if(!highPurity[j]) continue;     
           if(trkPt[j]<0.5) continue;
+          if(trkPt[j]>=103.6) continue;
           float Et = (pfHcal[j]+pfEcal[j])/TMath::CosH(trkEta[j]);
           int bin = trkBinMap(hiBin,trkPt[j]);
-          
+        
+          //extended dca histograms
+          if(TMath::Abs(trkEta[j])<=s.etaCut && trkPtError[j]/trkPt[j]<0.1 && trkNHit[j]>=11 && trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]<=0.15 && (trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))){
+            int centBin = 0;
+            if(hiBin>=10 && hiBin<20) centBin=1;
+            if(hiBin>=20 && hiBin<60) centBin=2;
+            if(hiBin>=60 && hiBin<100) centBin=3;
+            if(hiBin>=100 && hiBin<140) centBin=4;
+            if(hiBin>=140 && hiBin<200) centBin=5;
+            if(TMath::Abs(trkDxy1[j]/trkDxyError1[j])<3) dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDz1[j]/trkDzError1[j],evtW);
+            if(TMath::Abs(trkDz1[j]/trkDzError1[j])<3) d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+          }
+  
           eta[0][0]->Fill(trkEta[j],evtW);
           eta[trkBinMap(hiBin,trkPt[j])][0]->Fill(trkEta[j],evtW);
           if(TMath::Abs(trkEta[j])<=s.etaCut) fillTrkDists(phi[0][0],phi[bin][0],trkPhi[j],DCAz[0][0],DCAz[bin][0],trkDz1[j]/trkDzError1[j],DCAxy[0][0],DCAxy[bin][0],trkDxy1[j]/trkDxyError1[j],nHit[0][0],nHit[bin][0],trkNHit[j],chi2[0][0],chi2[bin][0],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][0],ptErr[bin][0],trkPtError[j]/trkPt[j],caloMatch[0][0],caloMatch[bin][0],Et/trkPt[j],evtW); 
@@ -303,7 +324,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           }
         }
 
-        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.2)*trkPt[j]))) continue; //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue-0.1)*trkPt[j]))) continue; //Calo Matchin
         if(trkNHit[j]<10) continue;
         if(trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]>0.18) continue;
       
@@ -339,7 +360,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           s.HI_smeared[c]->Fill(smearPt,smearWeight/binCenter);
         }//cent bin loop
 
-        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.2)*trkPt[j]))) continue; //Calo Matchin
+        if(!(trkPt[j]<s.caloMatchStart || (Et>(s.caloMatchValue+0.1)*trkPt[j]))) continue; //Calo Matchin
         if(TMath::Abs(trkDz1[j]/trkDzError1[j])>2 || TMath::Abs(trkDxy1[j]/trkDxyError1[j])>2) continue;
         if(trkPtError[j]/trkPt[j]>0.05) continue;
         if(trkNHit[j]<12) continue;

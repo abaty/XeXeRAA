@@ -11,9 +11,9 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  TFile * f = new TFile("../Hydjet/output_March20.root","read");
+  //TFile * f = new TFile("../Hydjet/output_March20.root","read");
   //TFile * f = new TFile("../EPOS/output_March20.root","read");
-  //TFile * f = new TFile("../Pythia/output_0.root","read");
+  TFile * f = new TFile("../Pythia/output_0.root","read");
 
   
   TH2D *gen2d, *reco2d, *recoNoFake2d, *recoNoFake2d_sig, *recoMatched2d, *genMatched2d, *genMatchedMult2d;
@@ -38,9 +38,9 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d_%d",c,cutsToUse));
   }
 
-  TFile * output = new TFile("trkCorr_Hydjet_March20.root","recreate");
+  //TFile * output = new TFile("trkCorr_Hydjet_March20.root","recreate");
   //TFile * output = new TFile("trkCorr_EPOS_March20.root","recreate");
-  //TFile * output = new TFile(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutsToUse),"recreate");
+  TFile * output = new TFile(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutsToUse),"recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -356,12 +356,12 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
       l->AddEntry(totalCorrection[1][c],"MB EPOS","p");
       l->AddEntry(totalCorrection[2][c],"MB Hydjet","p");
       int a, b;
-      if(c==0) a=0; b=5;
-      if(c==1) a=5; b=10;
-      if(c==2) a=10; b=30;
-      if(c==3) a=30; b=50;
-      if(c==4) a=50; b=70;
-      if(c==5) a=70; b=100;
+      if(c==0){ a=0; b=5;}
+      if(c==1){ a=5; b=10;}
+      if(c==2){ a=10; b=30;}
+      if(c==3){ a=30; b=50;}
+      if(c==4){ a=50; b=70;}
+      if(c==5){ a=70; b=100;}
       l->AddEntry((TObject*)0,Form("%d-%d %%",a,b),"");
       l->Draw("same");
 

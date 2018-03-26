@@ -7,6 +7,7 @@
 #include <string>
 #include <cstring>
 #include "TGraphAsymmErrors.h"
+#include "../../Settings.h"
 
 void speciesCorrPlots(){
   gStyle->SetErrorX(0);
@@ -292,7 +293,7 @@ void trkCorrPlots(int cutIndex = 0){
   c2->SetLogx();
   c2->SetTickx(1);
   c2->SetTicky(1);
-  TH1D * dummy = new TH1D("dummy","",10,0.5,127);
+  TH1D * dummy = new TH1D("dummy","",10,0.5,103.61);
   dummy->GetXaxis()->SetTitle("p_{T} (GeV)");
   dummy->GetXaxis()->CenterTitle();
   dummy->GetYaxis()->SetTitle("XeXe Tracking Efficiency");
@@ -304,29 +305,42 @@ void trkCorrPlots(int cutIndex = 0){
   dummy->GetXaxis()->SetLabelSize(0.048);
   dummy->Draw();
   TH1D * efficiencySmooth[6];
+  TH1D * efficiencySmoothCopy[6];
+  Settings s = Settings();
+
   for(int i = 0; i<6; i++){
     efficiencySmooth[i] = (TH1D*)f3->Get(Form("efficiency_smooth_%d",i));
-    if(i==0) efficiencySmooth[i]->SetLineColor(kBlack);
-    if(i==1) efficiencySmooth[i]->SetLineColor(kBlack);
-    if(i==2) efficiencySmooth[i]->SetLineColor(kBlue);
-    if(i==3) efficiencySmooth[i]->SetLineColor(kBlue);
-    if(i==4) efficiencySmooth[i]->SetLineColor(kRed);
-    if(i==5) efficiencySmooth[i]->SetLineColor(kRed);
-    if(i==1 || i==3 || i==5) efficiencySmooth[i]->SetLineStyle(3);
-    efficiencySmooth[i]->SetLineWidth(2);
-    efficiencySmooth[i]->SetMarkerStyle(1);
+    efficiencySmoothCopy[i] = new TH1D(Form("effSmoothCopy%d",i),"",s.ntrkBins_extra_D,s.xtrkbins_extra_D);
+    for(int j = 1; j<efficiencySmooth[i]->GetSize(); j++){
+      if(j==efficiencySmooth[i]->GetSize()-1){//set last bin in copy to previous bin
+        efficiencySmoothCopy[i]->SetBinContent(j,efficiencySmooth[i]->GetBinContent(j-1));
+      }else{
+        efficiencySmoothCopy[i]->SetBinContent(j,efficiencySmooth[i]->GetBinContent(j));
+      }
+    }
+    efficiencySmooth[i]->Print("All");
+    efficiencySmoothCopy[i]->Print("All");
+    if(i==0) efficiencySmoothCopy[i]->SetLineColor(kBlack);
+    if(i==1) efficiencySmoothCopy[i]->SetLineColor(kBlack);
+    if(i==2) efficiencySmoothCopy[i]->SetLineColor(kBlue);
+    if(i==3) efficiencySmoothCopy[i]->SetLineColor(kBlue);
+    if(i==4) efficiencySmoothCopy[i]->SetLineColor(kRed);
+    if(i==5) efficiencySmoothCopy[i]->SetLineColor(kRed);
+    if(i==1 || i==3 || i==5) efficiencySmoothCopy[i]->SetLineStyle(3);
+    efficiencySmoothCopy[i]->SetLineWidth(2);
+    efficiencySmoothCopy[i]->SetMarkerStyle(1);
     gStyle->SetErrorX(0);
-    efficiencySmooth[i]->Draw("same C");
+    efficiencySmoothCopy[i]->Draw("same C");
   } 
   TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.55);
   trkEffLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   trkEffLeg->AddEntry((TObject*)0,"PYTHIA 8 + HYDJET",""); 
-  trkEffLeg->AddEntry(efficiencySmooth[0],"0-5%","l"); 
-  trkEffLeg->AddEntry(efficiencySmooth[1],"5-10%","l"); 
-  trkEffLeg->AddEntry(efficiencySmooth[2],"10-30%","l"); 
-  trkEffLeg->AddEntry(efficiencySmooth[3],"30-50%","l"); 
-  trkEffLeg->AddEntry(efficiencySmooth[4],"50-70%","l"); 
-  trkEffLeg->AddEntry(efficiencySmooth[5],"70-100%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[5],"70-100%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[4],"50-70%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[3],"30-50%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[2],"10-30%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[1],"5-10%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[0],"0-5%","l"); 
   trkEffLeg->SetBorderSize(0);
   trkEffLeg->SetFillStyle(0);
   trkEffLeg->Draw("same");

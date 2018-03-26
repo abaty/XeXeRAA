@@ -46,6 +46,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
 
   TH1D *nHit[17][3][4], *chi2[17][3][4], *DCAz[17][3][4], *DCAxy[17][3][4], *ptErr[17][3][4], *eta[17][3][4], *phi[17][3][4], *caloMatch[17][3][4];
+  TH1D * dz_expanded[s.ntrkBins][6][3], * d0_expanded[s.ntrkBins][6][3];
 
 
   for(int c = 0; c<17; c++){
@@ -59,6 +60,14 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         eta[c][c2][c3] = new TH1D(Form("eta%d_%d_cut%d",c,c2,c3),Form("eta%d_%d_cut%d",c,c2,c3),50,-3,3);
         phi[c][c2][c3] = new TH1D(Form("phi%d_%d_cut%d",c,c2,c3),Form("phi%d_%d_cut%d",c,c2,c3),50,-TMath::Pi(),TMath::Pi());
         caloMatch[c][c2][c3] = new TH1D(Form("caloMatch%d_%d_cut%d",c,c2,c3),Form("caloMatch%d_%d_cut%d",c,c2,c3),50,0,2);
+      }
+    }
+  }
+  for(int c = 0; c<s.ntrkBins; c++){
+    for(int i = 0; i<6; i++){
+      for(int j = 0; j<3; j++){
+        dz_expanded[c][i][j] = new TH1D(Form("dz_expanded_%d_%d_%d",i,c,j),";#delta z",150,-30,30);
+        d0_expanded[c][i][j] = new TH1D(Form("d0_expanded_%d_%d_%d",i,c,j),";#delta 0",150,-30,30);
       }
     }
   }
@@ -215,6 +224,24 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         int statusIndex = 0;
         if(trkStatus[j]==1) statusIndex=1;
         else                statusIndex=2;       
+
+        if(TMath::Abs(trkEta[j])<=s.etaCut && trkPtError[j]/trkPt[j]<0.1 && trkNHit[j]>=11 && trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j]<=0.15 && (trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))){
+          int centBin = 0;
+          if(hiBin>=10 && hiBin<20) centBin=1;
+          if(hiBin>=20 && hiBin<60) centBin=2;
+          if(hiBin>=60 && hiBin<100) centBin=3;
+          if(hiBin>=100 && hiBin<140) centBin=4;
+          if(hiBin>=140 && hiBin<200) centBin=5;
+          if(TMath::Abs(trkDxy1[j]/trkDxyError1[j])<3){
+            dz_expanded[dummy->FindBin(trkPt[j])-1][centBin][0]->Fill(trkDz1[j]/trkDzError1[j],w);
+            dz_expanded[dummy->FindBin(trkPt[j])-1][centBin][statusIndex]->Fill(trkDz1[j]/trkDzError1[j],w); 
+          }
+          if(TMath::Abs(trkDz1[j]/trkDzError1[j])<3){
+            d0_expanded[dummy->FindBin(trkPt[j])-1][centBin][0]->Fill(trkDxy1[j]/trkDxyError1[j],w);
+            d0_expanded[dummy->FindBin(trkPt[j])-1][centBin][statusIndex]->Fill(trkDxy1[j]/trkDxyError1[j],w); 
+          }
+        }
+
 
         eta[0][0][0]->Fill(trkEta[j],w);
         eta[0][statusIndex][0]->Fill(trkEta[j],w);

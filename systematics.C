@@ -8,6 +8,32 @@
 #include "include/trackingCorrection.h"
 #include "include/trackingDataMCDiffUncert.h"
 
+void modErrorsForCorrelation(TH1D * division, TH1D* a, TH1D * b, int larger = 1){
+  for(int i = 1; i<division->GetSize()-2; i++){
+    float error2 = TMath::Power(a->GetBinError(i)/a->GetBinContent(i),2) + TMath::Power(b->GetBinError(i)/b->GetBinContent(i),2);
+    if(larger ==1){
+      error2 -= 2*TMath::Power(a->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+    }
+    if(larger==2) {
+      error2 -= 2*TMath::Power(b->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+    }   
+ 
+    if(error2<0){
+      if(larger ==1){
+        error2 += 2*TMath::Power(a->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+        error2 -= 2*TMath::Power(b->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+      }
+      if(larger ==2) {
+        error2 += 2*TMath::Power(b->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+        error2 -= 2*TMath::Power(a->GetBinError(i),2)/a->GetBinContent(i)/b->GetBinContent(i);
+      }   
+    }
+    if(error2<0) error2 = TMath::Power(a->GetBinError(i)/a->GetBinContent(i),2) + TMath::Power(b->GetBinError(i)/b->GetBinContent(i),2);
+
+    division->SetBinError(i,TMath::Sqrt(error2)*division->GetBinContent(i));
+  }
+}
+
 void plotRXP(TH1D * h1, TH1D * h2, TH1D * h3, TH1D * h4, TH1D * h5, TH1D * h6, TH1D * h7, TH1D * h8, TH1D * h9, TH1D * h10, int c, Settings s){
   if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","",1100,500);
@@ -318,13 +344,24 @@ void systematics(){
 
     s.HI_NoSpec[c] = (TH1D*)input->Get(Form("HI_NoSpec_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut1[c] = (TH1D*)input->Get(Form("HI_NoSpecCut1_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut1_copy[c] = (TH1D*)input->Get(Form("HI_NoSpecCut1_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut1[c]->Divide(s.HI_NoSpec[c]);
     s.HI_NoSpecCut2[c] = (TH1D*)input->Get(Form("HI_NoSpecCut2_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut2_copy[c] = (TH1D*)input->Get(Form("HI_NoSpecCut2_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut2[c]->Divide(s.HI_NoSpec[c]);
     s.HI_NoSpecCut3[c] = (TH1D*)input->Get(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    s.HI_NoSpecCut3_copy[c] = (TH1D*)input->Get(Form("HI_NoSpecCut3_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpecCut3[c]->Divide(s.HI_NoSpec[c]);
     s.HI_NoSpec_EffUp1Sig[c] = (TH1D*)input->Get(Form("HI_NoSpec_EffUp1Sig_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     s.HI_NoSpec_EffUp1Sig[c]->Divide(s.HI_NoSpec[c]);
+
+    //modify errors for correlation
+    modErrorsForCorrelation(s.HI_NoSpecCut1[c],s.HI_NoSpecCut1_copy[c], s.HI_NoSpec[c],1);
+    modErrorsForCorrelation(s.HI_NoSpecCut2[c],s.HI_NoSpecCut2_copy[c], s.HI_NoSpec[c],2);
+    modErrorsForCorrelation(s.HI_NoSpecCut3[c],s.HI_NoSpecCut3_copy[c], s.HI_NoSpec[c],1);
+    std::cout << "modified Errors" << std::endl;
+    s.HI_NoSpecCut2[c]->Print("All");
+    s.HI_NoSpecCut3[c]->Print("All");
 
     //finish fixing evt sel comparison
     evtSelVar1Fit[c] = new TF1(Form("evtSelVar1Fit_%d",c),"[0]",0.7,8);
