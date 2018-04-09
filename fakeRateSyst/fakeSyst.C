@@ -87,7 +87,7 @@ void fakeSyst(){
       d0_expanded[i][j][0]->SetMarkerStyle(8);
       d0_expanded[i][j][0]->GetYaxis()->SetTitle("normalized to unity");
       d0_expanded[i][j][0]->GetYaxis()->SetTitleOffset(1.3);
-      d0_expanded[i][j][0]->GetXaxis()->SetTitle("#sigma_{d0}/d0");
+      d0_expanded[i][j][0]->GetXaxis()->SetTitle("d0/#sigma_{d0}");
       d0_expanded[i][j][0]->SetMarkerColor(kBlack);
       d0_expanded[i][j][0]->GetYaxis()->SetRangeUser(0.000001,0.3);
       d0_expanded[i][j][0]->Draw();

@@ -104,6 +104,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * vz_h = new TH1D("vz","vz",120,-30,30);
   TH1D * nVtxMoreBin = new TH1D("nVtxMoreBin","nVtxMoreBin",50,0,50);
   TH1D *nHit[17][4], *chi2[17][4], *DCAz[17][4], *DCAxy[17][4], *ptErr[17][4], *eta[17][4], *phi[17][4], *caloMatch[17][4];
+  TH1D * eta_hist[20];
   TH1D * dz_expanded[s.ntrkBins][8], * d0_expanded[s.ntrkBins][8];
   if(s.doTrackDists){
     for(int c = 0; c<17; c++){
@@ -119,6 +120,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       }
     }
     for(int c = 0; c<s.ntrkBins; c++){
+      if(c<20) eta_hist[c] = new TH1D(Form("eta_hist_%d",c),Form("eta_hist_%d",c),50,-1,1);
       for(int i = 0; i<8; i++){
         dz_expanded[c][i] = new TH1D(Form("dz_expanded_%d_%d",i,c),";#delta z",150,-30,30);
         d0_expanded[c][i] = new TH1D(Form("d0_expanded_%d_%d",i,c),";#delta z",150,-30,30);
@@ -306,6 +308,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
           if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
           
           eta[0][2]->Fill(trkEta[j],evtW);
+          if(trkPt[j]>0.5 && trkPt[j]<0.6) eta_hist[hiBin/5]->Fill(trkEta[j],evtW);
           eta[trkBinMap(hiBin,trkPt[j])][2]->Fill(trkEta[j],evtW);
           if(TMath::Abs(trkEta[j])>s.etaCut) continue;
           fillTrkDists(phi[0][2],phi[bin][2],trkPhi[j],DCAz[0][2],DCAz[bin][2],trkDz1[j]/trkDzError1[j],DCAxy[0][2],DCAxy[bin][2],trkDxy1[j]/trkDxyError1[j],nHit[0][2],nHit[bin][2],trkNHit[j],chi2[0][2],chi2[bin][2],trkChi2[j]/(float)trkNdof[j]/(float)trkNlayer[j],ptErr[0][2],ptErr[bin][2],trkPtError[j]/trkPt[j],caloMatch[0][2],caloMatch[bin][2],Et/trkPt[j],evtW); 

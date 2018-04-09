@@ -44,6 +44,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
   TH1D * hiBin_Weighted_h = new TH1D("hiBin_weight",";hiBin",200,0,200);
   TH1D * vz_Weighted_h = new TH1D("vz_weight",";vz",120,-30,30);
   TH1D * noVtxCent_h = new TH1D("noVtxCent_h","noVtxCent_h",200,0,200);
+  TH1D * eta_hist[20];
 
   TH1D *nHit[17][3][4], *chi2[17][3][4], *DCAz[17][3][4], *DCAxy[17][3][4], *ptErr[17][3][4], *eta[17][3][4], *phi[17][3][4], *caloMatch[17][3][4];
   TH1D * dz_expanded[s.ntrkBins][8][3], * d0_expanded[s.ntrkBins][8][3];
@@ -64,6 +65,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
     }
   }
   for(int c = 0; c<s.ntrkBins; c++){
+    if(c<20) eta_hist[c] = new TH1D(Form("eta_hist_%d",c),Form("eta_hist_%d",c),50,-1,1);
     for(int i = 0; i<8; i++){
       for(int j = 0; j<3; j++){
         dz_expanded[c][i][j] = new TH1D(Form("dz_expanded_%d_%d_%d",i,c,j),";#delta z",150,-30,30);
@@ -371,6 +373,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
         if(!(trkPt[j]<s.caloMatchStart || (Et>s.caloMatchValue*trkPt[j]))) continue; //Calo Matchin
  
         eta[0][0][2]->Fill(trkEta[j],w);
+        if(trkPt[j]>0.5 && trkPt[j]<0.6) eta_hist[hiBin/5]->Fill(trkEta[j],w);
         eta[0][statusIndex][2]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][0][2]->Fill(trkEta[j],w);
         eta[trkBinMap(hiBin,trkPt[j])][statusIndex][2]->Fill(trkEta[j],w);
