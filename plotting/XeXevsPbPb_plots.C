@@ -43,6 +43,7 @@ void XeXevsPbPb_plots(){
   TF1 * extrapFunc = (TF1*)ppFit->Get("extrapFuncPoly4");
   
   TH1D * h[s.nCentBins];
+  TH1D * XePb05vs1030, * XePb510vs1030;
   TH1D * nVtx;
   TFile * f = TFile::Open("../output_0.root","read");
   nVtx = (TH1D*)f->Get("nVtxMoreBin");
@@ -156,7 +157,9 @@ void XeXevsPbPb_plots(){
     if(c==24) PbPbBin = 3;
     if(c==25) PbPbBin = 4;
     if(c==30) PbPbBin = 5;
-    
+    if(c==0)  XePb05vs1030 = new TH1D("XePb05vs1030","",s.ntrkBins,s.xtrkbins);
+    if(c==1)  XePb510vs1030 = new TH1D("XePb510vs1030","",s.ntrkBins,s.xtrkbins);
+ 
     for(int i = 1; i<h[c]->GetSize(); i++){
       if(i==1 || i==2){
         h[c]->SetBinContent(i,0);
@@ -168,8 +171,23 @@ void XeXevsPbPb_plots(){
       float PbPbContent = PbPb[PbPbBin]->GetBinContent(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)));
       float PbPbRelErr = PbPb[PbPbBin]->GetBinError(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
  
+      float temphc = h[c]->GetBinContent(i);
+
       h[c]->SetBinContent(i,h[c]->GetBinContent(i)/PbPbContent);
       h[c]->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
+
+      if(c==0){ 
+        PbPbContent = PbPb[2]->GetBinContent(PbPb[2]->FindBin(h[c]->GetBinCenter(i))); 
+        PbPbRelErr = PbPb[2]->GetBinError(PbPb[2]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+        XePb05vs1030->SetBinContent(i,temphc/PbPbContent);
+        XePb05vs1030->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
+      }
+      if(c==1){ 
+        PbPbContent = PbPb[2]->GetBinContent(PbPb[2]->FindBin(h[c]->GetBinCenter(i))); 
+        PbPbRelErr = PbPb[2]->GetBinError(PbPb[2]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+        XePb510vs1030->SetBinContent(i,temphc/PbPbContent);
+        XePb510vs1030->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
+      }
 
       if(h[c]->GetBinContent(i)==0){
         h[c]->SetBinContent(i,0);
@@ -279,5 +297,41 @@ void XeXevsPbPb_plots(){
     canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
   }
+
+  XePb05vs1030->Draw();
+  XePb05vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
+  for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
+    b[i-1]->SetFillColor(kRed-7);
+    float error = RXP_totSyst[0]->GetBinContent(i);
+    b[i-1]->SetX1(h[0]->GetXaxis()->GetBinLowEdge(i));
+    b[i-1]->SetX2(h[0]->GetXaxis()->GetBinUpEdge(i));
+    b[i-1]->SetY1((XePb05vs1030->GetBinContent(i))*(1-error));
+    b[i-1]->SetY2(XePb05vs1030->GetBinContent(i)*(1+error));
+    b[i-1]->Draw("same");
+  }
+  XePb05vs1030->Draw("same");
+  extrapFunc->Draw("same");
+  tex2->DrawLatex(0.7,0.1,"0-5%/10-30%");
+  canv->SaveAs("img/XeXevsPbPb_samenPart05.png");
+  canv->SaveAs("img/XeXevsPbPb_samenPart05.pdf");
+  canv->SaveAs("img/XeXevsPbPb_samenPart05.C");
+  XePb510vs1030->Draw();
+  XePb510vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
+  for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
+    b[i-1]->SetFillColor(kRed-7);
+    float error = RXP_totSyst[0]->GetBinContent(i);
+    b[i-1]->SetX1(h[0]->GetXaxis()->GetBinLowEdge(i));
+    b[i-1]->SetX2(h[0]->GetXaxis()->GetBinUpEdge(i));
+    b[i-1]->SetY1((XePb510vs1030->GetBinContent(i))*(1-error));
+    b[i-1]->SetY2(XePb510vs1030->GetBinContent(i)*(1+error));
+    b[i-1]->Draw("same");
+  }
+  XePb510vs1030->Draw("same");
+  extrapFunc->Draw("same");
+  tex2->DrawLatex(0.7,0.1,"5-10%/10-30%");
+  canv->SaveAs("img/XeXevsPbPb_samenPart510.png");
+  canv->SaveAs("img/XeXevsPbPb_samenPart510.pdf");
+  canv->SaveAs("img/XeXevsPbPb_samenPart510.C");
+
 }
 
