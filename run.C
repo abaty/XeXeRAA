@@ -220,7 +220,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       skim->GetEntry(i);
       evt->GetEntry(i);
       bool MinBias = false;
-      float evtW = 1.0/evtSelEff->Eval(hiHF);
+      //float evtW = 1.0/evtSelEff->Eval(hiHF);//removed from analysis after moving to 0-80%
+      float evtW = 1.0;
       if(hiHF>3300 && s.doRejectPU) continue;
       
       evtCount->Fill(1);
