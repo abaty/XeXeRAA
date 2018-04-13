@@ -241,7 +241,8 @@ void XeXevsPbPb_plots(){
     line1->Draw("same");
   
     tex2->SetTextSize(lumiTextSize*0.15);
-    tex2->DrawLatex(0.7,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
+    if(c==30) tex2->DrawLatex(0.7,0.1,"70-80% / 70-90%");
+    else tex2->DrawLatex(0.7,0.1,Form("%d-%d%s",5*s.lowCentBin[c],5*s.highCentBin[c],"%"));
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.095);
     tex->DrawLatex(0.9,0.47,"Normalization uncertainty");

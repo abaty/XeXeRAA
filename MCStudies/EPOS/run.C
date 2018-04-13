@@ -205,6 +205,7 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
       vz_Weighted_h->Fill(vz,w);
       hiBin_Weighted_h->Fill(hiBin,w);
 
+      if(hiBin>=160) continue;//don't analyze 80-100%
       trk->GetEntry(i);
       //for tracking
       for(int j = 0; j<nTrk; j++){

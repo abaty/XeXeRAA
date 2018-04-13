@@ -11,8 +11,8 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  //TFile * f = new TFile("../Hydjet/output_March20.root","read");
-  //TFile * f = new TFile("../EPOS/output_March20.root","read");
+  //TFile * f = new TFile("../Hydjet/output_0_April9.root","read");
+  //TFile * f = new TFile("../EPOS/output_0_April9.root","read");
   TFile * f = new TFile("../Pythia/output_0.root","read");
 
   
@@ -38,9 +38,9 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
     genMatchedMult[c] = (TH1D*)f->Get(Form("genMatchedMult_%d_%d",c,cutsToUse));
   }
 
-  //TFile * output = new TFile("trkCorr_Hydjet_March20.root","recreate");
-  //TFile * output = new TFile("trkCorr_EPOS_March20.root","recreate");
-  TFile * output = new TFile(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutsToUse),"recreate");
+  //TFile * output = new TFile("trkCorr_Hydjet_April9.root","recreate");
+  //TFile * output = new TFile("trkCorr_EPOS_April9.root","recreate");
+  TFile * output = new TFile(Form("trkCorr_Pythia_April9_CutIndex%d.root",cutsToUse),"recreate");
 
   //efficiency
   TH2D * efficiency2d = (TH2D*)genMatched2d->Clone("efficiency2d");  
@@ -208,12 +208,12 @@ void makeTrkCorr(int cutsToUse = 0 ,bool isEmbedded = true){
 
 void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
   //primary correction
-  TFile * f1 = TFile::Open("trkCorr_Pythia_March20_CutIndex0.root","read");
+  TFile * f1 = TFile::Open("trkCorr_Pythia_April9_CutIndex0.root","read");
   //secondary correction
-  TFile * f2 = TFile::Open("trkCorr_EPOS_March20.root","read");
+  TFile * f2 = TFile::Open("trkCorr_EPOS_April9.root","read");
 
   TFile * f3;
-  if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_March20.root","read");
+  if(makeTotalCorrectionPlots) f3 = TFile::Open("trkCorr_Hydjet_April9.root","read");
 
   TH2D * eff, *fake, *sec, *multiple;
   TH2D * effUnsmooth, *fakeUnsmooth, *secUnsmooth;
@@ -238,7 +238,7 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
 
   effStat = (TH2D*)f1->Get("efficiency2d_statErr");
 
-  TFile * output = TFile::Open("trkCorr_March20_wSpeciesCorr.root","recreate");
+  TFile * output = TFile::Open("trkCorr_April9_wSpeciesCorr.root","recreate");
   eff->SetDirectory(output);
   effUnsmooth->SetDirectory(output);
   fake->SetDirectory(output);
@@ -361,7 +361,7 @@ void makeSpeciesCorr(bool makeTotalCorrectionPlots = true){
       if(c==2){ a=10; b=30;}
       if(c==3){ a=30; b=50;}
       if(c==4){ a=50; b=70;}
-      if(c==5){ a=70; b=100;}
+      if(c==5){ a=70; b=80;}
       l->AddEntry((TObject*)0,Form("%d-%d %%",a,b),"");
       l->Draw("same");
 

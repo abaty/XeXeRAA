@@ -176,7 +176,7 @@ void spectra_plots(){
   specLeg->AddEntry(h[23],Form("10-30%s","%"),"p");  
   specLeg->AddEntry(h[24],Form("30-50%s","%"),"p");  
   specLeg->AddEntry(h[25],Form("50-70%s","%"),"p");  
-  specLeg->AddEntry(h[30],Form("70-90%s","%"),"p");  
+  specLeg->AddEntry(h[30],Form("70-80%s","%"),"p");  
   specLeg->AddEntry(ppSpec,"Extrapolated pp","p"); 
   specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
@@ -257,7 +257,7 @@ void spectra_plots(){
   systLeg->SetFillStyle(0);
   systLeg->AddEntry(pp_totSyst,"Extrapolated pp","f");
   systLeg->AddEntry(XeXe_totSyst[0],Form("0-5%s","%"),"f");
-  systLeg->AddEntry(XeXe_totSyst[30],Form("70-90%s","%"),"f");
+  systLeg->AddEntry(XeXe_totSyst[30],Form("70-80%s","%"),"f");
   systLeg->SetFillStyle(0);
   gStyle->SetPadTickY(1);
   systLeg->SetLineColor(kBlack);

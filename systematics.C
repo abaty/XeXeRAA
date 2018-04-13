@@ -328,7 +328,12 @@ void systematics(){
   TF1 * evtSelVar1Fit[s.nCentBins];
   TH1D * nVtx_evtSelVar1 = (TH1D*)evtSelFile->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
-    evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+
+   //FIXME
+   if(c==20) evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_0_100",5*s.lowCentBin[c],5*s.highCentBin[c]));
+   //FIXME
+    else evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    
     evtSelVar1[c]->Scale(1.0/nVtx_evtSelVar1->GetBinContent(nVtx_evtSelVar1->GetXaxis()->FindBin(c)));
   }
 
@@ -559,10 +564,10 @@ void systematics(){
   //RXePb
   for(int i = 0; i<s.nCentBins; i++){
     if(i!=0 && i!=1 && i!= 23 && i!=24 && i!= 25 && i!=30) continue;
-    TFile * hyperon = TFile::Open(Form("Pbsystematics/HyperonFractions_%d_%d.root",5*s.lowCentBin[i],5*s.highCentBin[i]),"read");
+    TFile * hyperon = TFile::Open(Form("Pbsystematics/HyperonFractions_%d_%d.root",5*s.lowCentBin[i],(i==30) ? 90 : 5*s.highCentBin[i]),"read");
     TH1D * hyperonCorr = (TH1D*)hyperon->Get("netSyst");
     TFile * trigger = TFile::Open("Pbsystematics/Spectra_ForPaper_Aug12.root","read");
-    TH1D * TriggerUncert = (TH1D*)trigger->Get(Form("h_HInormSyst_%d_%d",5*s.lowCentBin[i],5*s.highCentBin[i]));
+    TH1D * TriggerUncert = (TH1D*)trigger->Get(Form("h_HInormSyst_%d_%d",5*s.lowCentBin[i],(i==30) ? 90 : 5*s.highCentBin[i]));
     TFile * fakeFile = TFile::Open("Pbsystematics/Closure_PbPb.root","read");
     TH1D * PbPbFake = (TH1D*)fakeFile->Get("Fake_0");
 

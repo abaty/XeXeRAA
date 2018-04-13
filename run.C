@@ -17,7 +17,7 @@
 //FIXME preliminary
 double findTaaAverage(int L, int H) {
   //v2
-  if(L==0    && H==200 ) return         2.88;
+  if(L==0    && H==160 ) return         3.59;
   if(L==0    && H==5*2 ) return 	13.5;	
   if(L==5*2  && H==10*2) return 	10.6;	
   if(L==10*2 && H==15*2) return 	8.24;	
@@ -71,7 +71,7 @@ double findTaaAverage(int L, int H) {
 }
 double findNcollAverage(int L, int H) {
   //v2
-  if(L==0    && H==200 ) return         197;
+  if(L==0    && H==160 ) return         245.5;
   if(L==0    && H==5*2 ) return 	935.9;	
   if(L==5*2  && H==10*2) return 	727.7;	
   if(L==0*2  && H==10*2) return 	831.8;	
@@ -278,12 +278,12 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
             if(TMath::Abs(trkDxy1[j]/trkDxyError1[j])<3){
               dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDz1[j]/trkDzError1[j],evtW);
               if(centBin<2) dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][6]->Fill(trkDz1[j]/trkDzError1[j],evtW);
-              dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDz1[j]/trkDzError1[j],evtW);
+              if(hiBin<160) dz_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDz1[j]/trkDzError1[j],evtW);
             }
             if(TMath::Abs(trkDz1[j]/trkDzError1[j])<3){
               d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][centBin]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
               if(centBin<2) d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][6]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
-              d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
+              if(hiBin<160) d0_expanded[s.HI[0]->FindBin(trkPt[j])-1][7]->Fill(trkDxy1[j]/trkDxyError1[j],evtW);
             }
           }
   

@@ -12,7 +12,7 @@
 void speciesCorrPlots(){
   gStyle->SetErrorX(0);
   gStyle->SetOptStat(0);
-  TFile * f = TFile::Open("trkCorr_March20_wSpeciesCorr.root","read");
+  TFile * f = TFile::Open("trkCorr_April9_wSpeciesCorr.root","read");
   TH1D * speciesCorr[6];
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
   TLegend * l = new TLegend(0.6,0.7,0.9,0.9);
@@ -34,7 +34,7 @@ void speciesCorrPlots(){
     if(i==2) l->AddEntry((TObject*)0,"10-30%","");
     if(i==3) l->AddEntry((TObject*)0,"30-50%","");
     if(i==4) l->AddEntry((TObject*)0,"50-70%","");
-    if(i==5) l->AddEntry((TObject*)0,"70-100%","");
+    if(i==5) l->AddEntry((TObject*)0,"70-80%","");
     l->SetFillStyle(0);
     l->Draw("same");
 
@@ -127,7 +127,7 @@ void makeTGraphArray(TCanvas * c1, TGraphAsymmErrors ** eff, TGraphAsymmErrors *
     if(i==2) l[i]->AddEntry((TObject*)0,"10-30%","");
     if(i==3) l[i]->AddEntry((TObject*)0,"30-50%","");
     if(i==4) l[i]->AddEntry((TObject*)0,"50-70%","");
-    if(i==5) l[i]->AddEntry((TObject*)0,"70-100%","");
+    if(i==5) l[i]->AddEntry((TObject*)0,"70-80%","");
     l[i]->SetFillStyle(0);
     l[i]->AddEntry((TObject*)0,"Analysis Cuts","");
     if(!doFit) l[i]->AddEntry(eff[i],"Hydjet MB","p");
@@ -216,7 +216,7 @@ void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::st
     if(i==2) l[i]->AddEntry((TObject*)0,"10-30%","");
     if(i==3) l[i]->AddEntry((TObject*)0,"30-50%","");
     if(i==4) l[i]->AddEntry((TObject*)0,"50-70%","");
-    if(i==5) l[i]->AddEntry((TObject*)0,"70-100%","");
+    if(i==5) l[i]->AddEntry((TObject*)0,"70-80%","");
     l[i]->AddEntry((TObject*)0,"Analysis Cuts","");
     l[i]->AddEntry(eff[i],"Hydjet MB","p");
     l[i]->AddEntry(eff2[i],"EPOS MB","p");
@@ -236,9 +236,9 @@ void makeTH1Array(TCanvas * c1, TH1D ** eff, TH1D ** eff2, TH1D ** eff3, std::st
 
 
 void trkCorrPlots(int cutIndex = 0){
-  TFile * f1 = TFile::Open("trkCorr_Hydjet_March20.root","read");
-  TFile * f2 = TFile::Open("trkCorr_EPOS_March20.root","read");
-  TFile * f3 = TFile::Open(Form("trkCorr_Pythia_March20_CutIndex%d.root",cutIndex),"read");
+  TFile * f1 = TFile::Open("trkCorr_Hydjet_April9.root","read");
+  TFile * f2 = TFile::Open("trkCorr_EPOS_April9.root","read");
+  TFile * f3 = TFile::Open(Form("trkCorr_Pythia_April9_CutIndex%d.root",cutIndex),"read");
   gStyle->SetOptStat(0);
 
   TGraphAsymmErrors * efficiency[6], *fake[6], *secondary[6];
@@ -335,7 +335,7 @@ void trkCorrPlots(int cutIndex = 0){
   TLegend * trkEffLeg = new TLegend(0.3,0.15,0.85,0.55);
   trkEffLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   trkEffLeg->AddEntry((TObject*)0,"PYTHIA 8 + HYDJET",""); 
-  trkEffLeg->AddEntry(efficiencySmoothCopy[5],"70-100%","l"); 
+  trkEffLeg->AddEntry(efficiencySmoothCopy[5],"70-80%","l"); 
   trkEffLeg->AddEntry(efficiencySmoothCopy[4],"50-70%","l"); 
   trkEffLeg->AddEntry(efficiencySmoothCopy[3],"30-50%","l"); 
   trkEffLeg->AddEntry(efficiencySmoothCopy[2],"10-30%","l"); 

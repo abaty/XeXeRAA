@@ -15,11 +15,11 @@ class Settings{
 
   std::string ppRefFile = "ppRef_March3_Pythia.root";
   std::string trkResFile = "resolutions_March3.root";
-  std::string trkCorrFile = "trkCorr_March20_wSpeciesCorr.root";
-  std::string trkCorrFile_noSpec = "trkCorr_Pythia_March20_CutIndex0.root";
-  std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_March20_CutIndex1.root";
-  std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_March20_CutIndex2.root";
-  std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_March20_CutIndex3.root";
+  std::string trkCorrFile = "trkCorr_April9_wSpeciesCorr.root";
+  std::string trkCorrFile_noSpec = "trkCorr_Pythia_April9_CutIndex0.root";
+  std::string trkCorrFile_noSpecCut1 = "trkCorr_Pythia_April9_CutIndex1.root";
+  std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_April9_CutIndex2.root";
+  std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_April9_CutIndex3.root";
 
 
   static const int ntrkBins = 32;
@@ -31,14 +31,14 @@ class Settings{
 
   static const int nCentBins = 33;
   int lowCentBin[nCentBins] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,0,6,10,2,6,10,14,16,0,0,14,0,10};
-  int highCentBin[nCentBins] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,20,20,20,6,10,14,16,18,6,10,18,2,18};
-  float TAAuncert[nCentBins]   = {6.1,6.6,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,8.7,0.1,0.1,8.9,14,16.7,0.1,0.1,0.1,0.1,13,6.3,0.1};
-  float Ncolluncert[nCentBins] = {6.1,6.6,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,8.7,0.1,0.1,9,14,17,0.1,0.1,0.1,0.1,12,6.3,0.1};
+  int highCentBin[nCentBins] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,16,20,20,6,10,14,18,18,6,10,16,2,18};
+  float TAAuncert[nCentBins]   = {6.1,6.6,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,8.6,0.1,0.1,8.9,14,16.7,0.1,0.1,0.1,0.1,14.3,6.3,0.1};
+  float Ncolluncert[nCentBins] = {6.1,6.6,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,8.8,0.1,0.1,9,14,17,0.1,0.1,0.1,0.1,14.2,6.3,0.1};
 
-  float XeXeNcoll[6] = {922, 724.1, 399.4, 131.7, 34.4, 6.84};//Ncoll for 0-5,5-10,10-30,30-50,50-70,70-90
-  float XeXeNcollErr[6] = {57.1, 48.3, 36, 18.4, 5.75, 0.896};//NcollErr for 0-5,5-10,10-30,30-50,50-70,70-90
-  float XeXeNpart[6] = {236.5, 206.6, 140.8, 68.04, 26.85, 7.851};//Npart for 0-5,5-10,10-30,30-50,50-70,70-90
-  float XeXeNpartErr[6] = {1.74, 1.54, 2.41, 3.07, 2.09, 0.579};//NpartErr for 0-5,5-10,10-30,30-50,50-70,70-90
+  float XeXeNcoll[6] = {922, 724.1, 399.4, 131.7, 34.4, 9.568};//Ncoll for 0-5,5-10,10-30,30-50,50-70,70-90
+  float XeXeNcollErr[6] = {57.1, 48.3, 36, 18.4, 5.75, 1.36};//NcollErr for 0-5,5-10,10-30,30-50,50-70,70-90
+  float XeXeNpart[6] = {236.5, 206.6, 140.8, 68.04, 26.85, 10.4};//Npart for 0-5,5-10,10-30,30-50,50-70,70-90
+  float XeXeNpartErr[6] = {1.74, 1.54, 2.41, 3.07, 2.09, 0.834};//NpartErr for 0-5,5-10,10-30,30-50,50-70,70-90
 
   //from https://twiki.cern.ch/twiki/pub/CMS/HiCentrality2017/TAA_Uncert_Jason_2017-02-23.pdf
   float PbPbNcoll[6] = {1820, 1430, 805, 267, 65.4, 10.7};//Ncoll for 0-5,5-10,10-30,30-50,50-70,70-90

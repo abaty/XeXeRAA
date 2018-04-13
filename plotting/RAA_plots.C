@@ -329,7 +329,9 @@ void RAA_plots(){
       h[c]->SetFillColor(kRed-7);
       h[c]->SetFillStyle(1001);
       leg->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
-      leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb","pl");
+      if(c==30) leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb (70-90%)","pl");
+      if(c==20) leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb (0-100%)","pl");
+      if(c!=20 && c!=30) leg->AddEntry(PbPb[cc],"CMS 5.02 TeV PbPb","pl");
       leg->SetBorderSize(0);
       leg->Draw("same");
     }

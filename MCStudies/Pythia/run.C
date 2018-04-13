@@ -220,7 +220,8 @@ void countTracks(std::vector<std::string> fileList, int jobNumber){
 
       float w = evtW.getEvtWeight(vz,hiBin);
       //there are basically no events iwth hiBin>186, so remove them to avoid huge weights
-      if(hiBin>180) continue;
+      //if(hiBin>180) continue;
+      if(hiBin>=160) continue;//don't analyze 80-100%
 
       w=w*weight;
       vz_Weighted_h->Fill(vz,w);

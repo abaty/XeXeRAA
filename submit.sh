@@ -2,7 +2,7 @@
 
 #each job will be run as ./run.exe <job#> <njobs> <otherParamtersString>
 MainCFile="run.C"
-inputFiles="fileList.txt ppRef_March3_Pythia.root trkCorr_March20_wSpeciesCorr.root trkCorr_Pythia_March20_CutIndex0.root trkCorr_Pythia_March20_CutIndex1.root trkCorr_Pythia_March20_CutIndex2.root trkCorr_Pythia_March20_CutIndex3.root resolutions_March3.root "
+inputFiles="fileList.txt ppRef_March3_Pythia.root trkCorr_April9_wSpeciesCorr.root trkCorr_Pythia_April9_CutIndex0.root trkCorr_Pythia_April9_CutIndex1.root trkCorr_Pythia_April9_CutIndex2.root trkCorr_Pythia_April9_CutIndex3.root resolutions_March3.root "
 njobs=70
 otherParameters="fileList.txt 56"
 
