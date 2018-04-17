@@ -289,8 +289,9 @@ void trkCorrPlots(int cutIndex = 0){
 
 
   setTDRStyle();
-  TCanvas * c2 = new TCanvas("c2","c2",800,700);
+  TCanvas * c2 = new TCanvas("c2","c2",800,800);
   c2->SetLogx();
+  c2->SetRightMargin(0.05);
   c2->SetTickx(1);
   c2->SetTicky(1);
   TH1D * dummy = new TH1D("dummy","",10,0.5,103.61);
@@ -318,7 +319,6 @@ void trkCorrPlots(int cutIndex = 0){
         efficiencySmoothCopy[i]->SetBinContent(j,efficiencySmooth[i]->GetBinContent(j));
       }
     }
-    efficiencySmooth[i]->Print("All");
     efficiencySmoothCopy[i]->Print("All");
     if(i==0) efficiencySmoothCopy[i]->SetLineColor(kBlack);
     if(i==1) efficiencySmoothCopy[i]->SetLineColor(kBlack);
@@ -351,7 +351,7 @@ void trkCorrPlots(int cutIndex = 0){
   writeExtraText = true;  
   extraText  = "Simulation Preliminary";
   //extraText  = "Unpublished";
-  CMS_lumi( c2, iPeriod, 11 );
+  CMS_lumi( c2, iPeriod, 11, false, true);
 
   if(cutIndex==0){
     c2->SaveAs("img/effFitsStacked.png");

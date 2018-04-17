@@ -64,6 +64,48 @@ void getTheoryVitev(TGraph * vitev){
   vitev->SetFillColor(kRed);
   vitev->SetLineWidth(0);
 }
+void getTheoryCUJET(TGraph * cujet, int cent){
+  //Vitev**********************************************************************************************************
+  float temp_x;
+  float temp_y_u, temp_y_d;
+  float temp;
+  vector<float> x;
+  vector<float> y_d;
+  vector<float> y_u;
+  ifstream input_file("../theory/CUJET/CUJET_5440_XeXe_RAA_parsed.dat");
+  //get datai
+  std::cout << "reading theory prediction data" << std::endl;
+  while(!input_file.eof()){ 
+    input_file>>temp_x;
+    if(cent==1){
+      input_file>>temp;
+      input_file>>temp;
+    }
+    input_file>>temp_y_u;
+    input_file>>temp_y_d;
+    if(cent==0){
+      input_file>>temp;
+      input_file>>temp;
+    }
+    std::cout << temp_x << " " << temp_y_u << " " << temp_y_d << std::endl;
+    x.push_back(temp_x);
+    y_d.push_back(temp_y_d);
+    y_u.push_back(temp_y_u);
+  }
+  std::cout << "done reading " << x.size() << " Points"  << std::endl;
+  
+  //put data in histograms
+  const int graphPts = 180;
+  //vitev = TGraph(2*graphPts);
+  for (int i=0;i<graphPts;i++) {
+    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
+    cujet->SetPoint(i,x[i],y_d[i]);
+    cujet->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
+  }
+  cujet->SetFillStyle(3013);
+  cujet->SetFillColor(kBlue);
+  cujet->SetLineWidth(0);
+}
 //***************************************************************************************************8
 
 
@@ -353,16 +395,52 @@ void RAA_plots(){
     canv->SaveAs(Form("img/RAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
     canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
 
+    delete leg;
     //stuff with theory
+    TLegend * legTh;
+    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10) legTh = new TLegend(0.4,0.7,0.95,0.9);
+    else legTh = new TLegend(0.4,0.7666,0.95,0.9);
+    legTh->SetFillStyle(0);
+    gStyle->SetLegendBorderSize(0);
+    legTh->SetTextSize(0.05);
+    h[c]->SetFillColor(kRed-7);
+    h[c]->SetFillStyle(1001);
     if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10){
       const int graphPts = 950;
       TGraph * vitev = new TGraph(2*graphPts);
       getTheoryVitev(vitev);
       vitev->Draw("same f");
+
+      const int graphPtsCUJET = 180;
+      TGraph * cujet = new TGraph(2*graphPtsCUJET);
+      getTheoryCUJET(cujet,0);
+      cujet->Draw("same f");
+      legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
+      legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
+      legTh->AddEntry(vitev,"SCET_{G}","f");
+      legTh->Draw("same");    
+ 
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
     }
+    if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50){
+      delete PbPb[3];
+      for(int i = 0; i<s.ntrkBins; i++) delete bPbPb[i];
+      for(int i = 0; i<s.ntrkBins; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
+
+      const int graphPtsCUJET = 180;
+      TGraph * cujet = new TGraph(2*graphPtsCUJET);
+      getTheoryCUJET(cujet,1);
+      cujet->Draw("same f");
+      legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
+      legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
+      legTh->Draw("same");    
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    }
+    delete legTh;
   }
 
   for(int i = 2; i<s.ntrkBins; i++){ 

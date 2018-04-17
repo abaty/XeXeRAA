@@ -292,7 +292,7 @@ void plotCutRatios(TH1D * h1, TH1D * h2, TH1D * h3, int c, Settings s){
 void plotEvtSelRatios(TH1D * h1, int c, Settings s, TF1 * f ,std::string name,std::string Filename){
   if(!isRelevent(c)) return;
   TCanvas * c1 = new TCanvas("c1","c1",800,600);
-  TLegend * l = new TLegend(0.2,0.2,0.5,0.5);
+  TLegend * l = new TLegend(0.2,0.2,0.6,0.35);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   c1->SetLogx();
@@ -323,18 +323,25 @@ void systematics(){
   TH1D * ppSyst_NoLumi = (TH1D*)ppInput->Get("ppScaledSyst_NoLumi");
   TH1D * ppSyst = (TH1D*)ppInput->Get("ppScaledSyst");
  
-  TFile * evtSelFile = new TFile("output_Feb26_100percenteff.root","read");
+  TFile * evtSelFile = new TFile("output_April13_92percenteff.root","read");
   TH1D * evtSelVar1[s.nCentBins];
   TF1 * evtSelVar1Fit[s.nCentBins];
   TH1D * nVtx_evtSelVar1 = (TH1D*)evtSelFile->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
 
-   //FIXME
-   if(c==20) evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_0_100",5*s.lowCentBin[c],5*s.highCentBin[c]));
-   //FIXME
-    else evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    evtSelVar1[c] = (TH1D*) evtSelFile->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
     
     evtSelVar1[c]->Scale(1.0/nVtx_evtSelVar1->GetBinContent(nVtx_evtSelVar1->GetXaxis()->FindBin(c)));
+  }
+  TFile * evtSelFile2 = new TFile("output_April13_98percenteff.root","read");
+  TH1D * evtSelVar2[s.nCentBins];
+  TF1 * evtSelVar2Fit[s.nCentBins];
+  TH1D * nVtx_evtSelVar2 = (TH1D*)evtSelFile->Get("nVtxMoreBin");
+  for(int c = 0; c<s.nCentBins; c++){
+
+    evtSelVar2[c] = (TH1D*) evtSelFile2->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
+    
+    evtSelVar2[c]->Scale(1.0/nVtx_evtSelVar2->GetBinContent(nVtx_evtSelVar2->GetXaxis()->FindBin(c)));
   }
 
   TFile * fakeSyst = new TFile("fakeRateSyst/fakeSyst.root","read");
@@ -381,6 +388,13 @@ void systematics(){
     evtSelVar1[c]->Fit(Form("evtSelVar1Fit_%d",c),"REM0");
     evtSelVar1[c]->SetLineColor(kRed);
     evtSelVar1[c]->SetLineWidth(2);
+    
+    evtSelVar2Fit[c] = new TF1(Form("evtSelVar2Fit_%d",c),"[0]",0.7,8);
+    evtSelVar2[c]->Scale(nVtx_input->GetBinContent(nVtx_input->GetXaxis()->FindBin(c)));
+    evtSelVar2[c]->Divide(s.HI[c]);
+    evtSelVar2[c]->Fit(Form("evtSelVar2Fit_%d",c),"REM0");
+    evtSelVar2[c]->SetLineColor(kRed);
+    evtSelVar2[c]->SetLineWidth(2);
   }
 
   TFile * output = new TFile("systematics.root","recreate");
@@ -391,7 +405,9 @@ void systematics(){
     plotCutRatios(s.HI_NoSpecCut1[c],s.HI_NoSpecCut2[c],s.HI_NoSpecCut3[c],c,s);
 
     evtSelVar1[c]->SetDirectory(output);
-    plotEvtSelRatios(evtSelVar1[c],c,s,evtSelVar1Fit[c],"100%% Eff Assumption","100PercentEff");
+    plotEvtSelRatios(evtSelVar1[c],c,s,evtSelVar1Fit[c],"92%% Eff Assumption","92PercentEff");
+    evtSelVar2[c]->SetDirectory(output);
+    plotEvtSelRatios(evtSelVar2[c],c,s,evtSelVar2Fit[c],"98%% Eff Assumption","98PercentEff");
   }
   ppSyst_NoLumi->SetDirectory(output);
   //ppSyst_NoLumi->Write();
@@ -505,7 +521,7 @@ void systematics(){
       total2 += TMath::Power(tempSyst,2);
       
       //Syst from event selections, just take the fit value for now
-      spec_EventSelection[i]->SetBinContent(j,TMath::Abs(evtSelVar1Fit[i]->Eval(5)-1));
+      spec_EventSelection[i]->SetBinContent(j,TMath::Max(TMath::Abs(evtSelVar1Fit[i]->Eval(5)-1),TMath::Abs(evtSelVar2Fit[i]->Eval(5)-1)));
       //don't include evt selection uncert in total
       //total2 += TMath::Power(evtSelVar1Fit[i]->Eval(5)-1,2);
 

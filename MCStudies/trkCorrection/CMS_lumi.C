@@ -25,7 +25,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi )
   float H = pad->GetWh();
   float W = pad->GetWw();
   float l = pad->GetLeftMargin();
-  float t = pad->GetTopMargin();
+  float t = pad->GetTopMargin()*1.5;
   float r = pad->GetRightMargin();
   float b = pad->GetBottomMargin();
   //  float e = 0.025;
@@ -90,7 +90,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi )
   latex.SetTextFont(42);
   latex.SetTextAlign(31); 
   latex.SetTextSize(lumiTextSize*t);    
-  if(doBigLumi) latex.SetTextSize(lumiTextSize*t*1.3);   
+  if(doBigLumi) latex.SetTextSize(lumiTextSize*t*5.0);   
   else          latex.SetTextSize(lumiTextSize*t);     
   latex.DrawLatex(1-r,1-t+lumiTextOffset*t,lumiText);
 

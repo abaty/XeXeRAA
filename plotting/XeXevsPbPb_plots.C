@@ -36,6 +36,11 @@ void XeXevsPbPb_plots(){
   gStyle->SetTitleBorderSize(0);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
+
+  float TAAU_05_1030 = 0;
+  float TAAD_05_1030 = 0;
+  float TAAU_510_1030 = 0;
+  float TAAD_510_1030 = 0;
  
   Settings s = Settings();
 
@@ -229,6 +234,19 @@ void XeXevsPbPb_plots(){
     double evtSel = evtSelSyst[c]->GetBinContent(2);
     double TAAUncertU = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbU*PbPbU+evtSel*evtSel);
     double TAAUncertD = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbD*PbPbD+evtSel*evtSel);
+    
+    if(c==0){    
+      PbPbU = PbPbTAAUncertU[2]/TAA[2];
+      PbPbD = PbPbTAAUncertD[2]/TAA[2];
+      TAAU_05_1030 = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbU*PbPbU+evtSel*evtSel);
+      TAAD_05_1030 = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbD*PbPbD+evtSel*evtSel);
+    }
+    if(c==1){
+      PbPbU = PbPbTAAUncertU[2]/TAA[2];
+      PbPbD = PbPbTAAUncertD[2]/TAA[2];
+      TAAU_510_1030 = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbU*PbPbU+evtSel*evtSel);
+      TAAD_510_1030 = TMath::Sqrt(TMath::Power(s.TAAuncert[c]/100.0,2)+PbPbD*PbPbD+evtSel*evtSel);
+    }
 
     bTAA->SetFillColor(kRed+1);
     bTAA->SetLineWidth(0);
@@ -299,7 +317,26 @@ void XeXevsPbPb_plots(){
     canv->SaveAs(Form("img/XeXevsPbPb_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
   }
 
+  XePb05vs1030->GetYaxis()->SetRangeUser(0,2);
+  XePb05vs1030->SetMarkerSize(1.3);
+  XePb05vs1030->GetYaxis()->SetTitleOffset(1.5);
+  XePb05vs1030->GetXaxis()->SetTitleOffset(1.2);
+  XePb05vs1030->GetYaxis()->CenterTitle();
+  XePb05vs1030->GetXaxis()->SetTitle("p_{T} (GeV)");
+  XePb05vs1030->GetXaxis()->CenterTitle();
+  XePb05vs1030->GetXaxis()->SetLabelOffset(-0.005);
+  XePb05vs1030->GetXaxis()->SetTitleSize(0.06);
+  XePb05vs1030->GetYaxis()->SetTitleSize(0.06);
+  XePb05vs1030->GetYaxis()->SetTitleOffset(1.0);
+  XePb05vs1030->GetXaxis()->SetTitleOffset(0.87);
+  XePb05vs1030->GetYaxis()->SetLabelSize(0.055);
+  XePb05vs1030->GetXaxis()->SetLabelSize(0.055);
+  XePb05vs1030->GetXaxis()->SetLabelOffset(-0.017);
   XePb05vs1030->Draw();
+  line1 = new TLine(h[0]->GetXaxis()->GetBinLowEdge(1),1,h[0]->GetXaxis()->GetBinUpEdge(h[0]->GetSize()-2),1);
+  line1->SetLineWidth(2);
+  line1->SetLineStyle(2);
+  line1->Draw("same");
   XePb05vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
   for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
     b[i-1]->SetFillColor(kRed-7);
@@ -310,13 +347,43 @@ void XeXevsPbPb_plots(){
     b[i-1]->SetY2(XePb05vs1030->GetBinContent(i)*(1+error));
     b[i-1]->Draw("same");
   }
-  XePb05vs1030->Draw("same");
   extrapFunc->Draw("same");
+  XePb05vs1030->Draw("same");
+    tex->DrawLatex(0.9,0.47,"Normalization uncertainty");
+    tex->DrawLatex(0.9,0.35,"Expectation from #sqrt{s_{NN}} difference ");
+    bTAA->SetFillColor(kBlue);
+    bTAA->DrawBox(0.7,0.395,0.85,0.405);
+    bTAA->SetFillColor(kRed+1);
+    bTAA->DrawBox(0.575,1-TAAD_05_1030,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAU_05_1030);
+    bTAA->DrawBox(0.7,0.475,0.85,0.55);
+    tex->DrawLatex(0.7,0.6,"|#eta| < 1");
   tex2->DrawLatex(0.7,0.1,"0-5%/10-30%");
+    int iPeriod = 0;
+    lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
+    writeExtraText = true;  
+    extraText  = "Preliminary";
+    //extraText  = "Unpublished";
+    CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart05.png");
   canv->SaveAs("img/XeXevsPbPb_samenPart05.pdf");
   canv->SaveAs("img/XeXevsPbPb_samenPart05.C");
+  XePb510vs1030->GetYaxis()->SetRangeUser(0,2);
+  XePb510vs1030->SetMarkerSize(1.3);
+  XePb510vs1030->GetYaxis()->SetTitleOffset(1.5);
+  XePb510vs1030->GetXaxis()->SetTitleOffset(1.2);
+  XePb510vs1030->GetYaxis()->CenterTitle();
+  XePb510vs1030->GetXaxis()->SetTitle("p_{T} (GeV)");
+  XePb510vs1030->GetXaxis()->CenterTitle();
+  XePb510vs1030->GetXaxis()->SetLabelOffset(-0.005);
+  XePb510vs1030->GetXaxis()->SetTitleSize(0.06);
+  XePb510vs1030->GetYaxis()->SetTitleSize(0.06);
+  XePb510vs1030->GetYaxis()->SetTitleOffset(1.0);
+  XePb510vs1030->GetXaxis()->SetTitleOffset(0.87);
+  XePb510vs1030->GetYaxis()->SetLabelSize(0.055);
+  XePb510vs1030->GetXaxis()->SetLabelSize(0.055);
+  XePb510vs1030->GetXaxis()->SetLabelOffset(-0.017);
   XePb510vs1030->Draw();
+  line1->Draw("same");
   XePb510vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
   for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
     b[i-1]->SetFillColor(kRed-7);
@@ -327,9 +394,18 @@ void XeXevsPbPb_plots(){
     b[i-1]->SetY2(XePb510vs1030->GetBinContent(i)*(1+error));
     b[i-1]->Draw("same");
   }
-  XePb510vs1030->Draw("same");
   extrapFunc->Draw("same");
+  XePb510vs1030->Draw("same");
+    tex->DrawLatex(0.9,0.47,"Normalization uncertainty");
+    tex->DrawLatex(0.9,0.35,"Expectation from #sqrt{s_{NN}} difference ");
+    bTAA->SetFillColor(kBlue);
+    bTAA->DrawBox(0.7,0.395,0.85,0.405);
+    bTAA->SetFillColor(kRed+1);
+    bTAA->DrawBox(0.575,1-TAAD_510_1030,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAU_510_1030);
+    bTAA->DrawBox(0.7,0.475,0.85,0.55);
+    tex->DrawLatex(0.7,0.6,"|#eta| < 1");
   tex2->DrawLatex(0.7,0.1,"5-10%/10-30%");
+    CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart510.png");
   canv->SaveAs("img/XeXevsPbPb_samenPart510.pdf");
   canv->SaveAs("img/XeXevsPbPb_samenPart510.C");

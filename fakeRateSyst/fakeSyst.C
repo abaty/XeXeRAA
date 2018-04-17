@@ -118,9 +118,9 @@ void fakeSyst(){
       if(j==2){a=10; b=30;}
       if(j==3){a=30; b=50;}
       if(j==4){a=50; b=70;}
-      if(j==5){a=70; b=90;}
+      if(j==5){a=70; b=80;}
       if(j==6){a=0; b=10;}
-      if(j==7){a=0; b=100;}
+      if(j==7){a=0; b=80;}
       leg->AddEntry((TObject*)0,Form("%d-%d%%",a,b),"");
       leg->AddEntry((TObject*)0,Form("%.1f<p_{T}<%.1f",s.xtrkbins[i],s.xtrkbins[i+1]),"");
 
@@ -183,9 +183,9 @@ void fakeSyst(){
       if(i==2){a=10; b=30;}
       if(i==3){a=30; b=50;}
       if(i==4){a=50; b=70;}
-      if(i==5){a=70; b=90;}
+      if(i==5){a=70; b=80;}
       if(i==6){a=0; b=10;}
-      if(i==7){a=0; b=100;}
+      if(i==7){a=0; b=80;}
       leg->AddEntry((TObject*)0,Form("%d-%d%%",a,b),"");
       leg->Draw();
       c1->SaveAs(Form("img/uncert_%d.png",i));
