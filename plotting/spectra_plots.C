@@ -297,8 +297,8 @@ void spectra_plots(){
 
   int iPeriod = 0;
   lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-  writeExtraText = true;  
-  extraText  = "Preliminary";
+  writeExtraText = false;  
+  //extraText  = "Preliminary";
   //extraText  = "Unpublished";
   CMS_lumi( canv2, 0,11);
 

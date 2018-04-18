@@ -389,11 +389,12 @@ void RAA_plots(){
  
     int iPeriod = 0;
     lumi_sqrtS = " 27.4 pb^{-1} (5.02 TeV pp) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-    writeExtraText = true;  
-    extraText  = "Preliminary";
-    //if(c==20) extraText = "Supplementary"
+    writeExtraText = false;  
+    //extraText  = "Preliminary";
+    if(c==20){writeExtraText = true; extraText = "Supplementary";}
     //extraText  = "Unpublished";
     CMS_lumi( canv, iPeriod, 11 );
+    writeExtraText = false;  
  
     gStyle->SetPadTickY(1);
     canv->Update();
@@ -559,11 +560,12 @@ void RAA_plots(){
 
     lumi_sqrtS = "27.4 pb^{-1} (pp) + 404 #mub^{-1} (PbPb) + 3.42 #mub^{-1} (XeXe)";
 
-    //if(i>22) extraText = "Supplementary";
+    if(i>22){writeExtraText = true; extraText = "Supplementary";};
     CMS_lumi( c5, 0, 11,false,false,1.0 );
     c5->SaveAs(Form("img/Summary_NPart_%d.png",i));
     c5->SaveAs(Form("img/Summary_NPart_%d.pdf",i));
     c5->SaveAs(Form("img/Summary_NPart_%d.C",i));
+    writeExtraText = false;
     //sumNpart[15]->Print("All");
     //sumNpart[15]->Print("All");
     delete c5;

@@ -335,8 +335,8 @@ void XeXevsPbPb_plots(){
  
     int iPeriod = 0;
     lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-    writeExtraText = true;  
-    extraText  = "Preliminary";
+    writeExtraText = false;  
+    //extraText  = "Preliminary";
     //extraText  = "Unpublished";
     CMS_lumi( canv, iPeriod, 11 );
  
@@ -393,8 +393,8 @@ void XeXevsPbPb_plots(){
   tex2->DrawLatex(0.7,0.1,"0-5% / 10-30%");
     int iPeriod = 0;
     lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-    writeExtraText = true;  
-    extraText  = "Preliminary";
+    writeExtraText = false;  
+    //extraText  = "Preliminary";
     //extraText  = "Unpublished";
     CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart05.png");
@@ -440,7 +440,8 @@ void XeXevsPbPb_plots(){
     tex->DrawLatex(0.7,0.6,"|#eta| < 1");
   tex2->DrawLatex(0.7,0.1,"5-10% / 10-30%");
 
-    //extraText = "Supplementary";
+    writeExtraText = true;
+    extraText = "Supplementary";
     CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart510.png");
   canv->SaveAs("img/XeXevsPbPb_samenPart510.pdf");

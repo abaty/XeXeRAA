@@ -336,7 +336,7 @@ void systematics(){
   TFile * evtSelFile2 = new TFile("output_April13_98percenteff.root","read");
   TH1D * evtSelVar2[s.nCentBins];
   TF1 * evtSelVar2Fit[s.nCentBins];
-  TH1D * nVtx_evtSelVar2 = (TH1D*)evtSelFile->Get("nVtxMoreBin");
+  TH1D * nVtx_evtSelVar2 = (TH1D*)evtSelFile2->Get("nVtxMoreBin");
   for(int c = 0; c<s.nCentBins; c++){
 
     evtSelVar2[c] = (TH1D*) evtSelFile2->Get(Form("HI_%d_%d",5*s.lowCentBin[c],5*s.highCentBin[c]));
