@@ -60,8 +60,12 @@ void getTheoryVitev(TGraph * vitev){
     vitev->SetPoint(i,x[i],y_d[i]);
     vitev->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
   }
-  vitev->SetFillStyle(3002);
-  vitev->SetFillColor(kRed);
+  gStyle->SetHatchesLineWidth(2);
+  gStyle->SetHatchesSpacing(1);
+  vitev->SetFillStyle(3335);
+  //vitev->SetFillStyle(3002);
+  //vitev->SetFillColor(kRed);
+  vitev->SetFillColor(kGreen+1);
   vitev->SetLineWidth(0);
 }
 void getTheoryCUJET(TGraph * cujet, int cent){
@@ -102,7 +106,10 @@ void getTheoryCUJET(TGraph * cujet, int cent){
     cujet->SetPoint(i,x[i],y_d[i]);
     cujet->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
   }
-  cujet->SetFillStyle(3013);
+  gStyle->SetHatchesLineWidth(2);
+  gStyle->SetHatchesSpacing(1);
+  //cujet->SetFillStyle(3013);
+  cujet->SetFillStyle(3359);
   cujet->SetFillColor(kBlue);
   cujet->SetLineWidth(0);
 }
@@ -428,7 +435,8 @@ void RAA_plots(){
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->AddEntry(vitev,"SCET_{G}","f");
       legTh->Draw("same");    
- 
+      h[c]->Draw("same");     
+  
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
       canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
