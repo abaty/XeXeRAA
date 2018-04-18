@@ -70,15 +70,15 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
 
   TFile * output = TFile::Open("ppRef_Extrapolated.root","recreate");
 
-  TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5plusStat = new TH1D("pp5plusStat","pp5plusStat",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5NoError = new TH1D("pp5","pp5",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5relSyst_plus1 = new TH1D("pp5relSyst_plus1","pp5relSyst_plus1",s.ntrkBins,s.xtrkbins);
-  TH1D * pp5relSyst_minus1 = new TH1D("pp5relSyst_minus1","pp5relSyst_minus1",s.ntrkBins,s.xtrkbins);
+  TH1D * pp5 = new TH1D("pp5","pp5",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5plusStat = new TH1D("pp5plusStat","pp5plusStat",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5NoError = new TH1D("pp5","pp5",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5Syst = new TH1D("pp5Syst","pp5Syst",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5relSyst = new TH1D("pp5relSyst","pp5relSyst",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5relSyst_plus1 = new TH1D("pp5relSyst_plus1","pp5relSyst_plus1",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp5relSyst_minus1 = new TH1D("pp5relSyst_minus1","pp5relSyst_minus1",s.ntrkBins_ppana,s.xtrkbins_ppana);
 
-  TH1D * pythia8_5 = new TH1D("pythia8_5","pythia8_5",s.ntrkBins,s.xtrkbins);
+  TH1D * pythia8_5 = new TH1D("pythia8_5","pythia8_5",s.ntrkBins_ppana,s.xtrkbins_ppana);
   //TH1D * pythia8_544 = new TH1D("pythia8_544","pythia8_544",s.ntrkBins,s.xtrkbins);
   //TH1D * EPOS5 = new TH1D("EPOS_5","EPOS_5",s.ntrkBins,s.xtrkbins);
   TH1D * pythia8_5rat;
@@ -422,7 +422,8 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   int iPeriod = 0;
   lumi_sqrtS = "";
   writeExtraText = true;  
-  extraText  = "Simulation Preliminary";
+  //extraText  = "Simulation Preliminary";
+  extraText  = "Simulation";
   //extraText  = "Unpublished";
   CMS_lumi( c3, iPeriod, 11 );
 
@@ -484,8 +485,8 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   TH1D * pp7 = (TH1D*)pp7TeVFile->Get("pp7");
   TH1D * pp7NoError = (TH1D*)pp7->Clone("pp7NoError");
   for(int i = 0; i<pp7NoError->GetSize(); i++) pp7NoError->SetBinError(i,0);
-  TH1D * pp7relSyst_plus1 = new TH1D("pp7relSyst_plus1","pp7relSyst_plus1",s.ntrkBins,s.xtrkbins);
-  TH1D * pp7relSyst_minus1 = new TH1D("pp7relSyst_minus1","pp7relSyst_minus1",s.ntrkBins,s.xtrkbins);
+  TH1D * pp7relSyst_plus1 = new TH1D("pp7relSyst_plus1","pp7relSyst_plus1",s.ntrkBins_ppana,s.xtrkbins_ppana);
+  TH1D * pp7relSyst_minus1 = new TH1D("pp7relSyst_minus1","pp7relSyst_minus1",s.ntrkBins_ppana,s.xtrkbins_ppana);
   for(int i = 0; i<pp7->GetSize()-2;i++){
     pp7relSyst_plus1->SetBinContent(i+1,1+pp7->GetBinError(i+1)/pp7->GetBinContent(i+1));
     pp7relSyst_minus1->SetBinContent(i+1,1-pp7->GetBinError(i+1)/pp7->GetBinContent(i+1));
@@ -631,18 +632,18 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   ppScaledSyst->SetDirectory(output);
   ppScaledSyst->Write();
 
-  static const int ntrkBins = 30;
-  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0,73.6,103.6};
+  static const int ntrkBins = 29;
+  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 48.0,73.6,103.6};
   TH1D * ppScaledWithFit_Rebin = new TH1D("ppScaled_WithFit","",ntrkBins,xtrkbins);
   TH1D * ppScaledSyst_NoLumi_Rebin = new TH1D("ppScaledSyst_NoLumi","",ntrkBins,xtrkbins);
   TH1D * ppScaledSyst_Rebin = new TH1D("ppScaledSyst","",ntrkBins,xtrkbins);
   for(int i = 1; i<ppScaledWithFit_Rebin->GetSize()-1; i++){
-    if(i<29){
+    if(i<27){
       ppScaledWithFit_Rebin->SetBinContent(i,pp5plusStat->GetBinContent(i)*extrapFuncPoly4->Eval(pp5plusStat->GetBinCenter(i)));
       ppScaledWithFit_Rebin->SetBinError(i,pp5plusStat->GetBinError(i)*extrapFuncPoly4->Eval(pp5plusStat->GetBinCenter(i)));
       ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i)/ppSpec->GetBinContent(i),2)+TMath::Power(extrapPythiaFitUncert->GetBinContent(i),2),0.5));
     }
-    if(i==29){
+    if(i==27){
       float yield1 = pp5plusStat->GetBinContent(i)*pp5plusStat->GetBinWidth(i)*pp5plusStat->GetBinCenter(i);
       float yield2 = pp5plusStat->GetBinContent(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1);
       float net = (yield1+yield2)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
@@ -654,7 +655,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
       float syst = TMath::Power(ppSpec_syst->GetBinContent(i)/ppSpec->GetBinContent(i)*yield1/(yield1+yield2) + ppSpec_syst->GetBinContent(i+1)/ppSpec->GetBinContent(i+1)*yield2/(yield1+yield2),2);
       ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(syst+TMath::Power(extrapPythiaFitUncert->GetBinContent(i),2),0.5));
     }
-    if(i==30){
+    if(i==28){
       float yield1 = pp5plusStat->GetBinContent(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1);
       float yield2 = pp5plusStat->GetBinContent(i+2)*pp5plusStat->GetBinWidth(i+2)*pp5plusStat->GetBinCenter(i+2);
       float net = (yield1+yield2)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
@@ -665,6 +666,18 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
       ppScaledWithFit_Rebin->SetBinError(i,err*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
       float syst = TMath::Power(ppSpec_syst->GetBinContent(i+1)/ppSpec->GetBinContent(i+1)*yield1/(yield1+yield2) + ppSpec_syst->GetBinContent(i+2)/ppSpec->GetBinContent(i+2)*yield2/(yield1+yield2),2);
       ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(syst+TMath::Power(extrapPythiaFitUncert->GetBinContent(i+1),2),0.5));
+    }
+    if(i==29){
+      float yield1 = pp5plusStat->GetBinContent(i+2)*pp5plusStat->GetBinWidth(i+2)*pp5plusStat->GetBinCenter(i+2);
+      float yield2 = pp5plusStat->GetBinContent(i+3)*pp5plusStat->GetBinWidth(i+3)*pp5plusStat->GetBinCenter(i+3);
+      float net = (yield1+yield2)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      float error1 = TMath::Power(pp5plusStat->GetBinError(i+2)*pp5plusStat->GetBinWidth(i+2)*pp5plusStat->GetBinCenter(i+2),2);
+      float error2 = TMath::Power(pp5plusStat->GetBinError(i+3)*pp5plusStat->GetBinWidth(i+3)*pp5plusStat->GetBinCenter(i+3),2);
+      float err = TMath::Power(error1+error2,0.5)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      ppScaledWithFit_Rebin->SetBinContent(i,net*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      ppScaledWithFit_Rebin->SetBinError(i,err*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      float syst = TMath::Power(ppSpec_syst->GetBinContent(i+2)/ppSpec->GetBinContent(i+2)*yield1/(yield1+yield2) + ppSpec_syst->GetBinContent(i+3)/ppSpec->GetBinContent(i+3)*yield2/(yield1+yield2),2);
+      ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(syst+TMath::Power(extrapPythiaFitUncert->GetBinContent(i+2),2),0.5));
     }
 
 

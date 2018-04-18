@@ -349,7 +349,8 @@ void trkCorrPlots(int cutIndex = 0){
   int iPeriod = 0;
   lumi_sqrtS = "";
   writeExtraText = true;  
-  extraText  = "Simulation Preliminary";
+  //extraText  = "Simulation Preliminary";
+  extraText  = "Simulation";
   //extraText  = "Unpublished";
   CMS_lumi( c2, iPeriod, 11, false, true);
 

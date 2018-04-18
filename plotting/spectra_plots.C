@@ -152,10 +152,15 @@ void spectra_plots(){
   h[25]->Draw("same");
 
   //zero out two high-pt points with poor errors
+  h[25]->SetBinContent(29,0);
+  h[25]->SetBinContent(29,0);
+  
+  h[30]->SetBinContent(28,0);
   h[30]->SetBinContent(29,0);
   h[30]->SetBinContent(30,0);
   h[30]->SetBinContent(31,0);
   h[30]->SetBinContent(32,0);
+  h[30]->SetBinContent(28,0);
   h[30]->SetBinError(29,0);
   h[30]->SetBinError(30,0);
   h[30]->SetBinError(31,0);
@@ -213,6 +218,13 @@ void spectra_plots(){
   XeXe_totSyst[30]->Scale(100);
   XeXe_totSyst[30]->GetXaxis()->SetRangeUser(0.5,150);
   XeXe_totSyst[30]->Draw("same hist");
+
+  XeXe_totSyst[25]->SetBinContent(29,0);
+  XeXe_totSyst[25]->SetBinContent(29,0);
+  
+  XeXe_totSyst[30]->SetBinContent(28,0);
+  XeXe_totSyst[30]->SetBinError(28,0);
+
   XeXe_totSyst[30]->SetBinContent(29,0);  
   XeXe_totSyst[30]->SetBinContent(30,0);  
   XeXe_totSyst[30]->SetBinContent(31,0);  

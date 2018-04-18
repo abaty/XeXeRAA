@@ -21,9 +21,11 @@ class Settings{
   std::string trkCorrFile_noSpecCut2 = "trkCorr_Pythia_April9_CutIndex2.root";
   std::string trkCorrFile_noSpecCut3 = "trkCorr_Pythia_April9_CutIndex3.root";
 
+  static const int ntrkBins_ppana = 32;
+  double xtrkbins_ppana[ntrkBins_ppana+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0,60.8, 73.6,86.4, 103.6};
 
-  static const int ntrkBins = 32;
-  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0, 60.8,73.6,86.4,103.6};
+  static const int ntrkBins = 29;
+  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 48.0,73.6,103.6};
   static const int ntrkBins_extra = 18;
   double xtrkbins_extra[ntrkBins_extra+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 2.0 , 2.4  , 4.0 , 5.6  , 7.2 , 12.0, 24.0, 41.6,103.6};
   static const int ntrkBins_extra_D = 19;//dummy for plotting efficiency, should be same as above with 1 extra small bin

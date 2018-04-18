@@ -215,8 +215,8 @@ void RAA_plots(){
   TBox* bLumi = new TBox(0.1,0.1,0.15,0.2); 
   TBox* bTAA = new TBox(0.15,0.1,0.2,0.2); 
   TBox* b[s.ntrkBins];
-  TBox* bPbPb[s.ntrkBins];
-  for(int i = 0; i<s.ntrkBins; i++){
+  TBox* bPbPb[s.ntrkBins+3];
+  for(int i = 0; i<s.ntrkBins+3; i++){
     b[i] = new TBox(0.1,0.1,0.2,0.2); 
     bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
   }
@@ -265,8 +265,14 @@ void RAA_plots(){
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetYaxis()->SetRangeUser(0,1.6);
     h[c]->SetMarkerSize(1.3);
-    
+   
+    if(c==25){
+      h[25]->SetBinError(29,0);
+      h[25]->SetBinContent(29,0);  
+    } 
     if(c==30){
+      h[30]->SetBinContent(28,0);
+      h[30]->SetBinError(28,0);
       h[30]->SetBinContent(29,0);  
       h[30]->SetBinContent(30,0);  
       h[30]->SetBinContent(31,0);  
@@ -327,7 +333,7 @@ void RAA_plots(){
       sumNpart[1][i-1]->SetPointError(cc,0,0,h[c]->GetBinError(i),h[c]->GetBinError(i));
 
     }
-    for(int i = 1; i< (h[0]->GetSize()-1); i++){
+    for(int i = 1; i< (h[0]->GetSize()-1)+3; i++){
       //PbPb syst error boxes    
       //31 is 0-10%, removed for now  
       if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30 && c!=20) continue;
@@ -341,8 +347,8 @@ void RAA_plots(){
       if(i>2){
         bPbPb[i-3]->SetFillStyle(0);
         bPbPb[i-3]->SetLineColor(kBlue);
-        bPbPb[i-3]->SetX1(h[c]->GetXaxis()->GetBinLowEdge(i));
-        bPbPb[i-3]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
+        bPbPb[i-3]->SetX1(PbPb_syst[0]->GetXaxis()->GetBinLowEdge(i-2));
+        bPbPb[i-3]->SetX2(PbPb_syst[0]->GetXaxis()->GetBinUpEdge(i-2));
         float errU = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAU[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
         float errD = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAD[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
         bPbPb[i-3]->SetY1(PbPb[cc]->GetBinContent(i-2)+errU);
@@ -378,12 +384,14 @@ void RAA_plots(){
       leg->Draw("same");
     }
     h[c]->SetMarkerSize(1.3);
+    h[c]->SetLineWidth(2);
     h[c]->Draw("same");
  
     int iPeriod = 0;
     lumi_sqrtS = " 27.4 pb^{-1} (5.02 TeV pp) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
     extraText  = "Preliminary";
+    //if(c==20) extraText = "Supplementary"
     //extraText  = "Unpublished";
     CMS_lumi( canv, iPeriod, 11 );
  
@@ -426,8 +434,8 @@ void RAA_plots(){
     }
     if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50){
       delete PbPb[3];
-      for(int i = 0; i<s.ntrkBins; i++) delete bPbPb[i];
-      for(int i = 0; i<s.ntrkBins; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
+      for(int i = 0; i<s.ntrkBins+3; i++) delete bPbPb[i];
+      for(int i = 0; i<s.ntrkBins+3; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
 
       const int graphPtsCUJET = 180;
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
@@ -550,6 +558,8 @@ void RAA_plots(){
     leg5->Draw("same");
 
     lumi_sqrtS = "27.4 pb^{-1} (pp) + 404 #mub^{-1} (PbPb) + 3.42 #mub^{-1} (XeXe)";
+
+    //if(i>22) extraText = "Supplementary";
     CMS_lumi( c5, 0, 11,false,false,1.0 );
     c5->SaveAs(Form("img/Summary_NPart_%d.png",i));
     c5->SaveAs(Form("img/Summary_NPart_%d.pdf",i));

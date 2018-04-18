@@ -62,9 +62,11 @@ void XeXevsPbPb_plots(){
 
   TFile * sysFile = TFile::Open("../systematics.root","read");
   TH1D * RXP_totSyst[s.nCentBins];
+  TH1D * RXP_NPart_totSyst[2];
   TH1D * evtSelSyst[s.nCentBins];
   //XeXe systematic
   for(int c = 0; c<s.nCentBins; c++){
+    if(c==0 || c==1) RXP_NPart_totSyst[c] = (TH1D*)sysFile->Get(Form("RXP_Total_NPart_%d",c));
     RXP_totSyst[c] = (TH1D*)sysFile->Get(Form("RXP_Total_%d",c));
     RXP_totSyst[c]->SetDirectory(0);
     evtSelSyst[c] = (TH1D*)sysFile->Get(Form("RXP_EventSelection_%d",c));
@@ -175,6 +177,14 @@ void XeXevsPbPb_plots(){
       float relErr = h[c]->GetBinError(i)/h[c]->GetBinContent(i);
       float PbPbContent = PbPb[PbPbBin]->GetBinContent(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)));
       float PbPbRelErr = PbPb[PbPbBin]->GetBinError(PbPb[PbPbBin]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+
+      if(i==27 || i==28 || i==29){
+        int bin = PbPb[0]->FindBin(h[c]->GetBinLowEdge(i));
+        PbPbContent = PbPb[PbPbBin]->GetBinContent(bin)*PbPb[PbPbBin]->GetBinCenter(bin)*PbPb[PbPbBin]->GetBinWidth(bin)+PbPb[PbPbBin]->GetBinContent(bin+1)*PbPb[PbPbBin]->GetBinCenter(bin+1)*PbPb[PbPbBin]->GetBinWidth(bin+1);
+        PbPbContent = PbPbContent/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+        PbPbRelErr = TMath::Power(TMath::Power(PbPb[PbPbBin]->GetBinError(bin)*PbPb[PbPbBin]->GetBinCenter(bin)*PbPb[PbPbBin]->GetBinWidth(bin),2)+TMath::Power(PbPb[PbPbBin]->GetBinError(bin+1)*PbPb[PbPbBin]->GetBinCenter(bin+1)*PbPb[PbPbBin]->GetBinWidth(bin+1),2),0.5)/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+        PbPbRelErr = PbPbRelErr/PbPbContent;
+      }
  
       float temphc = h[c]->GetBinContent(i);
 
@@ -184,12 +194,26 @@ void XeXevsPbPb_plots(){
       if(c==0){ 
         PbPbContent = PbPb[2]->GetBinContent(PbPb[2]->FindBin(h[c]->GetBinCenter(i))); 
         PbPbRelErr = PbPb[2]->GetBinError(PbPb[2]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+        if(i==27 || i==28 || i==29){
+          int bin = PbPb[0]->FindBin(h[c]->GetBinLowEdge(i));
+          PbPbContent = PbPb[2]->GetBinContent(bin)*PbPb[2]->GetBinCenter(bin)*PbPb[2]->GetBinWidth(bin)+PbPb[2]->GetBinContent(bin+1)*PbPb[2]->GetBinCenter(bin+1)*PbPb[2]->GetBinWidth(bin+1);
+          PbPbContent = PbPbContent/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+          PbPbRelErr = TMath::Power(TMath::Power(PbPb[2]->GetBinError(bin)*PbPb[2]->GetBinCenter(bin)*PbPb[2]->GetBinWidth(bin),2)+TMath::Power(PbPb[2]->GetBinError(bin+1)*PbPb[2]->GetBinCenter(bin+1)*PbPb[2]->GetBinWidth(bin+1),2),0.5)/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+          PbPbRelErr = PbPbRelErr/PbPbContent;
+        }
         XePb05vs1030->SetBinContent(i,temphc/PbPbContent);
         XePb05vs1030->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
       }
       if(c==1){ 
         PbPbContent = PbPb[2]->GetBinContent(PbPb[2]->FindBin(h[c]->GetBinCenter(i))); 
         PbPbRelErr = PbPb[2]->GetBinError(PbPb[2]->FindBin(h[c]->GetBinCenter(i)))/PbPbContent;
+        if(i==27 || i==28 || i==29){
+          int bin = PbPb[0]->FindBin(h[c]->GetBinLowEdge(i));
+          PbPbContent = PbPb[2]->GetBinContent(bin)*PbPb[2]->GetBinCenter(bin)*PbPb[2]->GetBinWidth(bin)+PbPb[2]->GetBinContent(bin+1)*PbPb[2]->GetBinCenter(bin+1)*PbPb[2]->GetBinWidth(bin+1);
+          PbPbContent = PbPbContent/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+          PbPbRelErr = TMath::Power(TMath::Power(PbPb[2]->GetBinError(bin)*PbPb[2]->GetBinCenter(bin)*PbPb[2]->GetBinWidth(bin),2)+TMath::Power(PbPb[2]->GetBinError(bin+1)*PbPb[2]->GetBinCenter(bin+1)*PbPb[2]->GetBinWidth(bin+1),2),0.5)/h[c]->GetBinWidth(i)/h[c]->GetBinCenter(i);
+          PbPbRelErr = PbPbRelErr/PbPbContent;
+        }
         XePb510vs1030->SetBinContent(i,temphc/PbPbContent);
         XePb510vs1030->SetBinError(i,TMath::Power(relErr*relErr+PbPbRelErr*PbPbRelErr,0.5));
       }
@@ -276,7 +300,8 @@ void XeXevsPbPb_plots(){
       b[i-1]->SetX2(h[c]->GetXaxis()->GetBinUpEdge(i));
       b[i-1]->SetY1((h[c]->GetBinContent(i))*(1-error));
       b[i-1]->SetY2(h[c]->GetBinContent(i)*(1+error));
-      if(c==30 && i>=29) continue;
+      if(c==30 && i>=28) continue;
+      if(c==25 && i>=29) continue;
       b[i-1]->Draw("same");
     }
 
@@ -287,8 +312,15 @@ void XeXevsPbPb_plots(){
     extrapFunc->Draw("same");
     
     h[c]->SetMarkerSize(1.3);
+    h[c]->SetLineWidth(2);
 
+    if(c==25){
+      h[25]->SetBinError(29,0);
+      h[25]->SetBinContent(29,0);  
+    } 
     if(c==30){
+      h[30]->SetBinContent(28,0);
+      h[30]->SetBinError(28,0);
       h[30]->SetBinContent(29,0);  
       h[30]->SetBinContent(30,0);  
       h[30]->SetBinContent(31,0);  
@@ -319,6 +351,7 @@ void XeXevsPbPb_plots(){
 
   XePb05vs1030->GetYaxis()->SetRangeUser(0,2);
   XePb05vs1030->SetMarkerSize(1.3);
+  XePb05vs1030->SetLineWidth(2);
   XePb05vs1030->GetYaxis()->SetTitleOffset(1.5);
   XePb05vs1030->GetXaxis()->SetTitleOffset(1.2);
   XePb05vs1030->GetYaxis()->CenterTitle();
@@ -340,7 +373,7 @@ void XeXevsPbPb_plots(){
   XePb05vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
   for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
     b[i-1]->SetFillColor(kRed-7);
-    float error = RXP_totSyst[0]->GetBinContent(i);
+    float error = RXP_NPart_totSyst[0]->GetBinContent(i);
     b[i-1]->SetX1(h[0]->GetXaxis()->GetBinLowEdge(i));
     b[i-1]->SetX2(h[0]->GetXaxis()->GetBinUpEdge(i));
     b[i-1]->SetY1((XePb05vs1030->GetBinContent(i))*(1-error));
@@ -369,6 +402,7 @@ void XeXevsPbPb_plots(){
   canv->SaveAs("img/XeXevsPbPb_samenPart05.C");
   XePb510vs1030->GetYaxis()->SetRangeUser(0,2);
   XePb510vs1030->SetMarkerSize(1.3);
+  XePb510vs1030->SetLineWidth(2);
   XePb510vs1030->GetYaxis()->SetTitleOffset(1.5);
   XePb510vs1030->GetXaxis()->SetTitleOffset(1.2);
   XePb510vs1030->GetYaxis()->CenterTitle();
@@ -387,7 +421,7 @@ void XeXevsPbPb_plots(){
   XePb510vs1030->GetYaxis()->SetTitle("R^{Xe}_{Pb}");
   for(int i = 3; i<(h[0]->GetSize()-1); i++){ 
     b[i-1]->SetFillColor(kRed-7);
-    float error = RXP_totSyst[0]->GetBinContent(i);
+    float error = RXP_NPart_totSyst[1]->GetBinContent(i);
     b[i-1]->SetX1(h[0]->GetXaxis()->GetBinLowEdge(i));
     b[i-1]->SetX2(h[0]->GetXaxis()->GetBinUpEdge(i));
     b[i-1]->SetY1((XePb510vs1030->GetBinContent(i))*(1-error));
@@ -405,6 +439,8 @@ void XeXevsPbPb_plots(){
     bTAA->DrawBox(0.7,0.475,0.85,0.55);
     tex->DrawLatex(0.7,0.6,"|#eta| < 1");
   tex2->DrawLatex(0.7,0.1,"5-10% / 10-30%");
+
+    //extraText = "Supplementary";
     CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart510.png");
   canv->SaveAs("img/XeXevsPbPb_samenPart510.pdf");

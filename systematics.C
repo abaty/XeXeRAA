@@ -476,6 +476,9 @@ void systematics(){
     RXP_EventSelection[i] = new TH1D(Form("RXP_EventSelection_%d",i),"",s.ntrkBins,s.xtrkbins);
     RXP_Total[i] = new TH1D(Form("RXP_Total_%d",i),"",s.ntrkBins,s.xtrkbins);
   }  
+  TH1D * RXP_Total_NPart[2];
+  RXP_Total_NPart[0] = new TH1D("RXP_Total_NPart_0","",s.ntrkBins,s.xtrkbins);
+  RXP_Total_NPart[1] = new TH1D("RXP_Total_NPart_1","",s.ntrkBins,s.xtrkbins);
 
   //spectra
   for(int i = 0; i<s.nCentBins; i++){
@@ -640,6 +643,74 @@ void systematics(){
       RXP_Total[i]->SetBinContent(j,TMath::Sqrt(total2));
     }
     plotRXP(RXP_Total[i], RXP_SpecCorr[i], RXP_XeFakeCorr[i],  RXP_XeEffMethod[i], RXP_XeCutVariation[i], RXP_EventSelection[i],  RXP_PbFakeCorr[i], RXP_PbEffMethod[i] , RXP_PbCutVariation[i] , RXP_PbTrigger[i] , i, s); 
+    
+    hyperon->Close();
+    trigger->Close();
+    fakeFile->Close();
+  }
+  
+  for(int i = 0; i<s.nCentBins; i++){
+    if(i!=0 && i!=1) continue;
+    TFile * hyperon = TFile::Open("Pbsystematics/HyperonFractions_10_30.root","read");
+    TH1D * hyperonCorr = (TH1D*)hyperon->Get("netSyst");
+    TFile * trigger = TFile::Open("Pbsystematics/Spectra_ForPaper_Aug12.root","read");
+    TH1D * TriggerUncert = (TH1D*)trigger->Get("h_HInormSyst_10_30");
+    TFile * fakeFile = TFile::Open("Pbsystematics/Closure_PbPb.root","read");
+    TH1D * PbPbFake = (TH1D*)fakeFile->Get("Fake_0");
+
+    for(int j = 1; j<s.ntrkBins+1; j++){
+      double total2 = 0;
+      if(s.HI[i]->GetBinContent(j)==0) continue;
+      float PbPbCorr = TMath::Max(hyperonCorr->GetBinContent(hyperonCorr->FindBin(RXP_SpecCorr[i]->GetBinCenter(j))),0.015);
+      //fix high-pt region 
+      if(PbPbCorr>0.3) PbPbCorr = 0.015;
+
+      //stuff that doesn't inherit from above 
+      //species corr
+      //RXP_SpecCorr[i]->SetBinContent(j,TMath::Abs(PbPbCorr-spec_SpecCorr[i]->GetBinContent(j)));
+      total2 += TMath::Power(TMath::Abs(PbPbCorr-spec_SpecCorr[i]->GetBinContent(j)),2);
+      
+      //fake correction
+      double Pbfake = PbPbFake->GetBinContent(PbPbFake->FindBin(RXP_PbFakeCorr[i]->GetBinCenter(j)));
+      //RXP_PbFakeCorr[i]->SetBinContent(j,Pbfake-1);
+      total2 += TMath::Power(Pbfake-1,2);
+      
+      //Pb efficiency uncertinaty from MC stats
+      //RXP_PbEffMethod[i]->SetBinContent(j,PbFiniteMCStats(i,j));
+      total2 += TMath::Power(PbFiniteMCStats(i,j),2);
+      
+      //Syst from cut variations
+      //RXP_PbCutVariation[i]->SetBinContent(j,0.04);
+      total2 += 0.04*0.04;
+      
+      //Syst from PbPb trigger
+      float triggerUncertTemp = TriggerUncert->GetBinContent(TriggerUncert->FindBin(RXP_PbTrigger[i]->GetBinCenter(j)));
+      //RXP_PbTrigger[i]->SetBinContent(j,triggerUncertTemp);
+      total2 += TMath::Power(triggerUncertTemp,2);
+
+
+      //inherits from above
+      //Xeefficiency uncertainty from MC stats
+      //RXP_XeEffMethod[i]->SetBinContent(j,spec_EffMethod[i]->GetBinContent(j));
+      total2 += TMath::Power(spec_EffMethod[i]->GetBinContent(j),2);
+      
+      //Syst from cut variations
+      //RXP_XeCutVariation[i]->SetBinContent(j,spec_CutVariation[i]->GetBinContent(j));
+      total2 += TMath::Power(spec_CutVariation[i]->GetBinContent(j),2);
+      
+      //Syst from eventSelection
+      //RXP_EventSelection[i]->SetBinContent(j,spec_EventSelection[i]->GetBinContent(j));
+      //don't include uncert in total
+      //total2 += TMath::Power(spec_EventSelection[i]->GetBinContent(j),2);
+      
+      //fake correction
+      //RXP_XeFakeCorr[i]->SetBinContent(j,TMath::Abs(s.HI_UpFakeCorr[i]->GetBinContent(j)-1));
+      total2 += TMath::Power(s.HI_UpFakeCorr[i]->GetBinContent(j)-1,2);   
+
+      //total
+      RXP_Total_NPart[i]->SetBinContent(j,TMath::Sqrt(total2));
+    }
+    //plotRXP(RXP_Total[i], RXP_SpecCorr[i], RXP_XeFakeCorr[i],  RXP_XeEffMethod[i], RXP_XeCutVariation[i], RXP_EventSelection[i],  RXP_PbFakeCorr[i], RXP_PbEffMethod[i] , RXP_PbCutVariation[i] , RXP_PbTrigger[i] , i, s); 
     
     hyperon->Close();
     trigger->Close();
