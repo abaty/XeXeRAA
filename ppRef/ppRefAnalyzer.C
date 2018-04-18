@@ -264,7 +264,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   canv2->SaveAs("img/Spectra_perEventYield.C");
 
   
-  TCanvas * c3 = new TCanvas("c3","c3",800,600);
+  TCanvas * c3 = new TCanvas("c3","c3",800,800);
   extrapFactorPythia = (TH1D*)pythia8_544->Clone("extrapFactorPythia");
   extrapFactorPythia->Divide(pythia8_fromFile);
   extrapFactorPythia->SetLineColor(kRed);
@@ -374,7 +374,7 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
       extrapFactorHerw->SetBinContent(i,0);
       extrapFactorHerw->SetBinError(i,0);
     }
-    if(extrapFactorEPOS->GetBinError(i)/extrapFactorEPOS->GetBinContent(i)>0.2){
+    if(extrapFactorEPOS->GetBinError(i)/extrapFactorEPOS->GetBinContent(i)>0.15){
       extrapFactorEPOS->SetBinContent(i,0);
       extrapFactorEPOS->SetBinError(i,0);
     }
@@ -390,22 +390,30 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia->GetXaxis()->SetLabelOffset(-0.015);
   extrapFactorPythia->GetXaxis()->SetTitleSize(0.0675);
   extrapFactorPythia->GetXaxis()->SetLabelSize(0.05);
-  extrapFactorPythia->SetLineColor(kRed);
+  extrapFactorPythia->SetLineColor(kBlack);
   extrapFactorPythia->SetLineWidth(2);
-  extrapFactorPythia->SetMarkerColor(kRed);
+  extrapFactorPythia->SetMarkerColor(kBlack);
+  extrapFactorPythia->GetYaxis()->SetRangeUser(0.95,1.4);
+
+
+  c3->SetRightMargin(0.03);
+  extrapFactorPythia->SetMarkerSize(1.3);
   extrapFactorPythia->Draw("");
-  extrapFuncPoly4->SetLineColor(kBlack);
+  extrapFuncPoly4->SetLineColor(kRed);
+  extrapFuncPoly4->SetLineWidth(2);
   extrapFuncPoly4->Draw("same");
   extrapFactorEPOS->SetMarkerStyle(24);
+  extrapFactorEPOS->SetMarkerSize(1.3);
   extrapFactorEPOS->SetLineWidth(1);
   extrapFactorEPOS->Draw("same");
   extrapFactorHerw->SetLineWidth(1);
+  extrapFactorHerw->SetMarkerSize(1.3);
   extrapFactorHerw->Draw("same");
   //TH1D * extrapFactorPythiaClone = (TH1D*)extrapFactorPythia->Clone("extraFactorPythiaClone");
   //extrapFactorPythiaClone->Draw("same");
   specLeg2->SetX1NDC(0.2); 
   specLeg2->SetX2NDC(0.7); 
-  specLeg2->SetY1NDC(0.55); 
+  specLeg2->SetY1NDC(0.5); 
   specLeg2->SetY2NDC(0.75); 
   specLeg2->SetFillStyle(0); 
   specLeg2->Draw("same"); 
@@ -605,9 +613,10 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   extrapFactorPythia7->SetDirectory(output);
   extrapFactorPythia7->Write();
 
-  TH1D * ppScaledWithFit = (TH1D*)pp5plusStat->Clone("ppScaled_WithFit");
-  TH1D * ppScaledSyst_NoLumi = (TH1D*)ppSpec_syst->Clone("ppScaledSyst_NoLumi");
-  TH1D * ppScaledSyst = (TH1D*)ppSpec_syst->Clone("ppScaledSyst");
+  TH1D * ppScaledWithFit = (TH1D*)pp5plusStat->Clone("ppScaled_WithFit_noRebin");
+  TH1D * ppScaledSyst_NoLumi = (TH1D*)ppSpec_syst->Clone("ppScaledSyst_NoLumi_noRebin");
+  TH1D * ppScaledSyst = (TH1D*)ppSpec_syst->Clone("ppScaledSyst_noRebin");
+
   for(int i = 1; i<ppScaledWithFit->GetSize()-1; i++){
     ppScaledWithFit->SetBinContent(i,ppScaledWithFit->GetBinContent(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
     ppScaledWithFit->SetBinError(i,ppScaledWithFit->GetBinError(i)*extrapFuncPoly4->Eval(ppScaledWithFit->GetBinCenter(i)));
@@ -621,6 +630,55 @@ void ppRefAnalyzer(bool doRemoveHyperonCorr = false){
   ppScaledSyst_NoLumi->Write();
   ppScaledSyst->SetDirectory(output);
   ppScaledSyst->Write();
+
+  static const int ntrkBins = 30;
+  double xtrkbins[ntrkBins+1] = {0.5,0.6, 0.7 , 0.8 , 0.9 , 1.0 , 1.1 , 1.2 , 1.4 , 1.6 , 1.8 , 2.0 , 2.2 , 2.4 , 3.2 , 4.0 , 4.8 , 5.6 , 6.4 , 7.2 , 9.6 , 12.0, 14.4,19.2, 24.0, 28.8, 35.2, 41.6, 48.0,73.6,103.6};
+  TH1D * ppScaledWithFit_Rebin = new TH1D("ppScaled_WithFit","",ntrkBins,xtrkbins);
+  TH1D * ppScaledSyst_NoLumi_Rebin = new TH1D("ppScaledSyst_NoLumi","",ntrkBins,xtrkbins);
+  TH1D * ppScaledSyst_Rebin = new TH1D("ppScaledSyst","",ntrkBins,xtrkbins);
+  for(int i = 1; i<ppScaledWithFit_Rebin->GetSize()-1; i++){
+    if(i<29){
+      ppScaledWithFit_Rebin->SetBinContent(i,pp5plusStat->GetBinContent(i)*extrapFuncPoly4->Eval(pp5plusStat->GetBinCenter(i)));
+      ppScaledWithFit_Rebin->SetBinError(i,pp5plusStat->GetBinError(i)*extrapFuncPoly4->Eval(pp5plusStat->GetBinCenter(i)));
+      ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(TMath::Power(ppSpec_syst->GetBinContent(i)/ppSpec->GetBinContent(i),2)+TMath::Power(extrapPythiaFitUncert->GetBinContent(i),2),0.5));
+    }
+    if(i==29){
+      float yield1 = pp5plusStat->GetBinContent(i)*pp5plusStat->GetBinWidth(i)*pp5plusStat->GetBinCenter(i);
+      float yield2 = pp5plusStat->GetBinContent(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1);
+      float net = (yield1+yield2)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      float error1 = TMath::Power(pp5plusStat->GetBinError(i)*pp5plusStat->GetBinWidth(i)*pp5plusStat->GetBinCenter(i),2);
+      float error2 = TMath::Power(pp5plusStat->GetBinError(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1),2);
+      float err = TMath::Power(error1+error2,0.5)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      ppScaledWithFit_Rebin->SetBinContent(i,net*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      ppScaledWithFit_Rebin->SetBinError(i,err*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      float syst = TMath::Power(ppSpec_syst->GetBinContent(i)/ppSpec->GetBinContent(i)*yield1/(yield1+yield2) + ppSpec_syst->GetBinContent(i+1)/ppSpec->GetBinContent(i+1)*yield2/(yield1+yield2),2);
+      ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(syst+TMath::Power(extrapPythiaFitUncert->GetBinContent(i),2),0.5));
+    }
+    if(i==30){
+      float yield1 = pp5plusStat->GetBinContent(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1);
+      float yield2 = pp5plusStat->GetBinContent(i+2)*pp5plusStat->GetBinWidth(i+2)*pp5plusStat->GetBinCenter(i+2);
+      float net = (yield1+yield2)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      float error1 = TMath::Power(pp5plusStat->GetBinError(i+1)*pp5plusStat->GetBinWidth(i+1)*pp5plusStat->GetBinCenter(i+1),2);
+      float error2 = TMath::Power(pp5plusStat->GetBinError(i+2)*pp5plusStat->GetBinWidth(i+2)*pp5plusStat->GetBinCenter(i+2),2);
+      float err = TMath::Power(error1+error2,0.5)/ppScaledWithFit_Rebin->GetBinWidth(i)/ppScaledWithFit_Rebin->GetBinCenter(i);
+      ppScaledWithFit_Rebin->SetBinContent(i,net*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      ppScaledWithFit_Rebin->SetBinError(i,err*extrapFuncPoly4->Eval(ppScaledWithFit_Rebin->GetBinCenter(i)));
+      float syst = TMath::Power(ppSpec_syst->GetBinContent(i+1)/ppSpec->GetBinContent(i+1)*yield1/(yield1+yield2) + ppSpec_syst->GetBinContent(i+2)/ppSpec->GetBinContent(i+2)*yield2/(yield1+yield2),2);
+      ppScaledSyst_NoLumi_Rebin->SetBinContent(i,TMath::Power(syst+TMath::Power(extrapPythiaFitUncert->GetBinContent(i+1),2),0.5));
+    }
+
+
+    ppScaledSyst_Rebin->SetBinContent(i,TMath::Power(TMath::Power(ppScaledSyst_NoLumi_Rebin->GetBinContent(i),2)+0.023*0.023,0.5));
+  }
+
+  ppScaledWithFit_Rebin->SetDirectory(output);
+  ppScaledWithFit_Rebin->Write();
+  ppScaledSyst_NoLumi_Rebin->SetDirectory(output);
+  ppScaledSyst_NoLumi_Rebin->Write();
+  ppScaledSyst_Rebin->SetDirectory(output);
+  ppScaledSyst_Rebin->Write();
+
+
 
   TH1D * ppScaled = (TH1D*)pp5->Clone("ppScaled");
   ppScaled->Multiply(extrapFactorPythia);

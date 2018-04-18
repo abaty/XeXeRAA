@@ -4,7 +4,7 @@
 #include <iostream>
 
 void 
-CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi )
+CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi, float multiplier )
 {            
   bool outOfFrame    = false;
   if( iPosX/10==0 ) 
@@ -25,7 +25,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi )
   float H = pad->GetWh();
   float W = pad->GetWw();
   float l = pad->GetLeftMargin();
-  float t = pad->GetTopMargin();
+  float t = pad->GetTopMargin()*multiplier;
   float r = pad->GetRightMargin();
   float b = pad->GetBottomMargin();
   //  float e = 0.025;

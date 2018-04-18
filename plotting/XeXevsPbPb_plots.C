@@ -357,7 +357,7 @@ void XeXevsPbPb_plots(){
     bTAA->DrawBox(0.575,1-TAAD_05_1030,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAU_05_1030);
     bTAA->DrawBox(0.7,0.475,0.85,0.55);
     tex->DrawLatex(0.7,0.6,"|#eta| < 1");
-  tex2->DrawLatex(0.7,0.1,"0-5%/10-30%");
+  tex2->DrawLatex(0.7,0.1,"0-5% / 10-30%");
     int iPeriod = 0;
     lumi_sqrtS = "404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
     writeExtraText = true;  
@@ -404,7 +404,7 @@ void XeXevsPbPb_plots(){
     bTAA->DrawBox(0.575,1-TAAD_510_1030,TMath::Power(10,TMath::Log10(0.575)+(TMath::Log10(0.675)-TMath::Log10(0.575))/2.0),1+TAAU_510_1030);
     bTAA->DrawBox(0.7,0.475,0.85,0.55);
     tex->DrawLatex(0.7,0.6,"|#eta| < 1");
-  tex2->DrawLatex(0.7,0.1,"5-10%/10-30%");
+  tex2->DrawLatex(0.7,0.1,"5-10% / 10-30%");
     CMS_lumi( canv, iPeriod, 11 );
   canv->SaveAs("img/XeXevsPbPb_samenPart510.png");
   canv->SaveAs("img/XeXevsPbPb_samenPart510.pdf");

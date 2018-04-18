@@ -38,5 +38,5 @@ TString lumi_sqrtS = "";
 
 bool drawLogo      = false;
 
-void CMS_lumi( TPad* pad, int iPeriod=3, int iPosX=10, bool doBotLeft=false, bool doBigLumi=false );
+void CMS_lumi( TPad* pad, int iPeriod=3, int iPosX=10, bool doBotLeft=false, bool doBigLumi=false, float multiplier=1.0 );
 #endif

@@ -25,7 +25,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool doBotLeft, bool doBigLumi )
   float H = pad->GetWh();
   float W = pad->GetWw();
   float l = pad->GetLeftMargin();
-  float t = pad->GetTopMargin();
+  float t = pad->GetTopMargin()*1.5;
   float r = pad->GetRightMargin();
   float b = pad->GetBottomMargin();
   //  float e = 0.025;

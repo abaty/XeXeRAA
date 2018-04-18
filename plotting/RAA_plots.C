@@ -502,6 +502,7 @@ void RAA_plots(){
   }
   for(int i = 2; i<s.ntrkBins; i++){ 
     TCanvas * c5 = new TCanvas("c5","c5",650,600);
+    c5->SetTopMargin(0.07);
     sumNpart[0][i]->SetFillColor(kRed-7);
     sumNpart[0][i]->SetLineWidth(1);
     sumNpart[0][i]->SetMarkerStyle(8);
@@ -548,8 +549,8 @@ void RAA_plots(){
     leg5->SetFillStyle(0);
     leg5->Draw("same");
 
-    lumi_sqrtS = "27.4 pb^{-1} (5.02 TeV pp) + 404 #mub^{-1} (5.02 TeV PbPb) + 3.42 #mub^{-1} (5.44 TeV XeXe)";
-    CMS_lumi( c5, 0, 11 );
+    lumi_sqrtS = "27.4 pb^{-1} (pp) + 404 #mub^{-1} (PbPb) + 3.42 #mub^{-1} (XeXe)";
+    CMS_lumi( c5, 0, 11,false,false,1.0 );
     c5->SaveAs(Form("img/Summary_NPart_%d.png",i));
     c5->SaveAs(Form("img/Summary_NPart_%d.pdf",i));
     c5->SaveAs(Form("img/Summary_NPart_%d.C",i));

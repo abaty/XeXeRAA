@@ -92,12 +92,12 @@ void spectra_plots(){
   
   TCanvas * canv2 = new TCanvas("canv2","canv2",700,800);
   canv2->SetBorderSize(0);
-  TPad * pad1 = new TPad("pad1","pad1",0.0,0.3,1.0,1.0,0);
-  TPad * pad2 = new TPad("pad2","pad2",0.0,0.0,1.0,0.3,0);
+  TPad * pad1 = new TPad("pad1","pad1",0.0,0.25,1.0,1.0,0);
+  TPad * pad2 = new TPad("pad2","pad2",0.0,0.0,1.0,0.25,0);
   canv2->SetLineWidth(0);
   pad1->SetBottomMargin(0);
   pad1->SetLeftMargin(0.15);
-  pad1->SetTopMargin(0.08);
+  pad1->SetTopMargin(0.07);
   pad1->SetBorderSize(0);
   pad1->Draw();
   pad2->SetTopMargin(0);
@@ -117,8 +117,8 @@ void spectra_plots(){
   ppSpecD->GetYaxis()->SetLabelSize(0.04);
   ppSpecD->GetYaxis()->CenterTitle();
   ppSpecD->GetYaxis()->SetLabelOffset(0.002);
-  ppSpecD->GetYaxis()->SetRangeUser(1.1e-13,1e4);
-  ppSpecD->GetXaxis()->SetRangeUser(0.4,350);
+  ppSpecD->GetYaxis()->SetRangeUser(1.1e-14,1e7);
+  ppSpecD->GetXaxis()->SetRangeUser(0.4,150);
   ppSpecD->Draw();
 
   ppSpec->SetMarkerStyle(5);
@@ -168,7 +168,7 @@ void spectra_plots(){
   h[30]->Draw("same");
 
 
-  TLegend * specLeg = new TLegend(0.2,0.05,0.55,0.5);
+  TLegend * specLeg = new TLegend(0.6,0.52,1,0.9);
   //specLeg->SetFillStyle(0);
   specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   specLeg->AddEntry(h[0],Form("0-5%s (x10)","%"),"p");  
@@ -180,22 +180,24 @@ void spectra_plots(){
   specLeg->AddEntry(ppSpec,"Extrapolated pp","p"); 
   specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
+  TLegend * specLeg_norm = new TLegend(0.28,0.03,0.63,0.43);
+  //specLeg->SetFillStyle(0);
  
   pad2->cd();
   pad2->SetLogx();
   TH1D * ppSpecD2 = new TH1D("specDummy2","",3,0.4,150);
-  ppSpecD2->GetYaxis()->SetRangeUser(0.0,29.999);
+  ppSpecD2->GetYaxis()->SetRangeUser(0.0,19.999);
   ppSpecD2->GetYaxis()->SetNdivisions(4,4,0,kTRUE);
-  ppSpecD2->GetYaxis()->SetTitleOffset(0.6);
+  ppSpecD2->GetYaxis()->SetTitleOffset(0.4);
   ppSpecD2->GetYaxis()->SetTitleFont(42);
-  ppSpecD2->GetYaxis()->SetTitleSize(0.095);
-  ppSpecD2->GetYaxis()->SetLabelSize(0.095);
+  ppSpecD2->GetYaxis()->SetTitleSize(0.095*1.2);
+  ppSpecD2->GetYaxis()->SetLabelSize(0.095*1.2);
   ppSpecD2->GetXaxis()->SetTitleFont(42);
   ppSpecD2->GetYaxis()->SetTitle(Form("Syst. uncert. (%s)","%"));
-  ppSpecD2->GetXaxis()->SetRangeUser(0.4,350);
+  ppSpecD2->GetXaxis()->SetRangeUser(0.4,150);
   ppSpecD2->GetXaxis()->SetTitle("p_{T} (GeV)");
-  ppSpecD2->GetXaxis()->SetTitleSize(0.1);
-  ppSpecD2->GetXaxis()->SetLabelSize(0.1);
+  ppSpecD2->GetXaxis()->SetTitleSize(0.1*1.2);
+  ppSpecD2->GetXaxis()->SetLabelSize(0.1*1.2);
   ppSpecD2->GetXaxis()->SetTitleOffset(1.2);
   ppSpecD2->GetXaxis()->CenterTitle();
   ppSpecD2->GetXaxis()->SetTickLength(0.06);
@@ -227,7 +229,7 @@ void spectra_plots(){
   pp_totSyst->Draw("same");
 
   //normalization
-  TH1D * ppNorm = new TH1D("ppNorm","",2,110,140);
+  /*TH1D * ppNorm = new TH1D("ppNorm","",2,110,140);
   ppNorm->SetBinContent(1,2.3);
   ppNorm->SetBinContent(2,0);
   ppNorm->SetFillColor(kBlack);
@@ -251,17 +253,32 @@ void spectra_plots(){
   lat->SetTextSize(0.06);
   lat->DrawLatex(54,15,"Normalization");
   lat->DrawLatex(55,12,"uncertainties");
+  */
 
-  TLegend * systLeg = new TLegend(0.2,0.75,0.85,0.93);
-  systLeg->SetNColumns(3);
+  /*TLegend * systLeg = new TLegend(0.3,0.75,0.95,0.87);
+  systLeg->SetNColumns(3);*/
+  pad1->cd(); 
+  TLegend * systLeg = new TLegend(0.2,0.03,0.6,0.27);
   systLeg->SetFillStyle(0);
-  systLeg->AddEntry(pp_totSyst,"Extrapolated pp","f");
+  systLeg->AddEntry((TObject*)0,"","");
   systLeg->AddEntry(XeXe_totSyst[0],Form("0-5%s","%"),"f");
   systLeg->AddEntry(XeXe_totSyst[30],Form("70-80%s","%"),"f");
+  systLeg->AddEntry(pp_totSyst,"pp","f");
   systLeg->SetFillStyle(0);
-  gStyle->SetPadTickY(1);
   systLeg->SetLineColor(kBlack);
+  gStyle->SetPadTickY(1);
   systLeg->Draw("same");
+  TLegend * systLeg2 = new TLegend(0.15,0.03,0.7,0.27);
+  systLeg2->SetFillStyle(0);
+  systLeg2->SetTextAlign(22);
+  systLeg2->AddEntry((TObject*)0,"Normalization uncertainty","");
+  systLeg2->AddEntry((TObject*)0,Form("%.1f%%",evtSelSyst[0]->GetBinContent(2)*100),"");
+  systLeg2->AddEntry((TObject*)0,Form("%.0f%%",evtSelSyst[30]->GetBinContent(2)*100),"");
+  systLeg2->AddEntry((TObject*)0,"2.3%","");
+  systLeg2->SetFillStyle(0);
+  systLeg2->Draw("same");
+  pad2->cd();
+
   ppSpecD2->Draw("sameaxis");
   ppSpecD2->GetXaxis()->Draw("same");
   
@@ -271,7 +288,7 @@ void spectra_plots(){
   writeExtraText = true;  
   extraText  = "Preliminary";
   //extraText  = "Unpublished";
-  CMS_lumi( canv2, 0,33);
+  CMS_lumi( canv2, 0,11);
 
   canv2->SaveAs("img/spectra_XeXe.pdf");
   canv2->SaveAs("img/spectra_XeXe.png");
