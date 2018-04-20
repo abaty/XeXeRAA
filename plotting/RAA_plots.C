@@ -115,6 +115,50 @@ void getTheoryCUJET(TGraph * cujet, int cent){
 }
 //***************************************************************************************************8
 
+void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
+  graphPts = g->GetN()/2;
+  ratPts = rat->GetN()/2;
+  
+  int setPoints = 0;
+
+  for(int i=1;i<h->GetXaxis()->GetNbins()+1; i++){
+    double x = h->GetXaxis()->GetBinCenter(i);
+    double xg, yg;
+    double xg2, yg2;
+    for(int j = 0; j<graphPts; j++){
+      g->GetPoint(j,xg,yg);
+      g->GetPoint(j+1,xg2,yg2);
+      if(x>=xg && x<xg2){
+        //first edge
+        double interp = yg+(yg2-yg)*(x-xg)/(xg2-xg);
+        rat->SetPoint(setPoints, x, interp/h->GetBinContent(i)); 
+
+        //other edge
+        g->GetPoint((2*graphPts-1)-j,xg,yg);
+        g->GetPoint((2*graphPts-1)-(j+1),xg2,yg2);
+        interp = yg+(yg2-yg)*(x-xg)/(xg2-xg);
+        rat->SetPoint(2*ratPts-1-setPoints, x, interp/h->GetBinContent(i)); 
+
+        setPoints++;
+        break;
+      } 
+    }
+  } 
+  if(prediction==0){
+    gStyle->SetHatchesLineWidth(2);
+    gStyle->SetHatchesSpacing(1);
+    rat->SetFillStyle(3335);
+    rat->SetFillColor(kGreen+1);
+    rat->SetLineWidth(0);
+  } 
+  if(prediction==1){
+    gStyle->SetHatchesLineWidth(2);
+    gStyle->SetHatchesSpacing(1);
+    rat->SetFillStyle(3359);
+    rat->SetFillColor(kBlue);
+    rat->SetLineWidth(0);
+  } 
+}
 
 void RAA_plots(){
   TH1::SetDefaultSumw2();
@@ -181,12 +225,13 @@ void RAA_plots(){
   TFile * f = TFile::Open("../output_0.root","read");
   ppSpec = (TH1D*)f->Get("ppScaled_WithFit");
   nVtx = (TH1D*)f->Get("nVtxMoreBin");
+
   for(int c = 0; c<s.nCentBins; c++){
     h[c] = (TH1D*)f->Get(Form("HI_TaaWeighted_%d_%d",s.lowCentBin[c]*5,s.highCentBin[c]*5));
     h[c]->Divide(ppSpec);
     h[c]->Scale(1.0/nVtx->GetBinContent(nVtx->GetXaxis()->FindBin(c)));
     h[c]->SetDirectory(0);
-    h[c]->Print("All");
+    //h[c]->Print("All");
     
     //filling Graph
     if(c!=0 && c!=1 && c!= 23 && c!=24 && c!= 25 && c!=30) continue;
@@ -253,9 +298,48 @@ void RAA_plots(){
   gStyle->SetErrorX(0);
   
 
+  bool isFirstLoop = true;
   for(int c = 0; c<s.nCentBins; c++){
     //plotting
-    canv->Clear();
+    TCanvas* canvTh = new TCanvas("RAATh","RAATh",50,50,W,H*1.25);
+    TPad * pad1 = new TPad("pad1","pad1",0.0,0.2,1.0,1.0,0);
+    TPad * pad2 = new TPad("pad2","pad2",0.0,0.0,1.0,0.2,0);
+    if(!isFirstLoop){
+      canvTh->SetLogx();
+      canvTh->SetFillColor(0);
+      canvTh->SetBorderMode(0);
+      canvTh->SetFrameFillStyle(0);
+      canvTh->SetFrameBorderMode(0);
+      canvTh->SetLeftMargin( L/W );
+      canvTh->SetRightMargin( R/W );
+      canvTh->SetTopMargin( T/(H*1.25) );
+      canvTh->SetBottomMargin( B/(H*1.25) );
+      canvTh->SetTickx(1);
+      canvTh->SetTicky(1);
+     
+      gStyle->SetErrorX(0);
+
+      canvTh->SetLineWidth(0);
+      pad1->SetBottomMargin(0);
+      pad1->SetLogx();
+      pad1->SetLeftMargin(0.15);
+      pad1->SetTopMargin(0.07);
+      pad1->SetBorderSize(0);
+      pad1->Draw();
+      pad2->SetLogx();
+      pad2->SetTopMargin(0);
+      pad2->SetLeftMargin(0.15);
+      pad2->SetBottomMargin(0.4);
+      pad2->SetBorderSize(0);
+      pad2->Draw();
+      pad1->cd();
+    }
+    else{
+      canv->Clear();
+      canv->cd();
+    }
+
+
     h[c]->SetLineColor(kBlack);
     h[c]->SetMarkerStyle(8);
     h[c]->GetXaxis()->SetTitle("p_{T} (GeV)");
@@ -271,6 +355,7 @@ void RAA_plots(){
     h[c]->GetYaxis()->CenterTitle();
     h[c]->GetXaxis()->SetRangeUser(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
     h[c]->GetYaxis()->SetRangeUser(0,1.6);
+    if(!isFirstLoop) h[c]->GetYaxis()->SetRangeUser(0.001,1.6);
     h[c]->SetMarkerSize(1.3);
    
     if(c==25){
@@ -407,9 +492,11 @@ void RAA_plots(){
     canv->Update();
     canv->RedrawAxis();
     canv->GetFrame()->Draw();    
-    canv->SaveAs(Form("img/RAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    canv->SaveAs(Form("img/RAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
-    canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
+    if(isFirstLoop){
+      canv->SaveAs(Form("img/RAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/RAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canv->SaveAs(Form("img/RAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c])); 
+    }
 
     delete leg;
     //stuff with theory
@@ -421,27 +508,120 @@ void RAA_plots(){
     legTh->SetTextSize(0.05);
     h[c]->SetFillColor(kRed-7);
     h[c]->SetFillStyle(1001);
-    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10){
+
+    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10 && !isFirstLoop){
+      float lumiUncert = 0.023;//2.3% for pp lumi
+      float TAAUncert = s.TAAuncert[c]/100.0;
+      float evtSel = evtSelSyst[c]->GetBinContent(2);
+      float totUncert = TMath::Power(lumiUncert*lumiUncert+TAAUncert*TAAUncert+evtSel*evtSel,0.5);
+      TH1D * uncert = (TH1D*)XeXeRAA_totSyst[c]->Clone("histTemp");
+      uncert->Print("All");
+      TH1D * uncert2 = (TH1D*)XeXeRAA_totSyst[c]->Clone("histTemp2");
+      for(int i = 1; i<uncert->GetSize()-1; i++){
+        uncert->SetBinContent(i,1+TMath::Power(TMath::Power(uncert->GetBinContent(i),2)+TMath::Power(totUncert,2)+TMath::Power(h[c]->GetBinError(i),2),0.5));
+        uncert->SetLineWidth(0);
+        uncert->SetFillStyle(1001);
+        uncert->SetFillColor(18);
+        uncert2->SetBinContent(i,1-TMath::Power(TMath::Power(uncert2->GetBinContent(i),2)+TMath::Power(totUncert,2)+TMath::Power(h[c]->GetBinError(i),2),0.5));
+        uncert2->SetLineWidth(0);
+        uncert2->SetFillStyle(1001);
+        uncert2->SetFillColor(10);
+      }
+
+      pad1->cd();
       const int graphPts = 950;
       TGraph * vitev = new TGraph(2*graphPts);
       getTheoryVitev(vitev);
       vitev->Draw("same f");
 
+      TGraph * vitevRatio = new TGraph(2*13);
+      makeThRatio(vitev, vitevRatio, h[c], 0);
+      //vitev->Print("All");
+      h[c]->Print("All");
+      vitevRatio->Print("All");
+     
+
       const int graphPtsCUJET = 180;
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
       getTheoryCUJET(cujet,0);
       cujet->Draw("same f");
+      
+      TGraph * cujetRatio = new TGraph(2*9);
+      makeThRatio(cujet, cujetRatio, h[c], 1);
+      cujetRatio->Print("All");
+      
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->AddEntry(vitev,"SCET_{G}","f");
       legTh->Draw("same");    
       h[c]->Draw("same");     
-  
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+ 
+      pad2->cd();
+      canvTh->SetLogx();
+      vitevRatio->GetXaxis()->SetTickLength(0.12);
+      vitevRatio->GetYaxis()->SetNdivisions(2,2,0,kTRUE);
+      pad2->SetLogx();
+      vitevRatio->SetMinimum(0);
+      vitevRatio->SetMaximum(1.999);
+      vitevRatio->GetXaxis()->SetLimits(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
+      //vitevRatio->GetYaxis()->SetTitle("Theory/Data");
+      vitevRatio->GetXaxis()->SetTitle("p_{T} (GeV)");
+      vitevRatio->GetYaxis()->CenterTitle();
+      vitevRatio->GetXaxis()->CenterTitle();
+      vitevRatio->GetYaxis()->SetTitleSize(0.14);
+      vitevRatio->GetYaxis()->SetTitleOffset(0.3);
+      vitevRatio->GetYaxis()->SetLabelSize(0.23);
+      vitevRatio->GetXaxis()->SetTitleSize(0.2);
+      vitevRatio->GetXaxis()->SetLabelSize(0.18);
+      vitevRatio->GetXaxis()->SetLabelOffset(-0.05);
+      vitevRatio->Draw("Af");
+      uncert->Draw("HIST  same");
+      uncert2->Draw("HIST  same");
+      line1->Draw("same");
+      vitevRatio->Draw("same f");
+      cujetRatio->Draw("same f");
+     
+      canvTh->cd(); 
+      tex->SetTextAngle(90);
+      tex->SetTextSize(0.04);
+      tex->DrawLatexNDC(0.08,0.04,"Theory/Data");    
+      tex->SetTextAngle(0);
+      tex->SetTextSize(0.05);
+      tex->DrawLatexNDC(0.12,0.185,"0");    
+      
+      canvTh->RedrawAxis();
+      pad1->RedrawAxis();  
+      pad2->RedrawAxis();  
+      
+ 
+      CMS_lumi( canvTh, iPeriod, 11 );
+
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      isFirstLoop = true;
+      delete legTh;
+      continue;
     }
-    if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50){
+    if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50 && !isFirstLoop){
+      float lumiUncert = 0.023;//2.3% for pp lumi
+      float TAAUncert = s.TAAuncert[c]/100.0;
+      float evtSel = evtSelSyst[c]->GetBinContent(2);
+      float totUncert = TMath::Power(lumiUncert*lumiUncert+TAAUncert*TAAUncert+evtSel*evtSel,0.5);
+      TH1D * uncert = (TH1D*)XeXeRAA_totSyst[c]->Clone("histTemp");
+      uncert->Print("All");
+      TH1D * uncert2 = (TH1D*)XeXeRAA_totSyst[c]->Clone("histTemp2");
+      for(int i = 1; i<uncert->GetSize()-1; i++){
+        uncert->SetBinContent(i,1+TMath::Power(TMath::Power(uncert->GetBinContent(i),2)+TMath::Power(totUncert,2)+TMath::Power(h[c]->GetBinError(i),2),0.5));
+        uncert->SetLineWidth(0);
+        uncert->SetFillStyle(1001);
+        uncert->SetFillColor(18);
+        uncert2->SetBinContent(i,1-TMath::Power(TMath::Power(uncert2->GetBinContent(i),2)+TMath::Power(totUncert,2)+TMath::Power(h[c]->GetBinError(i),2),0.5));
+        uncert2->SetLineWidth(0);
+        uncert2->SetFillStyle(1001);
+        uncert2->SetFillColor(10);
+      }
+      pad1->cd();
       delete PbPb[3];
       for(int i = 0; i<s.ntrkBins+3; i++) delete bPbPb[i];
       for(int i = 0; i<s.ntrkBins+3; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
@@ -450,13 +630,65 @@ void RAA_plots(){
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
       getTheoryCUJET(cujet,1);
       cujet->Draw("same f");
+      
+      TGraph * cujetRatio = new TGraph(2*9);
+      makeThRatio(cujet, cujetRatio, h[c], 1);
+      cujetRatio->Print("All");
+      
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->Draw("same");    
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
-      canv->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      
+      pad2->cd();
+      canvTh->SetLogx();
+      cujetRatio->GetXaxis()->SetTickLength(0.12);
+      cujetRatio->GetYaxis()->SetNdivisions(2,2,0,kTRUE);
+      cujetRatio->GetYaxis()->CenterTitle();
+      cujetRatio->GetXaxis()->CenterTitle();
+      cujetRatio->GetYaxis()->SetTitleSize(0.14);
+      cujetRatio->GetYaxis()->SetTitleOffset(0.3);
+      cujetRatio->GetYaxis()->SetLabelSize(0.23);
+      cujetRatio->GetXaxis()->SetTitleSize(0.2);
+      cujetRatio->GetXaxis()->SetLabelSize(0.18);
+      cujetRatio->GetXaxis()->SetLabelOffset(-0.05);
+  
+      pad2->SetLogx();
+      cujetRatio->SetMinimum(0);
+      cujetRatio->SetMaximum(1.999);
+      //cujetRatio->GetYaxis()->SetTitle("Theory/Data");
+      cujetRatio->GetXaxis()->SetTitle("p_{T} (GeV)");
+      cujetRatio->GetXaxis()->SetLimits(0.5,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2));
+      cujetRatio->Draw("Af");
+      uncert->Draw("HIST  same");
+      uncert2->Draw("HIST  same");
+      line1->Draw("same");
+      cujetRatio->Draw("same f");
+
+      canvTh->cd(); 
+      tex->SetTextSize(0.04);
+      tex->SetTextAngle(90);
+      tex->DrawLatexNDC(0.08,0.04,"Theory/Data");    
+      tex->SetTextAngle(0);
+      tex->SetTextSize(0.05);
+      tex->DrawLatexNDC(0.12,0.185,"0");    
+
+      canvTh->RedrawAxis();
+      pad1->RedrawAxis();  
+      pad2->RedrawAxis();  
+     
+ 
+      CMS_lumi( canvTh, iPeriod, 11 );
+      
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.png",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.pdf",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
+      isFirstLoop = true;
+      delete legTh;
+      continue;
     }
+    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10 && isFirstLoop){ isFirstLoop = false; c--;}
+    if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50 && isFirstLoop){ isFirstLoop = 0; c--;}
+
     delete legTh;
   }
 
