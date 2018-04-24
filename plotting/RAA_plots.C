@@ -320,6 +320,7 @@ void RAA_plots(){
       gStyle->SetErrorX(0);
 
       canvTh->SetLineWidth(0);
+      pad1->SetRightMargin( R/W );
       pad1->SetBottomMargin(0);
       pad1->SetLogx();
       pad1->SetLeftMargin(0.15);
@@ -327,6 +328,7 @@ void RAA_plots(){
       pad1->SetBorderSize(0);
       pad1->Draw();
       pad2->SetLogx();
+      pad2->SetRightMargin( R/W );
       pad2->SetTopMargin(0);
       pad2->SetLeftMargin(0.15);
       pad2->SetBottomMargin(0.4);
@@ -558,7 +560,7 @@ void RAA_plots(){
  
       pad2->cd();
       canvTh->SetLogx();
-      vitevRatio->GetXaxis()->SetTickLength(0.12);
+      vitevRatio->GetXaxis()->SetTickLength(0.08);
       vitevRatio->GetYaxis()->SetNdivisions(2,2,0,kTRUE);
       pad2->SetLogx();
       vitevRatio->SetMinimum(0);
@@ -580,7 +582,17 @@ void RAA_plots(){
       line1->Draw("same");
       vitevRatio->Draw("same f");
       cujetRatio->Draw("same f");
-     
+    
+      TLegend * legTh3 = new TLegend(0.15,0.75,0.45,0.95);
+      legTh3->SetFillStyle(0);
+      legTh3->SetLineColor(kBlack);
+      legTh3->SetLineWidth(1);
+      legTh3->SetTextFont(42);
+      gStyle->SetLegendBorderSize(1);
+      legTh3->SetTextSize(0.18);
+      legTh3->AddEntry(uncert,"Total data uncertainty","F");
+      legTh3->Draw("same");
+ 
       canvTh->cd(); 
       tex->SetTextAngle(90);
       tex->SetTextSize(0.04);
@@ -641,7 +653,7 @@ void RAA_plots(){
       
       pad2->cd();
       canvTh->SetLogx();
-      cujetRatio->GetXaxis()->SetTickLength(0.12);
+      cujetRatio->GetXaxis()->SetTickLength(0.08);
       cujetRatio->GetYaxis()->SetNdivisions(2,2,0,kTRUE);
       cujetRatio->GetYaxis()->CenterTitle();
       cujetRatio->GetXaxis()->CenterTitle();
@@ -663,6 +675,16 @@ void RAA_plots(){
       uncert2->Draw("HIST  same");
       line1->Draw("same");
       cujetRatio->Draw("same f");
+      
+      TLegend * legTh3 = new TLegend(0.15,0.75,0.45,0.95);
+      legTh3->SetFillStyle(0);
+      legTh3->SetLineColor(kBlack);
+      legTh3->SetLineWidth(1);
+      legTh3->SetTextFont(42);
+      gStyle->SetLegendBorderSize(1);
+      legTh3->SetTextSize(0.18);
+      legTh3->AddEntry(uncert,"Total data uncertainty","F");
+      legTh3->Draw("same");
 
       canvTh->cd(); 
       tex->SetTextSize(0.04);
