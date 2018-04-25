@@ -26,6 +26,36 @@
 #include <fstream>
 #include "../Settings.h"
 
+void getTheoryXinNian(TGraph * xinnian, int cent = 0){
+  //Vitev**********************************************************************************************************
+  float temp_x;
+  float temp_y;
+  vector<float> x;
+  vector<float> y_d;
+  std::string inputFile;
+  if(cent==0) inputFile = "../theory/for_XeXe/RAA_XeXe5440_cen-00-10.dat";
+  if(cent==1) inputFile = "../theory/for_XeXe/RAA_XeXe5440_cen-30-50.dat";
+  ifstream input_file_d(inputFile);
+  //get datai
+  std::cout << "reading theory prediction data" << std::endl;
+  while(!input_file_d.eof()){ 
+    input_file_d>>temp_x;
+    input_file_d>>temp_y;
+    std::cout << temp_x << " " << temp_y << std::endl;
+    x.push_back(temp_x);
+    y_d.push_back(temp_y);
+  }
+  
+  //put data in histograms
+  const int graphPts = 24;
+  //vitev = TGraph(2*graphPts);
+  for (int i=0;i<graphPts;i++) {
+    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
+    xinnian->SetPoint(i,x[i],y_d[i]);
+  }
+  xinnian->SetLineColor(kViolet);
+  xinnian->SetLineWidth(2);
+}
 void getTheoryVitev(TGraph * vitev){
   //Vitev**********************************************************************************************************
   float temp_x;
@@ -115,9 +145,17 @@ void getTheoryCUJET(TGraph * cujet, int cent){
 }
 //***************************************************************************************************8
 
+//0 vitev
+//1 CUJET
+//2 Xin-Nian LBT
 void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
+  int graphPts, ratPts;
   graphPts = g->GetN()/2;
   ratPts = rat->GetN()/2;
+  if(prediction==2){
+    graphPts = g->GetN();
+    ratPts = rat->GetN();
+  }
   
   int setPoints = 0;
 
@@ -134,10 +172,12 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
         rat->SetPoint(setPoints, x, interp/h->GetBinContent(i)); 
 
         //other edge
-        g->GetPoint((2*graphPts-1)-j,xg,yg);
-        g->GetPoint((2*graphPts-1)-(j+1),xg2,yg2);
-        interp = yg+(yg2-yg)*(x-xg)/(xg2-xg);
-        rat->SetPoint(2*ratPts-1-setPoints, x, interp/h->GetBinContent(i)); 
+        if(prediction!=2){
+          g->GetPoint((2*graphPts-1)-j,xg,yg);
+          g->GetPoint((2*graphPts-1)-(j+1),xg2,yg2);
+          interp = yg+(yg2-yg)*(x-xg)/(xg2-xg);
+          rat->SetPoint(2*ratPts-1-setPoints, x, interp/h->GetBinContent(i)); 
+        }
 
         setPoints++;
         break;
@@ -157,6 +197,10 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
     rat->SetFillStyle(3359);
     rat->SetFillColor(kBlue);
     rat->SetLineWidth(0);
+  } 
+  if(prediction==2){
+    rat->SetLineColor(kViolet);
+    rat->SetLineWidth(2);
   } 
 }
 
@@ -542,17 +586,26 @@ void RAA_plots(){
       h[c]->Print("All");
       vitevRatio->Print("All");
      
-
+      const int graphPtsXinNian = 24;
+      TGraph * xinNian = new TGraph(graphPtsXinNian);
+      getTheoryXinNian(xinNian,0);
+      xinNian->Draw("same l");     
+      
+      TGraph * xinNianRatio = new TGraph(9);
+      makeThRatio(xinNian, xinNianRatio, h[c], 2);
+ 
       const int graphPtsCUJET = 180;
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
       getTheoryCUJET(cujet,0);
       cujet->Draw("same f");
-      
+     
+ 
       TGraph * cujetRatio = new TGraph(2*9);
       makeThRatio(cujet, cujetRatio, h[c], 1);
       cujetRatio->Print("All");
       
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
+      legTh->AddEntry(xinNian,"LBT","l");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->AddEntry(vitev,"SCET_{G}","f");
       legTh->Draw("same");    
@@ -582,6 +635,7 @@ void RAA_plots(){
       line1->Draw("same");
       vitevRatio->Draw("same f");
       cujetRatio->Draw("same f");
+      xinNianRatio->Draw("same l");
     
       TLegend * legTh3 = new TLegend(0.15,0.75,0.45,0.95);
       legTh3->SetFillStyle(0);
@@ -638,6 +692,14 @@ void RAA_plots(){
       for(int i = 0; i<s.ntrkBins+3; i++) delete bPbPb[i];
       for(int i = 0; i<s.ntrkBins+3; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
 
+      const int graphPtsXinNian = 24;
+      TGraph * xinNian = new TGraph(graphPtsXinNian);
+      getTheoryXinNian(xinNian,1);
+      xinNian->Draw("same l");     
+      
+      TGraph * xinNianRatio = new TGraph(9);
+      makeThRatio(xinNian, xinNianRatio, h[c], 2);
+      
       const int graphPtsCUJET = 180;
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
       getTheoryCUJET(cujet,1);
@@ -648,6 +710,7 @@ void RAA_plots(){
       cujetRatio->Print("All");
       
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
+      legTh->AddEntry(xinNian,"LBT","l");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->Draw("same");    
       
@@ -675,7 +738,8 @@ void RAA_plots(){
       uncert2->Draw("HIST  same");
       line1->Draw("same");
       cujetRatio->Draw("same f");
-      
+      xinNianRatio->Draw("same l");     
+ 
       TLegend * legTh3 = new TLegend(0.15,0.75,0.45,0.95);
       legTh3->SetFillStyle(0);
       legTh3->SetLineColor(kBlack);
