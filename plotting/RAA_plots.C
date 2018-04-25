@@ -143,6 +143,46 @@ void getTheoryCUJET(TGraph * cujet, int cent){
   cujet->SetFillColor(kBlue);
   cujet->SetLineWidth(0);
 }
+void getTheoryDjor(TGraph * djor, int cent){
+  //Vitev**********************************************************************************************************
+  float temp_x;
+  float temp_y_u, temp_y_d;
+  float temp;
+  vector<float> x;
+  vector<float> y_d;
+  vector<float> y_u;
+  std::string inFile;
+  if(cent==0) inFile = "../theory/Djordjevic/CMS_Xe+Xe_RAA_Bjorken_0_10.txt";
+  if(cent==1) inFile = "../theory/Djordjevic/CMS_Xe+Xe_RAA_Bjorken_30_50.txt";
+  ifstream input_file(inFile);
+  //get datai
+  std::cout << "reading theory prediction data" << std::endl;
+  while(!input_file.eof()){ 
+    input_file>>temp_x;
+    input_file>>temp_y_d;
+    input_file>>temp_y_u;
+    std::cout << temp_x << " " << temp_y_u << " " << temp_y_d << std::endl;
+    x.push_back(temp_x);
+    y_d.push_back(temp_y_d);
+    y_u.push_back(temp_y_u);
+  }
+  std::cout << "done reading " << x.size() << " Points"  << std::endl;
+  
+  //put data in histograms
+  const int graphPts = 16;
+  //vitev = TGraph(2*graphPts);
+  for (int i=0;i<graphPts;i++) {
+    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
+    djor->SetPoint(i,x[i],y_d[i]);
+    djor->SetPoint(graphPts+i,x[graphPts-i-1],y_u[graphPts-i-1]);
+  }
+  gStyle->SetHatchesLineWidth(2);
+  gStyle->SetHatchesSpacing(1);
+  //cujet->SetFillStyle(3013);
+  djor->SetFillStyle(1001);
+  djor->SetFillColor(kCyan);
+  djor->SetLineWidth(0);
+}
 //***************************************************************************************************8
 
 //0 vitev
@@ -201,6 +241,14 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
   if(prediction==2){
     rat->SetLineColor(kViolet);
     rat->SetLineWidth(2);
+  }
+  if(prediction==3){
+    gStyle->SetHatchesLineWidth(2);
+    gStyle->SetHatchesSpacing(1);
+    //cujet->SetFillStyle(3013);
+    rat->SetFillStyle(1001);
+    rat->SetFillColor(kCyan);
+    rat->SetLineWidth(0);
   } 
 }
 
@@ -547,8 +595,8 @@ void RAA_plots(){
     delete leg;
     //stuff with theory
     TLegend * legTh;
-    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10) legTh = new TLegend(0.4,0.7,0.95,0.9);
-    else legTh = new TLegend(0.4,0.7666,0.95,0.9);
+    if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10) legTh = new TLegend(0.4,0.65,0.95,0.9);
+    else legTh = new TLegend(0.4,0.65,0.95,0.9);
     legTh->SetFillStyle(0);
     gStyle->SetLegendBorderSize(0);
     legTh->SetTextSize(0.05);
@@ -575,6 +623,15 @@ void RAA_plots(){
       }
 
       pad1->cd();
+      const int graphPtsDjor = 16;
+      TGraph * Djor = new TGraph(2*graphPtsDjor);
+      getTheoryDjor(Djor,0);
+      Djor->Draw("same f");
+      
+      TGraph * djorRatio = new TGraph(2*11);
+      makeThRatio(Djor, djorRatio, h[c], 3);
+      djorRatio->Print("All");
+      
       const int graphPts = 950;
       TGraph * vitev = new TGraph(2*graphPts);
       getTheoryVitev(vitev);
@@ -604,8 +661,10 @@ void RAA_plots(){
       makeThRatio(cujet, cujetRatio, h[c], 1);
       cujetRatio->Print("All");
       
+      
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       legTh->AddEntry(xinNian,"LBT","l");
+      legTh->AddEntry(Djor,"Djordjevic","f");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->AddEntry(vitev,"SCET_{G}","f");
       legTh->Draw("same");    
@@ -632,6 +691,7 @@ void RAA_plots(){
       vitevRatio->Draw("Af");
       uncert->Draw("HIST  same");
       uncert2->Draw("HIST  same");
+      djorRatio->Draw("same f");
       line1->Draw("same");
       vitevRatio->Draw("same f");
       cujetRatio->Draw("same f");
@@ -691,6 +751,15 @@ void RAA_plots(){
       delete PbPb[3];
       for(int i = 0; i<s.ntrkBins+3; i++) delete bPbPb[i];
       for(int i = 0; i<s.ntrkBins+3; i++) bPbPb[i] = new TBox(0.1,0.1,0.2,0.2); 
+   
+      const int graphPtsDjor = 16;
+      TGraph * Djor = new TGraph(2*graphPtsDjor);
+      getTheoryDjor(Djor,1);
+      Djor->Draw("same f");
+      
+      TGraph * djorRatio = new TGraph(2*11);
+      makeThRatio(Djor, djorRatio, h[c], 3);
+      djorRatio->Print("All");
 
       const int graphPtsXinNian = 24;
       TGraph * xinNian = new TGraph(graphPtsXinNian);
@@ -711,8 +780,11 @@ void RAA_plots(){
       
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       legTh->AddEntry(xinNian,"LBT","l");
+      legTh->AddEntry(Djor,"Djordjevic","f");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
+      legTh->AddEntry((TObject*)0,"","");
       legTh->Draw("same");    
+      h[c]->Draw("same");     
       
       pad2->cd();
       canvTh->SetLogx();
@@ -736,6 +808,7 @@ void RAA_plots(){
       cujetRatio->Draw("Af");
       uncert->Draw("HIST  same");
       uncert2->Draw("HIST  same");
+      djorRatio->Draw("same f");
       line1->Draw("same");
       cujetRatio->Draw("same f");
       xinNianRatio->Draw("same l");     
