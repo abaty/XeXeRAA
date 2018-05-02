@@ -26,6 +26,35 @@
 #include <fstream>
 #include "../Settings.h"
 
+void getTheoryAndres(TGraph * andres){
+  //Vitev**********************************************************************************************************
+  float temp_x;
+  float temp_y;
+  vector<float> x;
+  vector<float> y_d;
+  std::string inputFile;
+  inputFile = "../theory/Andres/raa-XeXe-5.44TeV_PARSED.dat";
+  ifstream input_file_d(inputFile);
+  //get datai
+  std::cout << "reading theory prediction data" << std::endl;
+  while(!input_file_d.eof()){ 
+    input_file_d>>temp_x;
+    input_file_d>>temp_y;
+    std::cout << temp_x << " " << temp_y << std::endl;
+    x.push_back(temp_x);
+    y_d.push_back(temp_y);
+  }
+  
+  //put data in histograms
+  const int graphPts = 10;
+  //vitev = TGraph(2*graphPts);
+  for (int i=0;i<graphPts;i++) {
+    //std::cout << x[i] << " " << y_d[i] << " " << y_u[i] << std::endl;
+    andres->SetPoint(i,x[i],y_d[i]);
+  }
+  andres->SetLineColor(kOrange);
+  andres->SetLineWidth(2);
+}
 void getTheoryXinNian(TGraph * xinnian, int cent = 0){
   //Vitev**********************************************************************************************************
   float temp_x;
@@ -192,7 +221,7 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
   int graphPts, ratPts;
   graphPts = g->GetN()/2;
   ratPts = rat->GetN()/2;
-  if(prediction==2){
+  if(prediction==2 || prediction==4){
     graphPts = g->GetN();
     ratPts = rat->GetN();
   }
@@ -212,7 +241,7 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
         rat->SetPoint(setPoints, x, interp/h->GetBinContent(i)); 
 
         //other edge
-        if(prediction!=2){
+        if(prediction!=2 && prediction!=4){
           g->GetPoint((2*graphPts-1)-j,xg,yg);
           g->GetPoint((2*graphPts-1)-(j+1),xg2,yg2);
           interp = yg+(yg2-yg)*(x-xg)/(xg2-xg);
@@ -250,6 +279,10 @@ void makeThRatio(TGraph * g, TGraph * rat, TH1D * h, int prediction){
     rat->SetFillColor(kCyan);
     rat->SetLineWidth(0);
   } 
+  if(prediction==4){
+    rat->SetLineColor(kOrange);
+    rat->SetLineWidth(2);
+  }
 }
 
 void RAA_plots(){
@@ -471,16 +504,30 @@ void RAA_plots(){
     h[c]->Draw();
 
     
-    float lumiUncert = 0.023;//2.3% for pp lumi
+    float lumiUncert = 0.023;
+    float PbTAAU = 0.0;
+    float PbTAAD = 0.0;
     float TAAUncert = s.TAAuncert[c]/100.0;
     float evtSel = evtSelSyst[c]->GetBinContent(2);
     float totUncert = TMath::Power(lumiUncert*lumiUncert+TAAUncert*TAAUncert+evtSel*evtSel,0.5);
-    bLumi->SetFillColor(kGray);
-    bTAA->SetFillColor(kRed+1);
+    //lumi is PbPb TAA uncert here
+    bLumi->SetFillColor(kBlue);
     bLumi->SetLineWidth(0);
+    bTAA->SetFillColor(kRed+1);
     bTAA->SetLineWidth(0);
     bTAA->DrawBox(0.55,1-totUncert,TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.75)-TMath::Log10(0.55))/2.0),1+totUncert);
-    //bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.75)-TMath::Log10(0.55))/2.0),1-lumiUncert,0.75,1+lumiUncert);
+
+    if(c==0 || c==1 || c== 23 || c==24 || c==25 || c==30 || c==20){
+      int cc = c;
+      if(c==23) cc=2;
+      if(c==24) cc=3;
+      if(c==25) cc=4;
+      if(c==30) cc=5;
+      if(c==20) cc=7;
+      PbTAAD = TMath::Power(0.023*0.023+TMath::Power(PbPb_systTAAD[cc]->GetBinContent(10)/PbPb[cc]->GetBinContent(10),2),0.5);
+      PbTAAU = TMath::Power(0.023*0.023+TMath::Power(PbPb_systTAAU[cc]->GetBinContent(10)/PbPb[cc]->GetBinContent(10),2),0.5);
+      if(isFirstLoop) bLumi->DrawBox(TMath::Power(10,TMath::Log10(0.55)+(TMath::Log10(0.75)-TMath::Log10(0.55))/2.0),1-PbTAAD,0.75,1+PbTAAU);
+    }
       
 
     line1 = new TLine(h[c]->GetXaxis()->GetBinLowEdge(1),1,h[c]->GetXaxis()->GetBinUpEdge(h[c]->GetSize()-2),1);
@@ -493,8 +540,8 @@ void RAA_plots(){
     tex->SetTextFont(42);
     tex->SetTextSize(lumiTextSize*0.095);
     //tex->DrawLatex(0.8,1.04,"XeXe T_{AA} and pp lumi. uncertainty");
-    tex->DrawLatex(0.7,1.04,"Normalization uncertainty");
-    tex->DrawLatex(0.7,0.92,"|#eta| < 1");
+    tex->DrawLatex(0.8,1.04,"Normalization uncertainty");
+    tex->DrawLatex(0.8,0.92,"|#eta| < 1");
   
     for(int i = 1; i< (h[0]->GetSize()-1); i++){
       b[i-1]->SetFillColor(kRed-7);
@@ -535,8 +582,10 @@ void RAA_plots(){
         bPbPb[i-3]->SetLineColor(kBlue);
         bPbPb[i-3]->SetX1(PbPb_syst[0]->GetXaxis()->GetBinLowEdge(i-2));
         bPbPb[i-3]->SetX2(PbPb_syst[0]->GetXaxis()->GetBinUpEdge(i-2));
-        float errU = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAU[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
-        float errD = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAD[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
+        //float errU = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAU[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
+        //float errD = TMath::Power(TMath::Power(PbPb_syst[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systTAAD[cc]->GetBinContent(i-2),2)+TMath::Power(PbPb_systLumi[cc]->GetBinContent(i-2),2),0.5);
+        float errU = PbPb_syst[cc]->GetBinContent(i-2);
+        float errD = PbPb_syst[cc]->GetBinContent(i-2);
         bPbPb[i-3]->SetY1(PbPb[cc]->GetBinContent(i-2)+errU);
         bPbPb[i-3]->SetY2(PbPb[cc]->GetBinContent(i-2)-errD);
         bPbPb[i-3]->Draw("same");
@@ -650,6 +699,14 @@ void RAA_plots(){
       
       TGraph * xinNianRatio = new TGraph(9);
       makeThRatio(xinNian, xinNianRatio, h[c], 2);
+      
+      const int graphPtsAndres = 10;
+      TGraph * andres = new TGraph(graphPtsAndres);
+      getTheoryAndres(andres);
+      andres->Draw("same l");     
+      
+      TGraph * andresRatio = new TGraph(10);
+      makeThRatio(andres, andresRatio, h[c], 4);
  
       const int graphPtsCUJET = 180;
       TGraph * cujet = new TGraph(2*graphPtsCUJET);
@@ -664,6 +721,7 @@ void RAA_plots(){
       
       legTh->AddEntry(h[c],"CMS 5.44 TeV XeXe","plf");
       legTh->AddEntry(xinNian,"LBT","l");
+      legTh->AddEntry(andres,"Andres","l");
       legTh->AddEntry(Djor,"Djordjevic","f");
       legTh->AddEntry(cujet,"CUJET3.1/CIBJET","f");
       legTh->AddEntry(vitev,"SCET_{G}","f");
@@ -695,6 +753,7 @@ void RAA_plots(){
       line1->Draw("same");
       vitevRatio->Draw("same f");
       cujetRatio->Draw("same f");
+      andresRatio->Draw("same l");
       xinNianRatio->Draw("same l");
     
       TLegend * legTh3 = new TLegend(0.15,0.75,0.45,0.95);
@@ -730,6 +789,7 @@ void RAA_plots(){
       continue;
     }
     if(5*s.lowCentBin[c]==30 && 5*s.highCentBin[c] == 50 && !isFirstLoop){
+      delete bLumi;
       float lumiUncert = 0.023;//2.3% for pp lumi
       float TAAUncert = s.TAAuncert[c]/100.0;
       float evtSel = evtSelSyst[c]->GetBinContent(2);
@@ -843,6 +903,8 @@ void RAA_plots(){
       canvTh->SaveAs(Form("img/TheoryRAA_%d_%d.C",5*s.lowCentBin[c],5*s.highCentBin[c]));
       isFirstLoop = true;
       delete legTh;
+
+      bLumi = new TBox(0.1,0.1,0.15,0.2); 
       continue;
     }
     if(5*s.lowCentBin[c]==0 && 5*s.highCentBin[c] == 10 && isFirstLoop){ isFirstLoop = false; c--;}
